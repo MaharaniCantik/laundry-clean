@@ -6,12 +6,49 @@ use App\Http\Controllers\TrackingController;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('welcome');
+
 Route::get('/lacak', [TrackingController::class, 'index'])->name('lacak');
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('welcome');
+// Ini bagian default dari Breeze untuk user yang sudah login (umum)
+Route::get('/dashboard', function () {
+    $role = auth()->user()->role;
+
+    if ($role === 'admin') {
+        return redirect()->route('admin.dashboard');
+    } elseif ($role === 'owner') {
+        return redirect()->route('owner.dashboard');
+    } elseif ($role === 'kurir') {
+        return redirect()->route('kurir.dashboard');
+    }
+
+    return view('dashboard'); // fallback kalau role gak jelas
+})->middleware(['auth', 'verified'])->name('dashboard');
+// --- MULAI BAGIAN MULTI-ROLE KITA ---
+
+// Khusus Admin
+// Khusus Admin
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/admin/dashboard', function () {
+        return view('dashboard'); // <-- Ubah ini supaya pakai tampilan Breeze
+    })->name('admin.dashboard');
+});
+
+// Khusus Owner
+Route::middleware(['auth', 'role:owner'])->group(function () {
+    Route::get('/owner/dashboard', function () {
+        return view('dashboard'); // <-- Ubah ini juga
+    })->name('owner.dashboard');
+});
+
+// Khusus Kurir
+Route::middleware(['auth', 'role:kurir'])->group(function () {
+    Route::get('/kurir/dashboard', function () {
+        return view('dashboard'); // <-- Dan ini juga
+    })->name('kurir.dashboard');
+});
+
+// --- AKHIR BAGIAN MULTI-ROLE ---
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -19,4 +56,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
