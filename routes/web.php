@@ -24,31 +24,44 @@ Route::get('/dashboard', function () {
 
     return view('dashboard'); // fallback kalau role gak jelas
 })->middleware(['auth', 'verified'])->name('dashboard');
-// --- MULAI BAGIAN MULTI-ROLE KITA ---
 
-// Khusus Admin
-// Khusus Admin
+
+// =========================================================================
+// --- MULAI BAGIAN MULTI-ROLE KITA ---
+// =========================================================================
+
+// 1. Khusus Admin
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', function () {
-        return view('dashboard'); // <-- Ubah ini supaya pakai tampilan Breeze
+        return view('dashboard'); // <-- Sementara pakai tampilan default Breeze
     })->name('admin.dashboard');
 });
 
-// Khusus Owner
+// 2. Khusus Owner
 Route::middleware(['auth', 'role:owner'])->group(function () {
     Route::get('/owner/dashboard', function () {
-        return view('dashboard'); // <-- Ubah ini juga
+        return view('dashboard'); // <-- Sementara pakai tampilan default Breeze
     })->name('owner.dashboard');
 });
 
-// Khusus Kurir
+// 3. Khusus Kurir
 Route::middleware(['auth', 'role:kurir'])->group(function () {
     Route::get('/kurir/dashboard', function () {
-        return view('dashboard'); // <-- Dan ini juga
+        return view('dashboard'); // <-- Sementara pakai tampilan default Breeze
     })->name('kurir.dashboard');
 });
 
+// 4. Khusus Customer / User Biasa (INI YANG BARU KITA TAMBAHKAN)
+Route::middleware(['auth', 'role:user'])->group(function () {
+    Route::get('/customer/dashboard', function () {
+        return view('dashboard'); // <-- Sementara pakai tampilan default Breeze juga
+    })->name('customer.dashboard');
+});
+
+// =========================================================================
 // --- AKHIR BAGIAN MULTI-ROLE ---
+// =========================================================================
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -39,9 +39,8 @@ class AuthenticatedSessionController extends Controller
             return redirect()->intended(route('kurir.dashboard'));
         }
 
-        // Default jika role tidak dikenali
-        return redirect()->intended(route('dashboard'));
-        // --- AKHIR LOGIKA REDIRECT CUSTOM ---
+        // Jalur cadangan jika tidak masuk ke role mana pun
+        return redirect()->intended('/');
     }
 
     /**
