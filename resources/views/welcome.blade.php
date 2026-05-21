@@ -139,32 +139,44 @@
           Layanan cepat, bersih, dan terpercaya langsung ke depan pintumu.
         </p>
         <div class="flex flex-col sm:flex-row gap-3 justify-center md:justify-start animate-fadeUp4">
-          <button class="bg-orange text-white font-bold text-base px-8 py-4 rounded-full shadow-lg hover:bg-orangeHot hover:scale-105 transition-all duration-300 hover:shadow-orange/40 hover:shadow-xl">
-            🧺 Laundry Sekarang
-          </button>
-          <button class="border-2 border-purple text-purple font-semibold text-base px-8 py-4 rounded-full hover:bg-purple hover:text-white hover:scale-105 transition-all duration-300">
+          <div class="relative inline-block text-left w-full sm:w-auto z-50">
+            
+            <button id="tombol-dropdown" class="w-full sm:w-auto flex items-center justify-center gap-2 bg-orange text-white font-bold text-base px-8 py-4 rounded-full shadow-lg hover:bg-orangeHot hover:scale-105 transition-all duration-300 hover:shadow-orange/40 hover:shadow-xl">
+              🧺 Laundry Sekarang
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+
+            <div id="isi-dropdown" class="hidden absolute left-0 bottom-full mb-2 w-48 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
+              <a href="#" class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50">Laundry Kiloan</a>
+              <a href="#" class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50">Setrika</a>
+            </div>
+          </div>
+          <a href="{{ url('/#layanan') }}" class="w-full sm:w-auto text-center border-2 border-purple text-purple font-semibold text-base px-8 py-4 rounded-full hover:bg-purple hover:text-white hover:scale-105 transition-all duration-300">
             Lihat Layanan
-          </button>
+          </a>
+          
         </div>
-        <!-- Stats row -->
-        <div class="mt-10 flex gap-8 justify-center md:justify-start animate-fadeUp4">
-          <div class="text-center">
-            <p class="text-2xl font-black text-purple">5.000+</p>
-            <p class="text-xs text-gray-400 font-medium">Pelanggan Puas</p>
+              <!-- Stats row -->
+              <div class="mt-10 flex gap-8 justify-center md:justify-start animate-fadeUp4">
+                  <div class="text-center">
+                    <p class="text-2xl font-black text-purple">5.000+</p>
+                    <p class="text-xs text-gray-400 font-medium">Pelanggan Puas</p>
+                  </div>
+                  <div class="w-px bg-gray-200"></div>
+                  <div class="text-center">
+                    <p class="text-2xl font-black text-purple">24 Jam</p>
+                    <p class="text-xs text-gray-400 font-medium">Layanan Express</p>
+                  </div>
+                  <div class="w-px bg-gray-200"></div>
+                  <div class="text-center">
+                    <p class="text-2xl font-black text-purple">4.9 ⭐</p>
+                    <p class="text-xs text-gray-400 font-medium">Rating Google</p>
+                  </div>
+                </div>
+            </div>
           </div>
-          <div class="w-px bg-gray-200"></div>
-          <div class="text-center">
-            <p class="text-2xl font-black text-purple">24 Jam</p>
-            <p class="text-xs text-gray-400 font-medium">Layanan Express</p>
-          </div>
-          <div class="w-px bg-gray-200"></div>
-          <div class="text-center">
-            <p class="text-2xl font-black text-purple">4.9 ⭐</p>
-            <p class="text-xs text-gray-400 font-medium">Rating Google</p>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <!-- Wave divider -->
     <div id="tentang-kami"class="absolute bottom-0 left-0 right-0">
@@ -242,20 +254,27 @@
       <div class="grid grid-cols-2 md:grid-cols-3 gap-5">
 
         <!-- Service 1: Laundry Kiloan -->
-        <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col">
+       <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col">
           <div class="h-36 overflow-hidden">
-            <img src="https://i.pinimg.com/736x/de/ce/55/dece553f16399e7ae1c593451c08fe10.jpg" alt="Laundry Kiloan" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"/>
+              <img src="https://i.pinimg.com/736x/de/ce/55/dece553f16399e7ae1c593451c08fe10.jpg" alt="Laundry Kiloan" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"/>
           </div>
           <div class="p-4 flex flex-col flex-1">
-            <p class="font-bold text-purple text-sm mb-1">Laundry Kiloan</p>
-            <p class="text-gray-400 text-xs mb-3 flex-1">Cocok untuk cucian harian rumah tangga</p>
-            <button class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
-              <span>Mulai dari Rp 5.000</span>
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            </button>
+              <p class="font-bold text-purple text-sm mb-1">Laundry Kiloan</p>
+              <p class="text-gray-400 text-xs mb-3 flex-1">Cocok untuk cucian harian rumah tangga</p>
+              
+              @auth
+                  <a href="{{ route('order.kiloan') }}" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
+                      <span>Mulai dari Rp 5.000</span>
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                  </a>
+              @else
+                  <button @click="showLogin = true" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
+                      <span>Mulai dari Rp 5.000</span>
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                  </button>
+              @endauth
           </div>
-        </div>
-
+      </div>
         <!-- Service 2: Laundry Permadani/Karpet -->
         <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col">
           <div class="h-36 overflow-hidden">
@@ -264,10 +283,17 @@
           <div class="p-4 flex flex-col flex-1">
             <p class="font-bold text-purple text-sm mb-1">Laundry Permadani</p>
             <p class="text-gray-400 text-xs mb-3 flex-1">Karpet & permadani bersih sempurna</p>
-            <button class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
-              <span>Mulai dari Rp 15.000</span>
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            </button>
+              @auth
+                  <a href="{{ route('order.permadani') }}" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
+                      <span>Mulai dari Rp 15.000</span>
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                  </a>
+              @else
+                  <button @click="showLogin = true" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
+                      <span>Mulai dari Rp 15.000</span>
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                  </button>
+              @endauth
           </div>
         </div>
 
@@ -279,10 +305,18 @@
           <div class="p-4 flex flex-col flex-1">
             <p class="font-bold text-purple text-sm mb-1">Setrika</p>
             <p class="text-gray-400 text-xs mb-3 flex-1">Pakaian rapi tanpa kerutan</p>
-            <button class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
-              <span>Mulai dari Rp 5.000</span>
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            </button>
+             
+              @auth
+                  <a href="{{ route('order.setrika') }}" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
+                      <span>Mulai dari Rp 5.000</span>
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                  </a>
+              @else
+                  <button @click="showLogin = true" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
+                      <span>Mulai dari Rp 5.000</span>
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                  </button>
+              @endauth
           </div>
         </div>
 
@@ -294,10 +328,18 @@
           <div class="p-4 flex flex-col flex-1">
             <p class="font-bold text-purple text-sm mb-1">Laundry Boneka</p>
             <p class="text-gray-400 text-xs mb-3 flex-1">Boneka kesayangan bersih & wangi</p>
-            <button class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
-              <span>Mulai dari Rp 25.000</span>
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            </button>
+             
+              @auth
+                  <a href="{{ route('order.boneka') }}" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
+                      <span>Mulai dari Rp 25.000</span>
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                  </a>
+              @else
+                  <button @click="showLogin = true" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
+                      <span>Mulai dari Rp 25.000</span>
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                  </button>
+              @endauth
           </div>
         </div>
 
@@ -309,10 +351,18 @@
           <div class="p-4 flex flex-col flex-1">
             <p class="font-bold text-purple text-sm mb-1">Laundry Gorden</p>
             <p class="text-gray-400 text-xs mb-3 flex-1">Gorden bersih & bebas debu</p>
-            <button class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
-              <span>Mulai dari Rp 20.000</span>
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            </button>
+            
+              @auth
+                  <a href="{{ route('order.gorden') }}" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
+                      <span>Mulai dari Rp 35.000</span>
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                  </a>
+              @else
+                  <button @click="showLogin = true" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
+                      <span>Mulai dari Rp 35.000</span>
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                  </button>
+              @endauth
           </div>
         </div>
 
@@ -324,10 +374,18 @@
           <div class="p-4 flex flex-col flex-1">
             <p class="font-bold text-purple text-sm mb-1">Laundry Bedcover</p>
             <p class="text-gray-400 text-xs mb-3 flex-1">Sprei & bedcover harum bersih</p>
-            <button class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
-              <span>Mulai dari Rp 20.000</span>
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            </button>
+             
+              @auth
+                  <a href="{{ route('order.bedcover') }}" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
+                      <span>Mulai dari Rp 25.000</span>
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                  </a>
+              @else
+                  <button @click="showLogin = true" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
+                      <span>Mulai dari Rp 25.000</span>
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                  </button>
+              @endauth
           </div>
         </div>
 
@@ -342,10 +400,18 @@
           <div class="p-4 flex flex-col flex-1">
             <p class="font-bold text-purple text-sm mb-1">Laundry Sepatu</p>
             <p class="text-gray-400 text-xs mb-3 flex-1">Sepatu kinclong seperti baru lagi</p>
-            <button class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
-              <span>Mulai dari Rp 22.000</span>
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            </button>
+             
+              @auth
+                  <a href="{{ route('order.sepatu') }}" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
+                      <span>Mulai dari Rp 20.000</span>
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                  </a>
+              @else
+                  <button @click="showLogin = true" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
+                      <span>Mulai dari Rp 20.000</span>
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                  </button>
+              @endauth
           </div>
         </div>
       </div>
@@ -620,6 +686,23 @@
         
         setTimeout(() => {
             successMessage.classList.add('hidden');
-        }, 5000);
+        }, 5000); 
     }
+
+    const tombolDropdown = document.getElementById('tombol-dropdown');
+    const isiDropdown = document.getElementById('isi-dropdown');
+
+    // Ketika tombol diklik, tambah/hapus class 'hidden' pada isi dropdown
+    tombolDropdown.addEventListener('click', function(event) {
+      isiDropdown.classList.toggle('hidden');
+      // Mencegah klik tombol menutup dropdown seketika (event bubbling)
+      event.stopPropagation(); 
+    });
+
+    // Jika user klik di luar dropdown, menu otomatis tertutup
+    document.addEventListener('click', function(event) {
+      if (!tombolDropdown.contains(event.target) && !isiDropdown.contains(event.target)) {
+        isiDropdown.classList.add('hidden');
+      }
+    });
 </script>

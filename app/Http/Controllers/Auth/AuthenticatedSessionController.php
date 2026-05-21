@@ -41,6 +41,9 @@ class AuthenticatedSessionController extends Controller
 
         // Jalur cadangan jika tidak masuk ke role mana pun
         return redirect()->intended('/');
+        // Default jika role tidak dikenali
+        return redirect()->intended('/');    
+        // --- AKHIR LOGIKA REDIRECT CUSTOM ---
     }
 
     /**
