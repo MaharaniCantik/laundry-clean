@@ -93,9 +93,8 @@
 </head>
 
 
-<body x-data="{ showLogin: false, showRegister: false }" class="antialiased bg-skyBg text-gray-700 overflow-x-hidden">
+<body x-data="{ showLogin: {{ request()->get('openLoginModal') ? 'true' : 'false' }}, showRegister: false }" class="antialiased bg-skyBg text-gray-700 overflow-x-hidden">
   @include('partials.navbar')
-
   <!-- ░░░ HERO ░░░ -->
   <header class="relative bg-skyBg min-h-screen flex items-center overflow-hidden px-6 md:px-16 lg:px-24 py-20">
 
