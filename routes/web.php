@@ -25,10 +25,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/orders/gorden', [OrderController::class, 'gorden'])->name('order.gorden');
     Route::get('/orders/bedcover', [OrderController::class, 'bedcover'])->name('order.bedcover');
     Route::get('/orders/sepatu', [OrderController::class, 'sepatu'])->name('order.sepatu');
+    Route::any('/order/service', [OrderController::class, 'showService'])->name('order.service'); 
 
     Route::get('/order/checkout/{layanan}', [OrderController::class, 'checkout'])->name('order.checkout');
     Route::post('/order/store', [OrderController::class, 'store'])->name('order.store');
     Route::post('/order/confirm', [OrderController::class, 'confirm'])->name('order.confirm');
+    Route::get('/order/history', [OrderController::class, 'history'])->name('order.history');
 });
 
 // ==========================================

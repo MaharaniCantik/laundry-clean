@@ -1,46 +1,26 @@
+@php
+    // Bank Data Jangkauan Wilayah CuciYuk (Simulasi Area Tangerang)
+    $kecamatanTangerang = [
+        'Batuceper'   => 9,
+        'Ciledug'     => 12,
+        'Cibodas'     => 5,
+        'Pondok Aren' => 7.5,
+        'Jatiuwung'   => 4,
+        'Karawaci'    => 1, 
+        'Balaraja'    => 25.0, 
+    ];
+@endphp
+
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <x-app-layout>
     <div class="min-h-screen bg-gradient-to-br from-[#7ec8ea] to-[#d4effa] py-8 px-4 md:px-8 font-sans">
         <div class="max-w-5xl mx-auto">
 
-            {{-- ==========================================
-                 STEPPER (Sesuai Desain Figma)
-                 ========================================== --}}
-            <div class="relative flex justify-between items-center w-full max-w-3xl mx-auto mb-10 pt-6">
-                <div class="absolute top-[52px] left-0 w-full h-[2px] bg-[#E27D18] -z-10"></div>
+            {{-- STEPBAR --}}
+            @include('partials.step-bar')
 
-                <div class="flex flex-col items-center w-1/3">
-                    <div class="w-14 h-14 rounded-full bg-[#F6921E] flex items-center justify-center shadow-md text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-                        </svg>
-                    </div>
-                    <span class="mt-3 text-[#0085C9] font-bold text-xs md:text-sm">Informasi Pemesanan</span>
-                </div>
-
-                <div class="flex flex-col items-center w-1/3">
-                    <div class="w-14 h-14 rounded-full bg-[#F6921E]/40 flex items-center justify-center shadow-md text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                        </svg>
-                    </div>
-                    <span class="mt-3 text-gray-500 font-semibold text-xs md:text-sm">Layanan</span>
-                </div>
-
-                <div class="flex flex-col items-center w-1/3">
-                    <div class="w-14 h-14 rounded-full bg-[#F6921E]/40 flex items-center justify-center shadow-md text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
-                        </svg>
-                    </div>
-                    <span class="mt-3 text-gray-500 font-semibold text-xs md:text-sm">Laporan</span>
-                </div>
-            </div>
-
-            {{-- ==========================================
-                 FORM CARD UTAMA (Sesuai Layout Figma)
-                 ========================================== --}}
-            <form action="{{ route('order.store') }}" method="POST" class="bg-white rounded-[24px] shadow-xl p-6 md:p-10 mb-10">
+            {{-- FORM CARD UTAMA --}}
+            <form action="{{ route('order.service') }}" method="POST" class="bg-white rounded-[24px] shadow-xl p-6 md:p-10 mb-10">
                 @csrf
 
                 <input type="hidden" name="jenis_layanan" value="{{ $layanan }}">
@@ -91,14 +71,31 @@
                             </div>
                         </div>
 
-                        <div class="mt-4">
-                            <label class="block text-xs font-semibold text-gray-700 mb-1">Alamat Lengkap Konfirmasi</label>
-                            <input type="text" name="address" id="real-address" class="w-full border border-[#F6921E]/50 rounded-full px-4 py-2 focus:ring-2 focus:ring-[#F6921E] outline-none" placeholder="Alamat Anda akan muncul otomatis setelah pin peta digeser" required>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 font-semibold text-sm mb-1.5">Alamat Lengkap Konfirmasi</label>
+                            <input type="text" name="alamat_lengkap" id="real-address" value="Jalan Aria Santika, Pabuaran, Karawaci, Tangerang, Banten," class="w-full rounded-xl border-gray-300 p-3 text-sm bg-gray-50 text-gray-700 focus:ring-[#0085C9] focus:border-[#0085C9]">
                         </div>
 
-                        <div class="mt-4">
-                            <label class="block text-xs font-semibold text-gray-700 mb-1">Nama Lengkap</label>
-                            <input type="text" name="nama_lengkap" class="w-full border border-[#F6921E]/50 rounded-full px-4 py-2 focus:ring-2 focus:ring-[#F6921E] outline-none" required>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 font-semibold text-sm mb-1.5">Kecamatan (Untuk Hitung Ongkir)</label>
+                            <div class="relative">
+                                <select name="kecamatan_ongkir" id="select_kecamatan" required class="w-full rounded-xl border-gray-300 p-3 text-sm text-gray-700 focus:ring-[#0085C9] focus:border-[#0085C9] bg-white shadow-sm appearance-none cursor-pointer">
+                                    <option value="" disabled selected>-- Pilih Kecamatan Rumah Anda --</option>
+                                    @foreach($kecamatanTangerang as $namaKecamatan => $jarak)
+                                        <option value="{{ $jarak }}">
+                                            Kecamatan {{ $namaKecamatan }} ({{ $jarak }} Km)
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                                    <i class="fa-solid fa-chevron-down text-xs"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-gray-700 font-semibold text-sm mb-1.5">Nama Lengkap</label>
+                            <input type="text" name="nama_pelanggan" value="pelanggan" class="w-full rounded-xl border-gray-300 p-3 text-sm focus:ring-[#0085C9] focus:border-[#0085C9]">
                         </div>
 
                         <div class="mt-4">
@@ -145,7 +142,6 @@
                         <div class="hidden md:block absolute bottom-0 -left-[1px] h-24 w-[1px] bg-[#F6921E]"></div>
                     </div>
                 </div>
-
                 <div class="mt-8 flex justify-end">
                     <button type="submit" class="bg-[#F6921E] hover:bg-orange-600 text-white font-bold py-2.5 px-8 rounded-full shadow-md transition-transform hover:scale-105 text-sm">
                         Lanjut ke Layanan →
@@ -159,42 +155,34 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <script>
-    // 1. KOORDINAT OUTLET LAUNDRY ACUAN (Tetap dikunci untuk titik ukur)
+    // 1. KOORDINAT OUTLET LAUNDRY ACUAN
     const koordinatOutlet = L.latLng(-6.5971, 106.7986);
-
-    // 2. Inisialisasi Peta - Fokus awal di sekitar area outlet
     const map = L.map('map').setView(koordinatOutlet, 13);
 
-    // 3. Load gambar peta dari OpenStreetMap
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
-    // 4. Tambahkan Pin (Marker) yang BISA DIGESER
     const marker = L.marker(koordinatOutlet, {
         draggable: true
     }).addTo(map);
 
-    // FUNGSI UTAMA: Menghitung Jarak murni secara matematika (Sangat Cepat & Anti-Gagal)
     function kalkulasiDanSimpanJarak(posisiPin) {
         try {
             var jarakMeter = map.distance(posisiPin, koordinatOutlet);
-            var jarakKm = (jarakMeter / 1000).toFixed(1); // Mengubah ke satuan KM murni
+            var jarakKm = (jarakMeter / 1000).toFixed(1);
 
             var inputJarak = document.getElementById('jarak_km');
             if (inputJarak) {
                 inputJarak.value = jarakKm;
-                console.log("Sistem Logistik: Jarak sukses diperbarui -> " + jarakKm + " Km");
+                console.log("Jarak sukses diperbarui via Peta -> " + jarakKm + " Km");
             }
         } catch (error) {
             console.error("Gagal menghitung jarak: ", error);
         }
     }
 
-    // FUNGSI PEMBANTU: Mencari teks nama jalan (Reverse Geocoding)
     function updateAlamatDariKoordinat(lat, lng) {
         fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
             .then(response => response.json())
@@ -204,26 +192,32 @@
                     var realInput = document.getElementById('real-address');
                     
                     if (searchInput) searchInput.value = data.display_name;
-                    if (realInput) realInput.value = data.display_name;
+                    if (realInput) realInput.value = data.display_name; // Sekarang udah gak error!
                 }
             })
-            .catch(err => console.error("OSM Nominatim Timeout/Error: ", err));
+            .catch(err => console.error(err));
     }
 
-    // 5. EVENT UTAMA: Ketika PIN selesai digeser oleh user
     marker.on('dragend', function(e) {
         var position = marker.getLatLng(); 
-        marker.setLatLng(position, { draggable: true });
-
-        // 🔥 KUNCI PERBAIKAN: Hitung jarak WAJIB dijalankan paling pertama murni di browser!
-        // Tanpa menunggu jaringan internet / API alamat luar merespons.
         kalkulasiDanSimpanJarak(position);
-
-        // Baru setelah jarak aman, kita cari nama jalannya di latar belakang
         updateAlamatDariKoordinat(position.lat, position.lng);
     });
 
-    // 6. FITUR PENCARIAN ALAMAT MANUAL VIA KETIK ENTER
+    // FIX 4: Jembatan Otomatis! Kalau User milih Dropdown Kecamatan, nilai jarak_km ikut terupdate otomatis!
+    const selectKecamatan = document.getElementById('select_kecamatan');
+    if(selectKecamatan) {
+        selectKecamatan.addEventListener('change', function() {
+            var jarakDariDropdown = this.value;
+            var inputJarak = document.getElementById('jarak_km');
+            if(inputJarak) {
+                inputJarak.value = jarakDariDropdown;
+                console.log("Jarak sukses diperbarui via Dropdown -> " + jarakDariDropdown + " Km");
+            }
+        });
+    }
+
+    // PENCARIAN MANUAL VIA ENTER
     const searchInput = document.getElementById('search-address');
     if (searchInput) {
         searchInput.addEventListener('keypress', function(e) {
@@ -246,38 +240,34 @@
                             var realAddressInput = document.getElementById('real-address');
                             if (realAddressInput) realAddressInput.value = data[0].display_name;
 
-                            // Hitung jarak murni dari hasil pencarian manual
                             kalkulasiDanSimpanJarak(posisiBaru);
                         } else {
-                            alert("Lokasi tidak ditemukan, coba masukkan nama jalan yang lebih spesifik!");
+                            alert("Lokasi tidak ditemukan!");
                         }
                     })
                     .catch(err => console.error(err));
-        }
-    });
+            }
+        });
     }
 
-    // Jalankan hitungan awal pertama kali saat halaman dibuka (Default: 0 Km karena pin nempel di outlet)
     kalkulasiDanSimpanJarak(marker.getLatLng());
 
-
-    // --- SCRIPT LOGIKA PLACEHOLDER KATEGORI ALAMAT (BAWAAN) ---
+    // SCRIPT PLACEHOLDER KATEGORI
     const kategoriRadios = document.querySelectorAll('input[name="kategori_alamat"]');
     const instruksiTextArea = document.getElementById('instruksi-alamat');
     const labelTambahan = document.getElementById('label-tambahan');
 
     const placeholders = {
-        'Rumah': 'Contoh: Pagar warna hitam, depan warung Madura, atau nomor rumah.',
-        'Kost': 'Contoh: Kost Green House, Kamar 2B, Lantai 2.',
-        'Apartement': 'Contoh: Tower Aurora, Lantai 15, No. Unit 1502.',
-        'Hotel': 'Contoh: Kamar 304, atas nama reservasi Ahmad Fauzi.'
+        'Rumah': 'Contoh: Pagar warna hitam, depan warung Madura.',
+        'Kost': 'Contoh: Kost Green House, Kamar 2B.',
+        'Apartement': 'Contoh: Tower Aurora, Lantai 15.',
+        'Hotel': 'Contoh: Kamar 304, atas nama Ahmad.'
     };
 
     kategoriRadios.forEach(radio => {
         radio.addEventListener('change', function() {
             const pilihan = this.value;
             if (instruksiTextArea) instruksiTextArea.placeholder = placeholders[pilihan];
-
             if (pilihan !== 'Rumah') {
                 if (labelTambahan) {
                     labelTambahan.innerText = `(Wajib isi No. Kamar / Tower / Unit)`;
