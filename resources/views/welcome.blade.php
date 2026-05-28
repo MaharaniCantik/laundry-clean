@@ -285,12 +285,12 @@
             <p class="text-gray-400 text-xs mb-3 flex-1">Karpet & permadani bersih sempurna</p>
               @auth
                   <a href="{{ route('order.permadani') }}" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
-                      <span>Mulai dari Rp 15.000</span>
+                      <span>Mulai dari Rp 45.000</span>
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                   </a>
               @else
                   <button @click="showLogin = true" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
-                      <span>Mulai dari Rp 15.000</span>
+                      <span>Mulai dari Rp 45.000</span>
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                   </button>
               @endauth
