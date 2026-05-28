@@ -28,20 +28,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        // --- MULAI LOGIKA REDIRECT CUSTOM ---
-        $user = auth()->user();
-
-        if ($user->role === 'admin') {
-            return redirect()->intended(route('admin.dashboard'));
-        } elseif ($user->role === 'owner') {
-            return redirect()->intended(route('owner.dashboard'));
-        } elseif ($user->role === 'kurir') {
-            return redirect()->intended(route('kurir.dashboard'));
-        }
-
-        // Default jika role tidak dikenali
-        return redirect()->intended('/');    
-        // --- AKHIR LOGIKA REDIRECT CUSTOM ---
+        // Jalur cadangan jika tidak masuk ke role mana pun
+        return redirect('/');
     }
 
     /**
