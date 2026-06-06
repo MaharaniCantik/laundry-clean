@@ -21,18 +21,18 @@ class OrderController extends Controller
     }
 
     /**
-     * Step 2: Menerima data dari Checkout, Hitung Ongkir, & Tampilkan Halaman Timbangan
+     * Step 2: Menerima data dari Checkout, Hitung Ongkir Berdasarkan Jarak, & Tampilkan Halaman Timbangan/Layanan
      */
-   public function showService(Request $request)
+    public function showService(Request $request)
     {
-        // 1. Tangkap data dari Step 1 dengan nama input yang BENAR
-        $namaUser = $request->input('nama_pelanggan'); 
+        $namaUser = auth()->user()->name; 
         $alamatUser = $request->input('alamat_lengkap');
+        $layanan = $request->input('layanan_utama', 'kiloan'); 
         
-        // Ambil jarak (pastikan nama inputnya sesuai dengan yang ada di select kecamatan lo, misal 'jarak_km')
+        // Menangkap input jarak dari maps javascript (default 1.2 Km)
         $jarakTampil = (float) $request->input('jarak_km', 1.2); 
 
-        // 2. Logika Hitung Ongkir Otomatis (Pindahan dari Blade lo)
+        // LOGIKA HITUNG ONGKIR OTOMATIS
         if ($jarakTampil > 0 && $jarakTampil <= 5.0) {
             $ongkir = 0;
             $statusOngkirText = 'Gratis Ongkir (0-5 Km)';
@@ -51,61 +51,68 @@ class OrderController extends Controller
             $badgeClass = 'bg-red-100 text-red-700 border-red-200';
         }
 
-        // 3. Lempar semua variabel ini ke view biar tinggal dipake bersih
         return view('orders.service', compact(
             'namaUser', 
             'alamatUser', 
+            'layanan',
             'jarakTampil', 
             'ongkir', 
             'statusOngkirText', 
             'badgeClass'
         ));
-    }       
+    }      
 
     /**
-     * Step 3: Eksekutor Final - Simpan Data ke Tabel Orders Supabase
+     * Step 3: Eksekutor Final - Simpan Data Orderan Awal Berdasarkan Estimasi Pelanggan
      */
     public function store(Request $request)
     {
-        // 1. Validasi input wajib dari halaman service/timbangan
         $request->validate([
-            'nama_pelanggan'    => 'required',
             'alamat_lengkap'    => 'required',
-            'berat_laundry'     => 'required|numeric|min:1',
+            'berat_laundry'     => 'required|numeric|min:1', // Input estimasi dari pelanggan di halaman service
+            'tipe_durasi'       => 'required|in:reguler,express', // Ditambahkan agar menangkap pilihan paket
             'metode_pembayaran' => 'required',
         ]);
 
         try {
-            $hargaPerKg = 8000;
-            $berat      = (float) $request->input('berat_laundry', 1);
+            $beratInput = (float) $request->input('berat_laundry', 1);
             $ongkir     = (float) $request->input('ongkos_kirim', 0);
+            $jarak      = (float) $request->input('jarak_km', 0);
+            $tipeDurasi = $request->input('tipe_durasi', 'reguler');
 
-            // 2. Tembak data langsung ke tabel orders Supabase sesuai skema valid asli lo
+            // Set harga per kg berdasarkan paket durasi yang dipilih pelanggan
+            $hargaPerKg = ($tipeDurasi == 'express') ? 9000 : 5000; 
+            
+            // Hitung rumus estimasi harga awal
+            $estimasiHarga = ($beratInput * $hargaPerKg) + $ongkir;
+
+            // Masukkan data ke tabel orders Supabase
             $orderId = DB::table('orders')->insertGetId([
-                'user_id'           => auth()->check() ? auth()->id() : null,
-                'nama_pelanggan'    => $request->input('nama_pelanggan'),
+                'user_id'             => auth()->id(), 
+                'nama_pelanggan'      => auth()->user()->name, 
                 'alamat_lengkap'      => $request->input('alamat_lengkap'),
-                'jarak_km'            => (float) $request->input('jarak_km', 0),
+                'jarak_km'            => $jarak,
                 'ongkos_kirim'        => $ongkir,
-                'berat_laundry'       => $berat,
+                'tipe_durasi'         => $tipeDurasi,       // Kolom baru Supabase
+                'berat_laundry'       => $beratInput,       
+                'total_harga'         => $estimasiHarga,    // Kolom baru Supabase
                 'metode_pembayaran'   => $request->input('metode_pembayaran'),
                 'instruksi_pencucian' => $request->input('instruksi_pencucian'),
-                'status'              => 'Pending Penjemputan', // Default status non-null
+                'status'              => 'Pending Penjemputan', 
                 'created_at'          => now(),
                 'updated_at'          => now(),
             ]);
 
-            // 3. Alihkan ke halaman riwayat/laporan pencucian dengan flash message sukses
             return redirect()->route('order.history')->with([
                 'success' => 'Orderan berhasil disimpan ke Supabase!',
                 'order_data' => (object) [
                     'id'                => $orderId,
-                    'nama_pelanggan'    => $request->input('nama_pelanggan'),
+                    'nama_pelanggan'    => auth()->user()->name,
                     'metode_pembayaran' => $request->input('metode_pembayaran'),
                     'status'            => 'Pending Penjemputan',
-                    'berat_laundry'     => $berat,
+                    'berat_laundry'     => $beratInput,
                     'ongkos_kirim'      => $ongkir,
-                    'jarak_km'          => (float) $request->input('jarak_km', 0),
+                    'jarak_km'          => $jarak,
                     'alamat_lengkap'    => $request->input('alamat_lengkap'),
                     'created_at'        => now()
                 ]
@@ -116,32 +123,66 @@ class OrderController extends Controller
     }
 
     /**
+     * Step 4: [FITUR DASHBOARD ADMIN] - Update Berat Asli & Hitung Otomatis Harga Final
+     */
+    public function updateTimbangan(Request $request, $id)
+    {
+        $request->validate([
+            'berat_asli' => 'required|numeric|min:0.1', 
+        ]);
+
+        try {
+            $order = DB::table('orders')->where('id', $id)->first();
+
+            if (!$order) {
+                return back()->with('error', 'Orderan tidak ditemukan.');
+            }
+
+            // Hitung harga otomatis berdasarkan tipe durasi pesanan asli
+            $hargaPerKg = ($order->tipe_durasi == 'express') ? 9000 : 5000;
+            $beratReal = (float) $request->input('berat_asli');
+
+            $totalHargaFix = ($beratReal * $hargaPerKg) + $order->ongkos_kirim;
+
+            // Update data fix timbangan toko ke Supabase
+            DB::table('orders')->where('id', $id)->update([
+                'berat_laundry' => $beratReal,     
+                'total_harga'   => $totalHargaFix, 
+                'status'        => 'Sedang Diproses', 
+                'updated_at'    => now(),
+            ]);
+
+            return back()->with('success', 'Berat asli berhasil diperbarui! Harga dihitung otomatis oleh sistem.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal mengupdate data timbangan: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Menampilkan Halaman Riwayat / Laporan Pencucian
      */
     public function history()
     {
-        // Ambil data kiriman dari session flash store tadi
         $order = session('order_data');
 
-        // Kalau user akses langsung tanpa order baru, kita ambilin data terakhir dari DB
         if (!$order) {
-            $order = \DB::table('orders')
+            $order = DB::table('orders')
                         ->where('user_id', auth()->id())
                         ->orderBy('created_at', 'desc')
                         ->first();
         }
 
-        // Kalau bener-bener kosong, baru balikin ke dashboard
         if (!$order) {
             return redirect()->route('dashboard');
         }
 
+        // Konversi objek menjadi array agar kompatibel dengan view nota bawaan temanmu
+        $order = (array) $order;
+
         return view('orders.history', compact('order'));
     }
 
-    // =========================================================================
-    // Sisa layanan di bawah ini dipertahankan jika view-nya memang mandiri
-    // =========================================================================
+    // View Informasi Singkat Layanan
     public function kiloan() { return view('orders.kiloan'); }
     public function permadani() { return view('orders.permadani'); }
     public function setrika() { return view('orders.setrika'); }

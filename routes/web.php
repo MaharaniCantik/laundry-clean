@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\OrderController;
+use Illuminate\Support\Facades\Redirect;
 
 // ==========================================
 // 1. RUTE HALAMAN UTAMA (LANDING PAGE)
@@ -47,7 +48,7 @@ Route::get('/dashboard', function () {
         return redirect()->route('kurir.dashboard');
     }
 
-    return view('dashboard');
+    return redirect('/');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // ==========================================

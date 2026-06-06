@@ -28,7 +28,22 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        // Jalur cadangan jika tidak masuk ke role mana pun
+        // Ambil data user yang baru saja login
+        $user = Auth::user();
+
+        // 🔀 ALUR PENGALIRAN LOGIN SESUAI 4 ROLE
+        if ($user && $user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user && $user->role === 'owner') {
+            // 🔥 MASUKKAN DI SINI: Otomatis nembak ke rute owner
+            return redirect()->route('owner.dashboard'); 
+        } elseif ($user && $user->role === 'kurir') {
+            // 🔥 MASUKKAN DI SINI: Otomatis nembak ke rute kurir
+            return redirect()->route('kurir.dashboard');
+        }
+
+        // 🌟 JALUR USER BIASA (Pelanggan)
+        // Jika bukan admin, owner, atau kurir, otomatis lempar ke halaman utama ('/')
         return redirect('/');
     }
 

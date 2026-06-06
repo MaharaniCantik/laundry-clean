@@ -132,7 +132,7 @@
                         <div class="bg-white rounded-[20px] shadow-lg p-6">
                             <h3 class="text-[#0085C9] font-bold text-lg mb-4">Form Penimbangan</h3>
                             <div class="bg-[#e4f3fa] rounded-2xl p-5 border border-blue-100">
-                                <input type="hidden" id="js-harga-per-kg" value="8000">
+                                <input type="hidden" id="js-harga-per-kg" value="5000">
                                 <label class="block text-gray-700 font-semibold text-sm mb-3">Masukan berat(Kg)</label>
 
                                 <div class="flex items-center gap-5 mb-5">
@@ -168,7 +168,6 @@
                             Konfirmasi & Jemput Sekarang
                         </button>
 
-
                     </div>
                 </div>
 
@@ -189,11 +188,14 @@
 </style>
 
 {{-- ====================================================
- SCRIPT SINKRONISASI LOGIK (Sudah Clean)
+ SCRIPT SINKRONISASI LOGIK (Sudah Diperbaiki)
  ==================================================== --}}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const hargaPerKg = 8000;
+        // 🔥 FIX: Ambil nilai langsung dari input hidden #js-harga-per-kg (5000)
+        const inputHargaPerKg = document.getElementById('js-harga-per-kg');
+        const hargaPerKg = inputHargaPerKg ? (parseInt(inputHargaPerKg.value) || 5000) : 5000;
+
         const btnMinus = document.getElementById('btn-minus');
         const btnPlus = document.getElementById('btn-plus');
         const inputBerat = document.getElementById('input-berat');
