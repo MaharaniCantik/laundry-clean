@@ -40,7 +40,7 @@ Route::get('/dashboard', function () {
     $role = auth()->user()->role;
 
     if ($role === 'admin') {
-        return redirect()->route('admin.dashboard');
+        return redirect()->route('admin.dashboar');
     } elseif ($role === 'owner') {
         return redirect()->route('owner.dashboard');
     } elseif ($role === 'kurir') {
