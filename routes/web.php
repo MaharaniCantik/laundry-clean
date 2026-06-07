@@ -40,7 +40,7 @@ Route::get('/dashboard', function () {
     $role = auth()->user()->role;
 
     if ($role === 'admin') {
-        return redirect()->route('admin.dashboar');
+        return redirect()->route('admin.dashboard');
     } elseif ($role === 'owner') {
         return redirect()->route('owner.dashboard');
     } elseif ($role === 'kurir') {
@@ -55,19 +55,23 @@ Route::get('/dashboard', function () {
 // ==========================================
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', function () {
-        return view('dashboard');
+        return view('admin.dashboard');
     })->name('admin.dashboard');
+
+    Route::get('/admin/orders', function () {
+        return view('admin.orders');
+    })->name('admin.orders');
 });
 
 Route::middleware(['auth', 'role:owner'])->group(function () {
     Route::get('/owner/dashboard', function () {
-        return view('dashboard');
+        return view('owner.dashboard');
     })->name('owner.dashboard');
 });
 
 Route::middleware(['auth', 'role:kurir'])->group(function () {
     Route::get('/kurir/dashboard', function () {
-        return view('dashboard');
+       return view('kurir.dashboard');
     })->name('kurir.dashboard');
 });
 

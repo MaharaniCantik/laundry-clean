@@ -29,7 +29,7 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         // Jalur cadangan jika tidak masuk ke role mana pun
-        return redirect('/');
+        return redirect('dashboard');
     }
 
     /**
