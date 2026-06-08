@@ -19,59 +19,78 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
-                <div class="bg-surface-container-lowest p-5 rounded-xl ambient-shadow ambient-shadow-hover transition-all duration-300 border border-outline-variant/10 flex flex-col justify-between h-32 relative overflow-hidden group">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-gutter">
+                <div class="bg-surface-container-lowest p-5 rounded-xl ambient-shadow border border-outline-variant/10 flex flex-col justify-between h-32 relative overflow-hidden group">
                     <div class="flex justify-between items-start">
-                        <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">New Orders</span>
-                        <div class="bg-blue-50 text-secondary p-2 rounded-lg">
-                            <span class="material-symbols-outlined" style="font-size: 20px">local_laundry_service</span>
+                        <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Pending Penjemputan</span>
+                        <div class="bg-blue-50 text-blue-600 p-2 rounded-lg">
+                            <span class="material-symbols-outlined" style="font-size: 20px">schedule_send</span>
                         </div>
                     </div>
                     <div class="flex items-end justify-between">
-                        <p class="font-headline-lg text-headline-lg font-bold text-on-surface mt-2">
-                            {{ $newOrdersCount }}
-                        </p>
-                        <span class="font-body-sm text-body-sm text-emerald-600 flex items-center gap-0.5 bg-emerald-50 px-1.5 py-0.5 rounded">
-                            <span class="material-symbols-outlined" style="font-size: 14px">trending_up</span>
-                            12%
-                        </span>
+                        <p class="font-headline-lg text-headline-lg font-bold text-on-surface mt-2">{{ $pendingCount }}</p>
+                        <span class="font-body-sm text-body-sm text-on-surface-variant">Menunggu kurir</span>
                     </div>
-                    <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-secondary-container to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 </div>
 
-                <div class="bg-surface-container-lowest p-5 rounded-xl ambient-shadow ambient-shadow-hover transition-all duration-300 border border-outline-variant/10 flex flex-col justify-between h-32 relative overflow-hidden group">
+                <div class="bg-surface-container-lowest p-5 rounded-xl ambient-shadow border border-outline-variant/10 flex flex-col justify-between h-32 relative overflow-hidden group">
                     <div class="flex justify-between items-start">
-                        <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">In Process</span>
+                        <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Sedang Dijemput</span>
                         <div class="bg-amber-50 text-amber-600 p-2 rounded-lg">
+                            <span class="material-symbols-outlined" style="font-size: 20px">local_shipping</span>
+                        </div>
+                    </div>
+                    <div class="flex items-end justify-between">
+                        <p class="font-headline-lg text-headline-lg font-bold text-on-surface mt-2">{{ $dijemputCount }}</p>
+                        <span class="font-body-sm text-body-sm text-on-surface-variant">Perjalanan</span>
+                    </div>
+                    <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                </div>
+
+                <div class="bg-surface-container-lowest p-5 rounded-xl ambient-shadow border border-outline-variant/10 flex flex-col justify-between h-32 relative overflow-hidden group">
+                    <div class="flex justify-between items-start">
+                        <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Sedang Diproses</span>
+                        <div class="bg-purple-50 text-purple-600 p-2 rounded-lg">
                             <span class="material-symbols-outlined" style="font-size: 20px">wash</span>
                         </div>
                     </div>
                     <div class="flex items-end justify-between">
-                        <p class="font-headline-lg text-headline-lg font-bold text-on-surface mt-2">
-                            {{ $inProcessCount }}
-                        </p>
-                        <span class="font-body-sm text-body-sm text-on-surface-variant">Washing/Ironing</span>
+                        <p class="font-headline-lg text-headline-lg font-bold text-on-surface mt-2">{{ $diprosesCount }}</p>
+                        <span class="font-body-sm text-body-sm text-on-surface-variant">Cuci / Setrika</span>
                     </div>
-                    <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 </div>
 
-                <div class="bg-surface-container-lowest p-5 rounded-xl ambient-shadow ambient-shadow-hover transition-all duration-300 border border-outline-variant/10 flex flex-col justify-between h-32 relative overflow-hidden group">
+                <div class="bg-surface-container-lowest p-5 rounded-xl ambient-shadow border border-outline-variant/10 flex flex-col justify-between h-32 relative overflow-hidden group">
                     <div class="flex justify-between items-start">
-                        <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Ready for Delivery</span>
+                        <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Siap Diantar</span>
+                        <div class="bg-indigo-50 text-indigo-600 p-2 rounded-lg">
+                            <span class="material-symbols-outlined" style="font-size: 20px">package_2</span>
+                        </div>
+                    </div>
+                    <div class="flex items-end justify-between">
+                        <p class="font-headline-lg text-headline-lg font-bold text-on-surface mt-2">{{ $diantarCount }}</p>
+                        <span class="font-body-sm text-body-sm text-on-surface-variant">Awaiting driver</span>
+                    </div>
+                    <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                </div>
+
+                <div class="bg-surface-container-lowest p-5 rounded-xl ambient-shadow border border-outline-variant/10 flex flex-col justify-between h-32 relative overflow-hidden group">
+                    <div class="flex justify-between items-start">
+                        <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Selesai Berhasil</span>
                         <div class="bg-emerald-50 text-emerald-600 p-2 rounded-lg">
                             <span class="material-symbols-outlined" style="font-size: 20px">check_circle</span>
                         </div>
                     </div>
                     <div class="flex items-end justify-between">
-                        <p class="font-headline-lg text-headline-lg font-bold text-on-surface mt-2">
-                            {{ $readyCount }}
-                        </p>
-                        <span class="font-body-sm text-body-sm text-on-surface-variant">Awaiting drivers</span>
+                        <p class="font-headline-lg text-headline-lg font-bold text-on-surface mt-2">{{ $selesaiCount }}</p>
+                        <span class="font-body-sm text-body-sm text-on-surface-variant">Sudah beres</span>
                     </div>
                     <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 </div>
 
-                <div class="bg-surface-container-lowest p-5 rounded-xl ambient-shadow ambient-shadow-hover transition-all duration-300 border border-outline-variant/10 flex flex-col justify-between h-32 relative overflow-hidden group">
+                <div class="bg-surface-container-lowest p-5 rounded-xl ambient-shadow border border-outline-variant/10 flex flex-col justify-between h-32 relative overflow-hidden group">
                     <div class="flex justify-between items-start">
                         <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Revenue (Daily)</span>
                         <div class="bg-primary/10 text-primary p-2 rounded-lg">
@@ -79,13 +98,8 @@
                         </div>
                     </div>
                     <div class="flex items-end justify-between">
-                       <p class="font-headline-lg text-headline-lg font-bold text-on-surface mt-2">
-                            Rp {{ number_format($todayRevenue, 0, ',', '.') }}
-                        </p>
-                        <span class="font-body-sm text-body-sm text-emerald-600 flex items-center gap-0.5 bg-emerald-50 px-1.5 py-0.5 rounded">
-                            <span class="material-symbols-outlined" style="font-size: 14px">trending_up</span>
-                            4.5%
-                        </span>
+                        <p class="font-headline-lg text-headline-lg font-bold text-on-surface mt-2">Rp {{ number_format($todayRevenue, 0, ',', '.') }}</p>
+                        <span class="font-body-sm text-body-sm text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Hari Ini</span>
                     </div>
                     <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 </div>

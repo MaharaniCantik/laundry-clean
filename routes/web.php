@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\Admin\OrderAdminController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\Admin\KurirController;
 use Illuminate\Support\Facades\Redirect;
 
 // ==========================================
@@ -55,14 +57,25 @@ Route::get('/dashboard', function () {
 // 4. GRUP MULTI-ROLE (KENDALI DASHBOARD)
 // ==========================================
 Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/admin/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
+    // 1. Ini route dashboard yang benar
+    Route::get('/admin/dashboard', [OrderAdminController::class, 'index'])->name('admin.dashboard');
 
-    Route::get('/admin/orders', function () {
-        return view('admin.orders');
-    })->name('admin.orders');
+    // 2. Ini route orders Anda yang sudah benar
+    Route::get('/admin/orders',[OrderAdminController::class, 'ordersPage'])->name('admin.orders');
+
+    // Taruh ini di bawah rute admin.orders yang sudah ada kemarin:
+    Route::post('/admin/orders/{id}/update-status', [OrderAdminController::class, 'updateStatus'])->name('admin.orders.update-status');
+
+    // TARUH DI SINI (Gua sejajarin biar gak tumpang tindih middleware-nya, dan namanya disamain):
+    Route::get('/admin/armada_kurir', [KurirController::class, 'index'])->name('admin.armada_kurir');
+    // Route untuk menampilkan halaman form tambah kurir
+    Route::get('/admin/armada_kurir/create', [KurirController::class, 'create'])->name('admin.armada_kurir.create');
+
+    // Route untuk memproses penyimpanan data kurir baru
+    Route::post('/admin/armada_kurir/store', [KurirController::class, 'store'])->name('admin.armada_kurir.store');
 });
+
+
 
 Route::middleware(['auth', 'role:owner'])->group(function () {
     Route::get('/owner/dashboard', function () {
