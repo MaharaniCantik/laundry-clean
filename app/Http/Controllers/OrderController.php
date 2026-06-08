@@ -25,12 +25,12 @@ class OrderController extends Controller
      */
     public function showService(Request $request)
     {
-        $namaUser = auth()->user()->name; 
+        $namaUser = auth()->user()->name;
         $alamatUser = $request->input('alamat_lengkap');
-        $layanan = $request->input('layanan_utama', 'kiloan'); 
-        
+        $layanan = $request->input('layanan_utama', 'kiloan');
+
         // Menangkap input jarak dari maps javascript (default 1.2 Km)
-        $jarakTampil = (float) $request->input('jarak_km', 1.2); 
+        $jarakTampil = (float) $request->input('jarak_km', 1.2);
 
         // LOGIKA HITUNG ONGKIR OTOMATIS
         if ($jarakTampil > 0 && $jarakTampil <= 5.0) {
@@ -52,15 +52,15 @@ class OrderController extends Controller
         }
 
         return view('orders.service', compact(
-            'namaUser', 
-            'alamatUser', 
+            'namaUser',
+            'alamatUser',
             'layanan',
-            'jarakTampil', 
-            'ongkir', 
-            'statusOngkirText', 
+            'jarakTampil',
+            'ongkir',
+            'statusOngkirText',
             'badgeClass'
         ));
-    }      
+    }
 
     /**
      * Step 3: Eksekutor Final - Simpan Data Orderan Awal Berdasarkan Estimasi Pelanggan
@@ -69,8 +69,8 @@ class OrderController extends Controller
     {
         $request->validate([
             'alamat_lengkap'    => 'required',
-            'berat_laundry'     => 'required|numeric|min:1', // Input estimasi dari pelanggan di halaman service
-            'tipe_durasi'       => 'required|in:reguler,express', // Ditambahkan agar menangkap pilihan paket
+            'berat_laundry'     => 'required|numeric|min:1',
+            'tipe_durasi'       => 'required|in:reguler,express',
             'metode_pembayaran' => 'required',
         ]);
 
@@ -80,25 +80,30 @@ class OrderController extends Controller
             $jarak      = (float) $request->input('jarak_km', 0);
             $tipeDurasi = $request->input('tipe_durasi', 'reguler');
 
-            // Set harga per kg berdasarkan paket durasi yang dipilih pelanggan
-            $hargaPerKg = ($tipeDurasi == 'express') ? 9000 : 5000; 
-            
-            // Hitung rumus estimasi harga awal
+            $hargaPerKg = ($tipeDurasi == 'express') ? 9000 : 5000;
             $estimasiHarga = ($beratInput * $hargaPerKg) + $ongkir;
+
+            $tanggal = date('ymd');
+            $karakterAcak = strtoupper(substr(md5(uniqid(mt_rand(), true)), 0, 4));
+            $nomorResi = 'CY-' . $tanggal . '-' . $karakterAcak;
 
             // Masukkan data ke tabel orders Supabase
             $orderId = DB::table('orders')->insertGetId([
-                'user_id'             => auth()->id(), 
-                'nama_pelanggan'      => auth()->user()->name, 
+                'nomor_resi'          => $nomorResi,
+                'user_id'             => auth()->id(),
+                'nama_pelanggan'      => auth()->user()->name,
                 'alamat_lengkap'      => $request->input('alamat_lengkap'),
+                'nomor_telepon_order' => $request->input('phone'),
+                'instruksi_driver'    => $request->input('instruksi_driver'),
                 'jarak_km'            => $jarak,
                 'ongkos_kirim'        => $ongkir,
-                'tipe_durasi'         => $tipeDurasi,       // Kolom baru Supabase
-                'berat_laundry'       => $beratInput,       
-                'total_harga'         => $estimasiHarga,    // Kolom baru Supabase
+                'tipe_durasi'         => $tipeDurasi,
+                'berat_laundry'       => $beratInput,
+                'total_harga'         => $estimasiHarga,
+                'jenis_layanan'       => $request->input('jenis_layanan', 'kiloan'),
                 'metode_pembayaran'   => $request->input('metode_pembayaran'),
                 'instruksi_pencucian' => $request->input('instruksi_pencucian'),
-                'status'              => 'Pending Penjemputan', 
+                'status'              => 'Pending Penjemputan',
                 'created_at'          => now(),
                 'updated_at'          => now(),
             ]);
@@ -107,13 +112,19 @@ class OrderController extends Controller
                 'success' => 'Orderan berhasil disimpan ke Supabase!',
                 'order_data' => (object) [
                     'id'                => $orderId,
+                    'nomor_resi'        => $nomorResi,
                     'nama_pelanggan'    => auth()->user()->name,
                     'metode_pembayaran' => $request->input('metode_pembayaran'),
                     'status'            => 'Pending Penjemputan',
+                    'tipe_durasi'       => $tipeDurasi,
                     'berat_laundry'     => $beratInput,
                     'ongkos_kirim'      => $ongkir,
                     'jarak_km'          => $jarak,
                     'alamat_lengkap'    => $request->input('alamat_lengkap'),
+
+                    // 🌟 1 BARIS TAMBAHAN INI DI SINI BIAR NOTA LANGSUNG TOTALIN HARGA DI AWAL
+                    'total_harga'       => $estimasiHarga,
+
                     'created_at'        => now()
                 ]
             ]);
@@ -128,7 +139,7 @@ class OrderController extends Controller
     public function updateTimbangan(Request $request, $id)
     {
         $request->validate([
-            'berat_asli' => 'required|numeric|min:0.1', 
+            'berat_asli' => 'required|numeric|min:0.1',
         ]);
 
         try {
@@ -146,9 +157,9 @@ class OrderController extends Controller
 
             // Update data fix timbangan toko ke Supabase
             DB::table('orders')->where('id', $id)->update([
-                'berat_laundry' => $beratReal,     
-                'total_harga'   => $totalHargaFix, 
-                'status'        => 'Sedang Diproses', 
+                'berat_laundry' => $beratReal,
+                'total_harga'   => $totalHargaFix,
+                'status'        => 'Sedang Diproses',
                 'updated_at'    => now(),
             ]);
 
@@ -167,9 +178,9 @@ class OrderController extends Controller
 
         if (!$order) {
             $order = DB::table('orders')
-                        ->where('user_id', auth()->id())
-                        ->orderBy('created_at', 'desc')
-                        ->first();
+                ->where('user_id', auth()->id())
+                ->orderBy('created_at', 'desc')
+                ->first();
         }
 
         if (!$order) {
@@ -183,11 +194,32 @@ class OrderController extends Controller
     }
 
     // View Informasi Singkat Layanan
-    public function kiloan() { return view('orders.kiloan'); }
-    public function permadani() { return view('orders.permadani'); }
-    public function setrika() { return view('orders.setrika'); }
-    public function boneka() { return view('orders.boneka'); }
-    public function gorden() { return view('orders.gorden'); }
-    public function bedcover() { return view('orders.bedcover'); }
-    public function sepatu() { return view('orders.sepatu'); }
+    public function kiloan()
+    {
+        return view('orders.kiloan');
+    }
+    public function permadani()
+    {
+        return view('orders.permadani');
+    }
+    public function setrika()
+    {
+        return view('orders.setrika');
+    }
+    public function boneka()
+    {
+        return view('orders.boneka');
+    }
+    public function gorden()
+    {
+        return view('orders.gorden');
+    }
+    public function bedcover()
+    {
+        return view('orders.bedcover');
+    }
+    public function sepatu()
+    {
+        return view('orders.sepatu');
+    }
 }
