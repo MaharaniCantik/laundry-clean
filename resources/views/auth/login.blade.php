@@ -1,3 +1,7 @@
+<head>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+
 <div x-show="showLogin" 
      x-cloak
      class="fixed inset-0 z-[100] flex items-center justify-center p-4"
@@ -37,7 +41,7 @@
                         Password
                     </label>
                     <div class="relative">
-                        <input :type="showPass ? 'text' : 'password'" name="password" required 
+                        <input :type="showPass ? 'text' : 'password'" name="password" required placeholder="Masukkan password"
                             class="w-full px-4 py-3 border-2 border-[#F6921E] rounded-2xl outline-none text-sm transition-all">
                         <button type="button" @click="showPass = !showPass" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
                              </button>

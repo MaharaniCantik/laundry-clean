@@ -1,14 +1,5 @@
 @php
-    // Bank Data Jangkauan Wilayah CuciYuk (Simulasi Area Tangerang)
-    $kecamatanTangerang = [
-        'Batuceper'   => 9,
-        'Ciledug'     => 12,
-        'Cibodas'     => 5,
-        'Pondok Aren' => 7.5,
-        'Jatiuwung'   => 4,
-        'Karawaci'    => 1, 
-        'Balaraja'    => 25.0, 
-    ];
+    // Bank Data Jangkauan Wilayah dihapus karena kita pakai kalkulasi peta murni
 @endphp
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -55,7 +46,7 @@
                         <label class="block text-xs font-semibold text-gray-700 mb-1">
                             Instruksi Alamat <span id="label-tambahan">(Opsional)</span>
                         </label>
-                        <textarea id="instruksi-alamat" name="instruksi_alamat" rows="2" placeholder="Contoh: Pagar warna hitam, rumah nomor 4" class="w-full border border-[#F6921E]/50 rounded-[14px] px-4 py-2 focus:ring-2 focus:ring-[#F6921E] outline-none resize-none"></textarea>
+                        <textarea id="instruksi-alamat" name="instruksi_alamat" rows="2" placeholder="Contoh: Pagar warna hitam, depan warung Madura." class="w-full border border-[#F6921E]/50 rounded-[14px] px-4 py-2 focus:ring-2 focus:ring-[#F6921E] outline-none resize-none"></textarea>
 
                         <div class="mt-4">
                             <label class="block text-xs font-semibold text-gray-700 mb-1">Jenis Kontak</label>
@@ -71,31 +62,14 @@
                             </div>
                         </div>
 
-                        <div class="mb-4">
+                        <div class="mb-4 mt-4">
                             <label class="block text-gray-700 font-semibold text-sm mb-1.5">Alamat Lengkap Konfirmasi</label>
-                            <input type="text" name="alamat_lengkap" id="real-address" value="Jalan Aria Santika, Pabuaran, Karawaci, Tangerang, Banten," class="w-full rounded-xl border-gray-300 p-3 text-sm bg-gray-50 text-gray-700 focus:ring-[#0085C9] focus:border-[#0085C9]">
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="block text-gray-700 font-semibold text-sm mb-1.5">Kecamatan (Untuk Hitung Ongkir)</label>
-                            <div class="relative">
-                                <select name="kecamatan_ongkir" id="select_kecamatan" required class="w-full rounded-xl border-gray-300 p-3 text-sm text-gray-700 focus:ring-[#0085C9] focus:border-[#0085C9] bg-white shadow-sm appearance-none cursor-pointer">
-                                    <option value="" disabled selected>-- Pilih Kecamatan Rumah Anda --</option>
-                                    @foreach($kecamatanTangerang as $namaKecamatan => $jarak)
-                                        <option value="{{ $jarak }}">
-                                            Kecamatan {{ $namaKecamatan }} ({{ $jarak }} Km)
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
-                                    <i class="fa-solid fa-chevron-down text-xs"></i>
-                                </div>
-                            </div>
+                            <input type="text" name="alamat_lengkap" id="real-address" value="" class="w-full rounded-xl border-gray-300 p-3 text-sm bg-gray-50 text-gray-700 focus:ring-[#0085C9] focus:border-[#0085C9]" required>
                         </div>
 
                         <div class="mb-4">
                             <label class="block text-gray-700 font-semibold text-sm mb-1.5">Nama Lengkap</label>
-                            <input type="text" name="nama_pelanggan" value="pelanggan" class="w-full rounded-xl border-gray-300 p-3 text-sm focus:ring-[#0085C9] focus:border-[#0085C9]">
+                            <input type="text" name="nama_pelanggan" value="{{ auth()->user()->name }}" class="w-full rounded-xl border-gray-300 p-3 text-sm bg-gray-100 text-gray-700 focus:ring-blue-500 focus:border-blue-500" readonly>
                         </div>
 
                         <div class="mt-4">
@@ -156,8 +130,8 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-    // 1. KOORDINAT OUTLET LAUNDRY ACUAN
-    const koordinatOutlet = L.latLng(-6.5971, 106.7986);
+    // 1. 🔥 SET KOORDINAT OUTLET LAUNDRY HASIL WAWANCARA DI SINI 🔥
+    const koordinatOutlet = L.latLng(-6.178284931297267, 106.60835419292565);
     const map = L.map('map').setView(koordinatOutlet, 13);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -192,7 +166,7 @@
                     var realInput = document.getElementById('real-address');
                     
                     if (searchInput) searchInput.value = data.display_name;
-                    if (realInput) realInput.value = data.display_name; // Sekarang udah gak error!
+                    if (realInput) realInput.value = data.display_name;
                 }
             })
             .catch(err => console.error(err));
@@ -204,18 +178,7 @@
         updateAlamatDariKoordinat(position.lat, position.lng);
     });
 
-    // FIX 4: Jembatan Otomatis! Kalau User milih Dropdown Kecamatan, nilai jarak_km ikut terupdate otomatis!
-    const selectKecamatan = document.getElementById('select_kecamatan');
-    if(selectKecamatan) {
-        selectKecamatan.addEventListener('change', function() {
-            var jarakDariDropdown = this.value;
-            var inputJarak = document.getElementById('jarak_km');
-            if(inputJarak) {
-                inputJarak.value = jarakDariDropdown;
-                console.log("Jarak sukses diperbarui via Dropdown -> " + jarakDariDropdown + " Km");
-            }
-        });
-    }
+    // 🔥 LOGIKA JEMBATAN DROPDOWN YANG MERUSAK JARAK SUDAH DIHAPUS TOTAL 🔥
 
     // PENCARIAN MANUAL VIA ENTER
     const searchInput = document.getElementById('search-address');
