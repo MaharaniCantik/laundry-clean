@@ -4,11 +4,18 @@
     <form action="{{ route('order.store') }}" method="POST">
         @csrf
 
-        <input type="hidden" name="nama_pelanggan" value="{{ $namaUser }}">
-        <input type="hidden" name="alamat_lengkap" value="{{ $alamatUser }}">
-        <input type="hidden" name="jarak_km" value="{{ $jarakTampil }}">
-        <input type="hidden" name="ongkos_kirim" value="{{ $ongkir }}">
-        
+        <input type="hidden" name="nama_pelanggan" value="{{ old('nama_pelanggan', $namaUser) }}">
+        <input type="hidden" name="alamat_lengkap" value="{{ old('alamat_lengkap', $alamatUser) }}">
+        <input type="hidden" name="jarak_km" value="{{ old('jarak_km', $jarakTampil) }}">
+        <input type="hidden" name="ongkos_kirim" value="{{ old('ongkos_kirim', $ongkir) }}">
+
+        {{-- 🌟 GANTI DUA BARIS INI BIAR DATA TELEPON & INSTRUKSI VALID MASUK KE CONTROLLER 🌟 --}}
+        <input type="hidden" name="phone" value="{{ old('phone', request('phone')) }}">
+        <input type="hidden" name="instruksi_driver" value="{{ old('instruksi_driver', request('instruksi_driver')) }}">
+
+        {{-- Kolom jenis_layanan pembawa dari checkout.blade --}}
+        <input type="hidden" name="jenis_layanan" value="{{ old('jenis_layanan', request('jenis_layanan', 'kiloan')) }}">
+
         <input type="hidden" id="js-ongkir" value="{{ $ongkir }}">
 
         <div class="min-h-screen bg-gradient-to-br from-[#7ec8ea] to-[#d4effa] py-8 px-4 md:px-8 font-sans">
@@ -37,6 +44,14 @@
                                     <span class="text-sm font-semibold text-gray-700">{{ $alamatUser }}</span>
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="bg-white rounded-[20px] shadow-lg p-6 ">
+                            <label class="text-[#0085C9] font-bold text-lg mb-4">Pilih Durasi Laundry:</label>
+                            <select name="tipe_durasi" class="w-full p-2 border rounded" required>
+                                <option value="reguler">Reguler (Rp 5.000 / Kg)</option>
+                                <option value="express">Express (Rp 9.000 / Kg)</option>
+                            </select>
                         </div>
 
                         {{-- METODE PEMBAYARAN --}}
@@ -182,6 +197,7 @@
         -webkit-appearance: none;
         margin: 0;
     }
+
     .no-spinners {
         -moz-appearance: textfield;
     }
@@ -192,14 +208,19 @@
  ==================================================== --}}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // 🔥 FIX: Ambil nilai langsung dari input hidden #js-harga-per-kg (5000)
-        const inputHargaPerKg = document.getElementById('js-harga-per-kg');
-        const hargaPerKg = inputHargaPerKg ? (parseInt(inputHargaPerKg.value) || 5000) : 5000;
-
         const btnMinus = document.getElementById('btn-minus');
         const btnPlus = document.getElementById('btn-plus');
         const inputBerat = document.getElementById('input-berat');
         const textHarga = document.getElementById('text-harga');
+
+        function dapatkanHargaPerKg() {
+            // Menggunakan selector yang lebih aman untuk mencari dropdown tipe_durasi
+            const selectDurasi = document.querySelector('select[name="tipe_durasi"]');
+            if (selectDurasi && selectDurasi.value === 'express') {
+                return 9000;
+            }
+            return 5000;
+        }
 
         function dapatkanOngkirDariLayar() {
             const inputOngkir = document.getElementById('js-ongkir');
@@ -207,17 +228,27 @@
         }
 
         function updateHarga() {
+            // Pastikan inputBerat ada sebelum membaca nilainya
+            if (!inputBerat || !textHarga) return;
+
             let berat = parseInt(inputBerat.value) || 1;
             if (berat < 1) {
                 berat = 1;
                 inputBerat.value = 1;
             }
+            const hargaPerKg = dapatkanHargaPerKg();
             const ongkirJarak = dapatkanOngkirDariLayar();
             let totalHarga = (berat * hargaPerKg) + ongkirJarak;
             textHarga.innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(totalHarga);
         }
 
-        if (btnPlus) {
+        // Pasang event listener ke dropdown durasi jika elemennya ditemukan
+        const selectDurasiElement = document.querySelector('select[name="tipe_durasi"]');
+        if (selectDurasiElement) {
+            selectDurasiElement.addEventListener('change', updateHarga);
+        }
+
+        if (btnPlus && inputBerat) {
             btnPlus.addEventListener('click', function(e) {
                 e.preventDefault();
                 let currentVal = parseInt(inputBerat.value) || 0;
@@ -226,7 +257,7 @@
             });
         }
 
-        if (btnMinus) {
+        if (btnMinus && inputBerat) {
             btnMinus.addEventListener('click', function(e) {
                 e.preventDefault();
                 let currentVal = parseInt(inputBerat.value) || 1;
@@ -256,6 +287,8 @@
                 });
             });
         }
+
+        // Jalankan kalkulasi awal saat halaman selesai dimuat
         updateHarga();
     });
 </script>

@@ -15,7 +15,8 @@ Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 
-Route::get('/lacak', [TrackingController::class, 'index'])->name('lacak');
+Route::get('/lacak', [TrackingController::class, 'index'])->name('tracking.index');
+Route::post('/lacak/cari', [TrackingController::class, 'search'])->name('tracking.search');
 
 // ==========================================
 // 2. RUTE UNTUK ORDERAN (WAJIB LOGIN)

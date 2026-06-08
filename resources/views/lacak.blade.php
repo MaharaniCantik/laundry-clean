@@ -7,7 +7,35 @@
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        skyBg: '#D1E9F6',
+                        skyMid: '#B8DCF0',
+                        blueMed: '#38A1D1',
+                        blueDark: '#2080B0',
+                        purple: '#5D325E',
+                        purpleLight: '#7A4A7B',
+                        orange: '#F6921E',
+                        orangeHot:'#E07E10',
+                    },
+                    fontFamily: {
+                        poppins: ['Poppins', 'sans-serif'],
+                    }
+                }
+            }
+        };
+    </script>
+
     <style>
+        /* 3. PAKSA SEMUA FONT MENGGUNAKAN POPPINS SESUAI WELCOME */
+        * { font-family: 'Poppins', sans-serif; }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -15,82 +43,130 @@
         .fade-in { animation: fadeIn 0.4s ease-out forwards; }
     </style>
 </head>
-<body class="min-h-screen bg-[#E2F3FC]" x-data="{ showLogin: false, showRegister: false }">
+<body class="min-h-screen bg-[#E2F3FC]">
+
     @include('partials.navbar')
-    <main class="relative pt-32 pb-12 flex items-center justify-center">
+    
+    <main class="relative pt-32 pb-12 flex flex-col items-center justify-center px-4 space-y-8 w-full">
+        
         <div class="bg-white w-full max-w-md rounded-[32px] shadow-2xl p-8 border-2 border-white">
              <div class="text-center mb-6">
                 <h1 class="text-2xl font-bold text-gray-900">Lacak Laundry</h1>
                 <p class="text-sm text-gray-500">Masukkan nomor nota anda</p>
              </div>
 
-             <div class="space-y-4">
-                <input type="text"placeholder="Contoh: KN-001" id="resi" class="w-full px-5 py-4 rounded-2xl border-2 border-gray-100 outline-none focus:border-[#F6921E] uppercase font-bold ">
-                <button id="btn-lacak" class="w-full bg-[#F6921E] text-white font-bold py-4 rounded-2xl shadow-lg">
+             <form action="{{ route('tracking.search') }}" method="POST" class="space-y-4" id="form-lacak">
+                @csrf
+                <input type="text" name="nomor_resi" id="resi" 
+                       value="{{ old('nomor_resi', isset($order) ? $order->nomor_resi : '') }}" 
+                       placeholder="Contoh: CY-260608-A1B2" 
+                       class="w-full px-5 py-4 rounded-2xl border-2 border-gray-100 outline-none focus:border-[#F6921E] uppercase font-bold text-center tracking-wider placeholder:tracking-normal placeholder:font-normal">
+                
+                <button type="submit" id="btn-lacak" class="w-full bg-[#F6921E] hover:bg-orange-600 text-white font-bold py-4 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2">
                     Lacak Sekarang
                 </button>
-             </div>
+             </form>
 
-             <div id="hasil-lacak" class="hidden mt-8 pt-8 border-t-2 border-dashed">
-                <h3 class="font-bold text-gray-800">Status Pesanan: <span id="display-resi" class="text-[#F6921E]"></span></h3>
-             </div>
-                <p id="error-message" class="text-red-500 text-xs mt-2 hidden">Nomor resi wajib diisi!</p>
+             @if(session('error'))
+                 <p class="text-red-500 text-xs mt-3 text-center font-semibold">❌ {{ session('error') }}</p>
+             @endif
+             <p id="error-message" class="text-red-500 text-xs mt-3 hidden text-center font-semibold">Nomor resi wajib diisi!</p>
         </div>
+
+        @if(isset($order))
+            <div class="bg-white w-full max-w-2xl rounded-[32px] shadow-2xl p-6 md:p-8 border-2 border-white fade-in space-y-6">
+                <div class="border-b border-dashed border-gray-100 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <div>
+                        <span class="text-gray-400 text-xs block">No. Nota / Resi:</span>
+                        <span class="font-black text-gray-800 tracking-wider text-lg">{{ $order->nomor_resi ?? $order->nomor_nota }}</span>
+                    </div>
+                    <div class="sm:text-right">
+                        <span class="text-gray-400 text-xs block">Status Terakhir:</span>
+                        <span class="inline-block px-3 py-1 rounded-full text-[11px] font-black bg-orange-50 text-[#F6921E] mt-0.5 border border-orange-100">{{ $order->status }}</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div class="bg-gray-50 p-3 rounded-2xl text-gray-600">
+                        <p class="text-gray-400">Pelanggan:</p>
+                        <p class="font-bold text-gray-800 mt-0.5">{{ auth()->check() ? $order->nama_pelanggan : substr($order->nama_pelanggan, 0, 2) . '***' }}</p>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-2xl text-gray-600">
+                        <p class="text-gray-400">Berat Estimasi:</p>
+                        <p class="font-bold text-gray-800 mt-0.5">{{ $order->berat_laundry }} Kg</p>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-2xl text-gray-600">
+                        <p class="text-gray-400">Paket Layanan:</p>
+                        <p class="font-bold text-gray-800 mt-0.5">{{ ucfirst($order->tipe_durasi ?? 'reguler') }}</p>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-2xl text-gray-600">
+                        <p class="text-gray-400">Total Biaya:</p>
+                        <p class="font-bold text-green-600 mt-0.5">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</p>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50/70 p-3 rounded-2xl text-[11px] text-gray-500">
+                    <span class="font-bold text-[#2080B0] block mb-0.5">Alamat Penjemputan / Pengantaran:</span>
+                    <p class="italic leading-relaxed">
+                        {{ auth()->check() ? $order->alamat_lengkap : '🔒 Login untuk melihat detail alamat lengkap.' }}
+                    </p>
+                </div>
+            </div>
+        @endif
+
+        @auth
+            @if(isset($ordersHistory) && $ordersHistory->count() > 0)
+                <div class="bg-white w-full max-w-2xl rounded-[32px] shadow-2xl p-6 border-2 border-white fade-in space-y-3">
+                    <h3 class="text-xs font-black text-gray-400 uppercase tracking-wider border-b pb-2 border-gray-100 flex justify-between items-center">
+                        <span>📋 Riwayat Pesanan Saya</span>
+                        <span class="bg-gray-100 text-gray-600 text-[10px] px-2 py-0.5 rounded-full">{{ $ordersHistory->count() }} Order</span>
+                    </h3>
+                    
+                    <div class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                        @foreach($ordersHistory as $histori)
+                            <div class="flex justify-between items-center p-3 bg-gray-50/80 hover:bg-orange-50/30 rounded-xl border border-gray-100 transition-all text-xs">
+                                <div class="space-y-0.5">
+                                    <p class="font-bold text-gray-700 tracking-wider">{{ $histori->nomor_resi ?? $histori->nomor_nota ?? 'BELUM ADA RESI' }}</p>
+                                    <p class="text-gray-400 text-[11px]">{{ date('d M Y', strtotime($histori->created_at)) }} • <span class="font-semibold text-gray-600">Rp {{ number_format($histori->total_harga, 0, ',', '.') }}</span></p>
+                                </div>
+                                <div>
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-100">{{ $histori->status }}</span>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+        @endauth
     </main>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const formLacak = document.getElementById('form-lacak');
             const btnLacak = document.getElementById('btn-lacak');
             const inputResi = document.getElementById('resi');
             const errorMessage = document.getElementById('error-message');
-            const hasilLacak = document.getElementById('hasil-lacak');
-            const displayResi = document.getElementById('display-resi');
 
-            btnLacak.addEventListener('click', () => {
+            formLacak.addEventListener('submit', (e) => {
                 const resiValue = inputResi.value.trim();
 
-                // Reset state
-                errorMessage.classList.add('hidden');
-                hasilLacak.classList.add('hidden');
-                hasilLacak.classList.remove('fade-in');
-
-                // Validasi input kosong
                 if (!resiValue) {
+                    e.preventDefault();
                     errorMessage.classList.remove('hidden');
                     inputResi.focus();
                     return;
                 }
 
-                // Efek loading pada tombol
-                const originalText = btnLacak.innerHTML;
                 btnLacak.innerHTML = `
-                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                     Mencari...
                 `;
                 btnLacak.disabled = true;
-
-                // Simulasi delay pencarian ke database (1.5 detik)
-                setTimeout(() => {
-                    // Kembalikan tombol ke semula
-                    btnLacak.innerHTML = originalText;
-                    btnLacak.disabled = false;
-
-                    // Tampilkan hasil
-                    displayResi.textContent = resiValue.toUpperCase();
-                    hasilLacak.classList.remove('hidden');
-                    hasilLacak.classList.add('fade-in');
-                }, 1000);
-            });
-
-            // Memungkinkan tekan 'Enter' untuk melacak
-            inputResi.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    btnLacak.click();
-                }
             });
         });
-    </script>   
+    </script> 
 </body>
 </html>

@@ -2,26 +2,36 @@
     <div class="min-h-screen bg-gradient-to-br from-[#7ec8ea] to-[#d4effa] py-8 px-4 md:px-8 font-sans">
         <div class="max-w-5xl mx-auto">
             @include('partials.step-bar')
-            
-            <div class="max-w-2xl mx-auto py-8 px-4"> 
+
+            <div class="max-w-2xl mx-auto py-8 px-4">
                 <div class="text-center mb-6">
                     <h2 class="text-2xl font-black text-[#0085C9]">Nota Pesanan Laundry</h2>
                     <p class="text-xs text-gray-400 mt-1">Terima kasih telah mempercayakan laundry Anda kepada kami</p>
                 </div>
 
                 @if(session('success'))
-                    <div class="mb-4 p-4 bg-green-100 border border-green-300 text-green-800 rounded-xl font-semibold text-sm text-center">
-                        🎉 {{ session('success') }}
-                    </div>
+                <div class="mb-4 p-4 bg-green-100 border border-green-300 text-green-800 rounded-xl font-semibold text-sm text-center">
+                    🎉 {{ session('success') }}
+                </div>
                 @endif
 
                 <div class="bg-white rounded-[20px] shadow-lg p-6 border border-gray-100 space-y-4">
-                    
+
                     <div class="border-b border-dashed border-gray-200 pb-4 space-y-2">
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-400">Nama Pelanggan:</span>
-                            <span class="font-bold text-gray-800">{{ $namaUser ?? 'Pelanggan' }}</span>
+                        {{-- BARIS NOMOR RESI --}}
+                        <div class="flex justify-between text-sm bg-blue-50 p-2 rounded-lg border border-blue-100">
+                            <span class="text-blue-600 font-semibold">Nomor Resi / Pesanan:</span>
+                            <span class="font-black text-blue-800 tracking-wider">{{ $order['nomor_resi'] ?? 'KODE-GENERATING' }}</span>
                         </div>
+
+                        {{-- 🌟 PERBAIKAN 1: NAMA PELANGGAN DIAMBIL DARI DATA ORDER YANG VALID & TIDAK DUPLIKAT --}}
+                        <div class="flex justify-between text-sm pt-2">
+                            <span class="text-gray-400">Nama Pelanggan:</span>
+                            <span class="font-bold text-gray-800">{{ $order['nama_pelanggan'] ?? auth()->user()->name }}</span>
+                        </div>
+                    </div>
+
+                    <div class="border-b border-dashed border-gray-200 pb-4 space-y-2">
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-400">Metode Pembayaran:</span>
                             <span class="px-2 py-0.5 bg-gray-100 rounded text-xs font-bold text-gray-700">{{ $order['metode_pembayaran'] }}</span>
@@ -45,16 +55,21 @@
                             <span class="text-gray-500">Ongkos Kirim ({{ $order['jarak_km'] }} Km):</span>
                             <span class="font-semibold text-gray-700">Rp {{ number_format($order['ongkos_kirim'], 0, ',', '.') }}</span>
                         </div>
+                        
+                        {{-- 🌟 PERBAIKAN 2: LOGIKA HARGA PAKET EXPRESS (9000) & REGULER (5000) SUDAH DISINKRONKAN --}}
                         <div class="flex justify-between">
-                            <span class="text-gray-500">Estimasi Biaya Laundry:</span>
-                            <span class="font-semibold text-gray-700">Rp {{ number_format($order['berat_laundry'] * 5000, 0, ',', '.') }}</span>
+                            <span class="text-gray-500">Estimasi Biaya Laundry ({{ ucfirst($order['tipe_durasi'] ?? 'reguler') }}):</span>
+                            <span class="font-semibold text-gray-700">
+                                Rp {{ number_format(($order['tipe_durasi'] == 'express' ? 9000 : 5000) * $order['berat_laundry'], 0, ',', '.') }}
+                            </span>
                         </div>
                     </div>
 
+                    {{-- TOTAL HARGA DINAMIS --}}
                     <div class="flex justify-between items-center pt-2">
                         <span class="text-base font-bold text-gray-800">Total Pembayaran:</span>
                         <span class="text-xl font-black text-[#0085C9]">
-                            Rp {{ number_format(($order['berat_laundry'] * 5000) + $order['ongkos_kirim'], 0, ',', '.') }}
+                            Rp {{ number_format($order['total_harga'] ?? (( $order['berat_laundry'] * ($order['tipe_durasi'] == 'express' ? 9000 : 5000) ) + $order['ongkos_kirim']), 0, ',', '.') }}
                         </span>
                     </div>
 
