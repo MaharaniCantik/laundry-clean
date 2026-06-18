@@ -1,5 +1,5 @@
 @php
-    // Bank Data Jangkauan Wilayah dihapus karena kita pakai kalkulasi peta murni
+// Bank Data Jangkauan Wilayah dihapus karena kita pakai kalkulasi peta murni
 @endphp
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -98,16 +98,33 @@
                         <h3 class="text-lg font-bold text-gray-900 mb-2">Mau PickUp Kapan?</h3>
 
                         <div class="grid grid-cols-2 gap-4">
+                            {{-- Input Hari/Tanggal --}}
                             <div>
                                 <label class="block text-xs font-semibold text-gray-700 mb-1">Hari apa?</label>
-                                <input type="date" name="hari_pickup" class="w-full border border-[#F6921E]/50 rounded-[14px] px-4 py-2 focus:ring-2 focus:ring-[#F6921E] outline-none text-gray-600 text-sm" required>
+                                <input type="date"
+                                    name="hari_pickup"
+                                    min="{{ date('Y-m-d') }}"
+                                    class="w-full border border-[#F6921E]/50 rounded-[14px] px-4 py-2 focus:ring-2 focus:ring-[#F6921E] outline-none text-gray-600 text-sm"
+                                    required>
                             </div>
+
+                            {{-- 🌟 JADINYA DROPDOWN SLOT JAM (Sesuai Jadwal Operasional Toko) 🌟 --}}
                             <div>
                                 <label class="block text-xs font-semibold text-gray-700 mb-1">Jam Berapa?</label>
-                                <input type="time" name="jam_pickup" class="w-full border border-[#F6921E]/50 rounded-[14px] px-4 py-2 focus:ring-2 focus:ring-[#F6921E] outline-none text-gray-600 text-sm" required>
+                                <select name="jam_pickup"
+                                    class="w-full border border-[#F6921E]/50 rounded-[14px] px-4 py-2 focus:ring-2 focus:ring-[#F6921E] outline-none text-gray-600 text-sm bg-white"
+                                    required>
+                                    <option value="" disabled selected>-- Pilih Jam --</option>
+                                    <option value="09:00 - 11:00">Pagi (09:00 - 11:00)</option>
+                                    <option value="11:00 - 13:00">Siang (11:00 - 13:00)</option>
+                                    <option value="13:00 - 15:00">Siang (13:00 - 15:00)</option>
+                                    <option value="15:00 - 17:00">Sore (15:00 - 17:00)</option>
+                                    <option value="17:00 - 19:00">Sore/Malam (17:00 - 19:00)</option>
+                                    <option value="19:00 - 21:00">Malam (19:00 - 21:00)</option>
+                                    <option value="21:00 - 22:00">Malam Khusus Weekend (21:00 - 22:00)</option>
+                                </select>
                             </div>
                         </div>
-
                         <div>
                             <label class="block text-xs font-semibold text-gray-700 mb-1">Intruksi Untuk Driver</label>
                             <textarea name="instruksi_driver" rows="5" class="w-full border border-[#F6921E]/50 rounded-[14px] px-4 py-3 focus:ring-2 focus:ring-[#F6921E] outline-none resize-none"></textarea>
@@ -164,7 +181,7 @@
                 if (data && data.display_name) {
                     var searchInput = document.getElementById('search-address');
                     var realInput = document.getElementById('real-address');
-                    
+
                     if (searchInput) searchInput.value = data.display_name;
                     if (realInput) realInput.value = data.display_name;
                 }
@@ -173,7 +190,7 @@
     }
 
     marker.on('dragend', function(e) {
-        var position = marker.getLatLng(); 
+        var position = marker.getLatLng();
         kalkulasiDanSimpanJarak(position);
         updateAlamatDariKoordinat(position.lat, position.lng);
     });
@@ -185,7 +202,7 @@
     if (searchInput) {
         searchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
-                e.preventDefault(); 
+                e.preventDefault();
                 const query = searchInput.value;
 
                 fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`)
@@ -196,7 +213,7 @@
                             const lon = parseFloat(data[0].lon);
                             const posisiBaru = L.latLng(lat, lon);
 
-                            map.setView(posisiBaru, 15); 
+                            map.setView(posisiBaru, 15);
                             marker.setLatLng(posisiBaru);
 
                             searchInput.value = data[0].display_name;

@@ -148,8 +148,13 @@
             </button>
 
             <div id="isi-dropdown" class="hidden absolute left-0 bottom-full mb-2 w-48 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
-              <a href="#" class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50">Laundry Kiloan</a>
-              <a href="#" class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50">Setrika</a>
+              <a href="{{ route('order.kiloan') }}" class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50">Laundry Kiloan</a>
+              <a href="{{ route('order.permadani') }}" class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50">Laundry Permadani</a>
+              <a href="{{ route('order.setrika') }}" class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50">Setrika</a>
+              <a href="{{ route('order.boneka') }}" class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50">Laundry Boneka</a>
+              <a href="{{ route('order.gorden') }}" class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50">Laundry Gordern</a>
+              <a href="{{ route('order.bedcover') }}" class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50">Laundry Bedcover</a>
+              <a href="{{ route('order.sepatu') }}" class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50">Laundry Sepatu</a>
             </div>
           </div>
           <a href="{{ url('/#layanan') }}" class="w-full sm:w-auto text-center border-2 border-purple text-purple font-semibold text-base px-8 py-4 rounded-full hover:bg-purple hover:text-white hover:scale-105 transition-all duration-300">

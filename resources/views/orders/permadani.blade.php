@@ -44,7 +44,7 @@
                     <div class="flex justify-between items-center p-4 px-6">
                         <div class="space-y-0.5">
                             <h3 class="text-sm font-bold text-gray-700 tracking-wide">Tipis</h3>
-                            <p class="text-xs text-gray-400 font-medium">Harga Rp 45.000/1m² | Estimasi 14 Hari</p>
+                            <p class="text-xs text-gray-400 font-medium">Harga Rp 45.000/1m²</p>
                         </div>
                         <span class="text-sm font-extrabold text-[#F6921E]">Rp 45.000</span>
                     </div>
@@ -52,7 +52,7 @@
                     <div class="flex justify-between items-center p-4 px-6">
                         <div class="space-y-0.5">
                             <h3 class="text-sm font-bold text-gray-700 tracking-wide">Tebal</h3>
-                            <p class="text-xs text-gray-400 font-medium">Harga Rp 70.000/1m² | Estimasi 14 Hari</p>
+                            <p class="text-xs text-gray-400 font-medium">Harga Rp 70.000/1m²</p>
                         </div>
                         <span class="text-sm font-extrabold text-[#F6921E]">Rp 70.000</span>
                     </div>
@@ -110,7 +110,7 @@
 
                     {{-- CTA Button --}}
                     <div class="pt-4 flex justify-center">
-                        <a href="{{ route('order.checkout', ['layanan' => 'kiloan']) }}"
+                        <a href="{{ route('order.checkout', ['layanan' => 'permadani']) }}"
                            class="inline-block bg-orange-500 hover:bg-orange-600 text-white font-bold text-base tracking-wide rounded-xl px-12 py-3.5 shadow-md hover:shadow-orange-200 transition-all duration-150 ease-out">
                             Pesan Sekarang
                         </a>
