@@ -55,23 +55,25 @@
                     </div>
 
                     <div class="space-y-2 pb-4 border-b border-dashed border-gray-200 text-sm">
-                        {{-- 🌟 DINAMIS: BERAT TIMBANGAN VS LUAS KARPET --}}
+                        {{-- 🌟 Jauh lebih dinamis, bersih, dan rapi --}}
                         <div class="flex justify-between">
                             <span class="text-gray-500">
-                                {{ ($order['jenis_layanan'] ?? '') == 'permadani' ? 'Luas Karpet:' : 'Berat Timbangan:' }}
+                                {{ (strtolower($order['jenis_layanan'] ?? '') == 'permadani') ? 'Luas Karpet:' : 'Berat Timbangan:' }}
                             </span>
                             <span class="font-bold text-gray-800">
-                                {{ $order['berat_laundry'] }} {{ ($order['jenis_layanan'] ?? '') == 'permadani' ? 'm²' : 'Kg' }}
+                                {{ $order['berat_laundry'] ?? 0 }} {{ (strtolower($order['jenis_layanan'] ?? '') == 'permadani') ? 'm²' : 'Kg' }}
                             </span>
                         </div>
 
                         <div class="flex justify-between">
+
                             <span class="text-gray-500">Ongkos Kirim ({{ $order['jarak_km'] }} Km):</span>
+
                             <span class="font-semibold text-gray-700">Rp {{ number_format($order['ongkos_kirim'], 0, ',', '.') }}</span>
+
                         </div>
 
-                        {{-- 🌟 DINAMIS: KALKULASI HARGA BERDASARKAN JENIS LAYANAN --}}
-                        <div class="flex justify-between">
+                       <div class="flex justify-between">
                             <span class="text-gray-500">
                                 Estimasi Biaya Laundry ({{ ucfirst($order['tipe_durasi'] ?? 'reguler') }}):
                             </span>
@@ -82,7 +84,6 @@
                                 $jenis = $order['jenis_layanan'] ?? '';
                                 $tipe = $order['tipe_durasi'] ?? '';
                                 $qty = $order['berat_laundry'] ?? 0;
-
                                 if ($jenis == 'permadani') {
                                 $hargaSatuan = ($tipe == 'tebal') ? 70000 : 45000;
                                 } else {
@@ -93,7 +94,7 @@
                                 {{ number_format($subtotal, 0, ',', '.') }}
                             </span>
                         </div>
-                    </div>
+                    </div> 
 
                     {{-- TOTAL HARGA DINAMIS --}}
                     <div class="flex justify-between items-center pt-2">

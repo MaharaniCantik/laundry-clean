@@ -114,7 +114,7 @@
                                     {{ $order->jenis_layanan ?? 'Kiloan' }}
                                 </span>
                                 <div class="font-body-sm text-body-sm text-on-surface-variant mt-1">
-                                    {{ $order->berat_laundry ?? 0 }} kg - {{ $order->tipe_durasi ?? 'Reguler' }}
+                                    {{ $order->berat_laundry ?? 0 }} {{ $order->satuan ?? 'kg' }} - {{ ucfirst($order->tipe_durasi ?? 'Reguler') }}
                                 </div>
                             </td>
                             
