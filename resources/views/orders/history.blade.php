@@ -46,21 +46,51 @@
                         </div>
                     </div>
 
+                    {{-- 🌟 BARIS BARU: MENAMPILKAN JADWAL PICKUP YANG DIPILIH USER 🌟 --}}
+                    <div class="flex justify-between text-sm pt-1">
+                        <span class="text-gray-400">Jadwal Penjemputan:</span>
+                        <span class="px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-xs font-bold border border-blue-100">
+                            🗓️ {{ $order['jadwal_pickup'] ?? 'Segera Di-pickup' }}
+                        </span>
+                    </div>
+
                     <div class="space-y-2 pb-4 border-b border-dashed border-gray-200 text-sm">
+                        {{-- 🌟 DINAMIS: BERAT TIMBANGAN VS LUAS KARPET --}}
                         <div class="flex justify-between">
-                            <span class="text-gray-500">Berat Timbangan:</span>
-                            <span class="font-bold text-gray-800">{{ $order['berat_laundry'] }} Kg</span>
+                            <span class="text-gray-500">
+                                {{ ($order['jenis_layanan'] ?? '') == 'permadani' ? 'Luas Karpet:' : 'Berat Timbangan:' }}
+                            </span>
+                            <span class="font-bold text-gray-800">
+                                {{ $order['berat_laundry'] }} {{ ($order['jenis_layanan'] ?? '') == 'permadani' ? 'm²' : 'Kg' }}
+                            </span>
                         </div>
+
                         <div class="flex justify-between">
                             <span class="text-gray-500">Ongkos Kirim ({{ $order['jarak_km'] }} Km):</span>
                             <span class="font-semibold text-gray-700">Rp {{ number_format($order['ongkos_kirim'], 0, ',', '.') }}</span>
                         </div>
-                        
-                        {{-- 🌟 PERBAIKAN 2: LOGIKA HARGA PAKET EXPRESS (9000) & REGULER (5000) SUDAH DISINKRONKAN --}}
+
+                        {{-- 🌟 DINAMIS: KALKULASI HARGA BERDASARKAN JENIS LAYANAN --}}
                         <div class="flex justify-between">
-                            <span class="text-gray-500">Estimasi Biaya Laundry ({{ ucfirst($order['tipe_durasi'] ?? 'reguler') }}):</span>
+                            <span class="text-gray-500">
+                                Estimasi Biaya Laundry ({{ ucfirst($order['tipe_durasi'] ?? 'reguler') }}):
+                            </span>
                             <span class="font-semibold text-gray-700">
-                                Rp {{ number_format(($order['tipe_durasi'] == 'express' ? 9000 : 5000) * $order['berat_laundry'], 0, ',', '.') }}
+                                Rp
+                                @php
+                                // Ambil jenis layanan aman dari array atau object
+                                $jenis = $order['jenis_layanan'] ?? '';
+                                $tipe = $order['tipe_durasi'] ?? '';
+                                $qty = $order['berat_laundry'] ?? 0;
+
+                                if ($jenis == 'permadani') {
+                                $hargaSatuan = ($tipe == 'tebal') ? 70000 : 45000;
+                                } else {
+                                $hargaSatuan = ($tipe == 'express') ? 9000 : 5000;
+                                }
+                                $subtotal = $qty * $hargaSatuan;
+                                @endphp
+                                {{ number_format($subtotal, 0, ',', '.') }}
                             </span>
                         </div>
                     </div>
