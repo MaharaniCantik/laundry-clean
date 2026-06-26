@@ -76,34 +76,73 @@ class OrderController extends Controller
     {
         $request->validate([
             'alamat_lengkap'    => 'required',
-            'berat_laundry'     => 'required|numeric|min:1', // Di view permadani, input ini bisa mewakili Luas (m2) atau Jumlah Lembar
-            'tipe_durasi'       => 'required', // Untuk kiloan (reguler/express), Untuk permadani (tipis/tebal)
+            'berat_laundry'     => 'required|numeric|min:1',
+            'tipe_durasi'       => 'required',
             'metode_pembayaran' => 'required',
         ]);
 
         try {
-            $qtyInput   = (float) $request->input('berat_laundry', 1); // Kita buat istilah umum qtyInput biar fleksibel
-            $ongkir     = (float) $request->input('ongkos_kirim', 0);
-            $jarak      = (float) $request->input('jarak_km', 0);
+            $qtyInput     = (float) $request->input('berat_laundry', 1);
+            $ongkir       = (float) $request->input('ongkos_kirim', 0);
+            $jarak        = (float) $request->input('jarak_km', 0);
             $jenisLayanan = $request->input('jenis_layanan', 'kiloan');
-            $tipeDurasi   = $request->input('tipe_durasi', 'reguler'); // ini menangkap reguler/express ATAU tipis/tebal dari form
+            $tipeDurasi   = $request->input('tipe_durasi', 'reguler');
 
-            // 🌟 LOGIKA HITUNG HARGA DINAMIS BERDASARKAN JENIS LAYANAN
+            // 🌟 1. LOGIKA HITUNG HARGA DINAMIS & AMANKAN TEKS PAKET
             if ($jenisLayanan == 'permadani') {
-                // Sesuai Pricelist Laundry Karpet di gambar: Tipis = 45.000, Tebal = 70.000
                 $hargaPerUnit = ($tipeDurasi == 'tebal') ? 70000 : 45000;
                 $estimasiHarga = ($qtyInput * $hargaPerUnit) + $ongkir;
+
+                // Format teks untuk disimpan ke kolom tipe_durasi di DB
+                $namaPaketTeks = "Permadani - " . ucfirst($tipeDurasi);
             } else {
-                // Default Rumus Kiloan Lu yang lama
+                // Jaga-jaga kalau frontend ngirim data 'tebal'/'tipis' ke kiloan karena bug, kita paksa ke reguler/express
+                if ($tipeDurasi !== 'express' && $tipeDurasi !== 'reguler') {
+                    $tipeDurasi = 'reguler';
+                }
+
                 $hargaPerKg = ($tipeDurasi == 'express') ? 9000 : 5000;
                 $estimasiHarga = ($qtyInput * $hargaPerKg) + $ongkir;
+
+                $namaPaketTeks = "Kiloan - " . ucfirst($tipeDurasi);
             }
+
+            // ====================================================
+            // 🌟 2. LOGIKA OTOMATISASI TANGGAL & JAM KEMBALI
+            // ====================================================
+            $hariPickup = $request->input('hari_pickup');
+            $hariDeliveryUser = $request->input('hari_delivery');
+            $jamDelivery = $request->input('jam_delivery') ?? 'Siang (11:00 - 13:00)';
+
+            // Tentukan durasi wajib di backend biar gak bisa diakalin frontend/javascript bug
+            if ($jenisLayanan == 'permadani') {
+                $durasiProses = 14; // Paksa 14 hari kalau permadani
+            } elseif ($tipeDurasi == 'express') {
+                $durasiProses = 1;  // Paksa 1 hari kalau kiloan express
+            } else {
+                $durasiProses = 3;  // Paksa 3 hari kalau kiloan reguler
+            }
+
+            // Hitung tanggal minimal yang sah
+            $tanggalSeharusnya = date('Y-m-d', strtotime($hariPickup . ' + ' . $durasiProses . ' days'));
+
+            // VALIDASI KETAT: Mau jenis layanan apapun, kalau tanggal yang dikirim user ternyata 
+            // lebih cepat dari durasi standar laundry, langsung OVERWRITE/PAKSA pakai tanggal seharusnya!
+            if (!$hariDeliveryUser || $hariDeliveryUser < $tanggalSeharusnya) {
+                $tglFinal = $tanggalSeharusnya;
+            } else {
+                $tglFinal = $hariDeliveryUser;
+            }
+
+            // Gabungkan tanggal dengan jam pengiriman kembali
+            $jadwalPengiriman = $tglFinal . ' @ ' . $jamDelivery;
+            // ====================================================
 
             $tanggal = date('ymd');
             $karakterAcak = strtoupper(substr(md5(uniqid(mt_rand(), true)), 0, 4));
             $nomorResi = 'CY-' . $tanggal . '-' . $karakterAcak;
 
-            // Masukkan data ke tabel orders Supabase
+            // 🌟 3. INSERT DATA KE SUPABASE
             $orderId = DB::table('orders')->insertGetId([
                 'nomor_resi'          => $nomorResi,
                 'user_id'             => auth()->id(),
@@ -113,33 +152,37 @@ class OrderController extends Controller
                 'instruksi_driver'    => $request->input('instruksi_driver'),
                 'jarak_km'            => $jarak,
                 'ongkos_kirim'        => $ongkir,
-                'tipe_durasi'         => $tipeDurasi, // Akan menyimpan 'reguler'/'express' atau 'tipis'/'tebal'
-                'berat_laundry'       => $qtyInput,   // Menyimpan jumlah m2 / lembar karpet
-                'total_harga'         => $estimasiHarga,
-                'jenis_layanan'       => $jenisLayanan, // Menyimpan 'permadani'
+                'tipe_durasi'         => $namaPaketTeks, // Menyimpan teks rapi: "Kiloan - Express" atau "Permadani - Tebal"
+                'berat_laundry'       => $qtyInput,
+                'total_harga'         => $estimasiHarga, // Fix sesuai hitungan backend di atas
+                'jenis_layanan'       => $jenisLayanan,
                 'metode_pembayaran'   => $request->input('metode_pembayaran'),
                 'instruksi_pencucian' => $request->input('instruksi_pencucian'),
                 'status'              => 'Pending Penjemputan',
                 'jadwal_pickup'       => $request->input('hari_pickup') . ' @ ' . $request->input('jam_pickup'),
+                'jadwal_pengiriman'   => $jadwalPengiriman,
                 'created_at'          => now(),
                 'updated_at'          => now(),
             ]);
 
+            // 🌟 4. REDIRECT DAN KIRIM DATA FLASH SESSION DALAM BENTUK ARRAY
             return redirect()->route('order.history')->with([
                 'success' => 'Pesanan laundry Anda berhasil dibuat! Kurir kami akan segera menjemput.',
-                'order_data' => (object) [
+                'order_data' => [
                     'id'                => $orderId,
                     'nomor_resi'        => $nomorResi,
                     'nama_pelanggan'    => auth()->user()->name,
                     'metode_pembayaran' => $request->input('metode_pembayaran'),
                     'status'            => 'Pending Penjemputan',
-                    'tipe_durasi'       => $tipeDurasi,
+                    'tipe_durasi'       => $namaPaketTeks,
                     'berat_laundry'     => $qtyInput,
                     'ongkos_kirim'      => $ongkir,
                     'jarak_km'          => $jarak,
                     'alamat_lengkap'    => $request->input('alamat_lengkap'),
                     'total_harga'       => $estimasiHarga,
                     'jadwal_pickup'     => $request->input('hari_pickup') . ' @ ' . $request->input('jam_pickup'),
+                    'jadwal_pengiriman' => $jadwalPengiriman,
+                    'instruksi_driver'  => $request->input('instruksi_driver'),
                     'created_at'        => now()
                 ]
             ]);

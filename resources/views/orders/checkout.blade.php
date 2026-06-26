@@ -14,7 +14,7 @@
             <form action="{{ route('order.service') }}" method="POST" class="bg-white rounded-[24px] shadow-xl p-6 md:p-10 mb-10">
                 @csrf
 
-                <input type="hidden" name="jenis_layanan" value="{{ $layanan }}">
+                <input type="hidden" id="js-jenis-layanan" name="jenis_layanan" value="{{ $layanan }}">
 
                 <input type="hidden" name="jarak_km" id="jarak_km" value="0">
 
@@ -94,43 +94,81 @@
                         </div>
                     </div>
 
-                    <div class="space-y-4 md:border-l md:border-[#F6921E]/30 md:pl-10 relative">
-                        <h3 class="text-lg font-bold text-gray-900 mb-2">Mau PickUp Kapan?</h3>
+                    <div class="space-y-6 md:border-l md:border-[#F6921E]/30 md:pl-10 relative">
 
-                        <div class="grid grid-cols-2 gap-4">
-                            {{-- Input Hari/Tanggal --}}
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-700 mb-1">Hari apa?</label>
-                                <input type="date"
-                                    name="hari_pickup"
-                                    min="{{ date('Y-m-d') }}"
-                                    class="w-full border border-[#F6921E]/50 rounded-[14px] px-4 py-2 focus:ring-2 focus:ring-[#F6921E] outline-none text-gray-600 text-sm"
-                                    required>
-                            </div>
+                        {{-- 1. FORM PICKUP (ATAS) --}}
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-bold text-gray-900 mb-2">Mau PickUp Kapan?</h3>
 
-                            {{-- 🌟 JADINYA DROPDOWN SLOT JAM (Sesuai Jadwal Operasional Toko) 🌟 --}}
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-700 mb-1">Jam Berapa?</label>
-                                <select name="jam_pickup"
-                                    class="w-full border border-[#F6921E]/50 rounded-[14px] px-4 py-2 focus:ring-2 focus:ring-[#F6921E] outline-none text-gray-600 text-sm bg-white"
-                                    required>
-                                    <option value="" disabled selected>-- Pilih Jam --</option>
-                                    <option value="09:00 - 11:00">Pagi (09:00 - 11:00)</option>
-                                    <option value="11:00 - 13:00">Siang (11:00 - 13:00)</option>
-                                    <option value="13:00 - 15:00">Siang (13:00 - 15:00)</option>
-                                    <option value="15:00 - 17:00">Sore (15:00 - 17:00)</option>
-                                    <option value="17:00 - 19:00">Sore/Malam (17:00 - 19:00)</option>
-                                    <option value="19:00 - 21:00">Malam (19:00 - 21:00)</option>
-                                    <option value="21:00 - 22:00">Malam Khusus Weekend (21:00 - 22:00)</option>
-                                </select>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1">Hari apa?</label>
+                                    <input type="date"
+                                        name="hari_pickup"
+                                        min="{{ date('Y-m-d') }}"
+                                        class="w-full border border-[#F6921E]/50 rounded-[14px] px-4 py-2 focus:ring-2 focus:ring-[#F6921E] outline-none text-gray-600 text-sm bg-white"
+                                        required>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1">Jam Berapa?</label>
+                                    <select name="jam_pickup"
+                                        class="w-full border border-[#F6921E]/50 rounded-[14px] px-4 py-2 focus:ring-2 focus:ring-[#F6921E] outline-none text-gray-600 text-sm bg-white"
+                                        required>
+                                        <option value="" disabled selected>-- Pilih Jam --</option>
+                                        <option value="09:00 - 11:00">Pagi (09:00 - 11:00)</option>
+                                        <option value="11:00 - 13:00">Siang (11:00 - 13:00)</option>
+                                        <option value="13:00 - 15:00">Siang (13:00 - 15:00)</option>
+                                        <option value="15:00 - 17:00">Sore (15:00 - 17:00)</option>
+                                        <option value="17:00 - 19:00">Sore/Malam (17:00 - 19:00)</option>
+                                        <option value="19:00 - 21:00">Malam (19:00 - 21:00)</option>
+                                        <option value="21:00 - 22:00">Malam Khusus Weekend (21:00 - 22:00)</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-700 mb-1">Intruksi Untuk Driver</label>
-                            <textarea name="instruksi_driver" rows="5" class="w-full border border-[#F6921E]/50 rounded-[14px] px-4 py-3 focus:ring-2 focus:ring-[#F6921E] outline-none resize-none"></textarea>
+
+                        {{-- 2. FORM DELIVERY (TEPAT DI BAWAH PICKUP) --}}
+                        <div class="space-y-4 pt-6 border-t border-gray-100">
+                            <h3 class="text-lg font-bold text-gray-900 mb-2">Mau Diantar Kembali Kapan?</h3>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1">Hari apa?</label>
+                                    <input type="date"
+                                        id="hari_delivery" {{-- 🌟 Ditambahkan ID untuk JavaScript --}}
+                                        name="hari_delivery"
+                                        min="{{ date('Y-m-d') }}"
+                                        class="w-full border border-[#F6921E]/50 rounded-[14px] px-4 py-2 focus:ring-2 focus:ring-[#F6921E] outline-none text-gray-600 text-sm bg-white"
+                                        required>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 mb-1">Jam Berapa?</label>
+                                    <select name="jam_delivery"
+                                        class="w-full border border-[#F6921E]/50 rounded-[14px] px-4 py-2 focus:ring-2 focus:ring-[#F6921E] outline-none text-gray-600 text-sm bg-white"
+                                        required>
+                                        <option value="" disabled selected>-- Pilih Jam --</option>
+                                        <option value="09:00 - 11:00">Pagi (09:00 - 11:00)</option>
+                                        <option value="11:00 - 13:00">Siang (11:00 - 13:00)</option>
+                                        <option value="13:00 - 15:00">Siang (13:00 - 15:00)</option>
+                                        <option value="15:00 - 17:00">Sore (15:00 - 17:00)</option>
+                                        <option value="17:00 - 19:00">Sore/Malam (17:00 - 19:00)</option>
+                                        <option value="19:00 - 21:00">Malam (19:00 - 21:00)</option>
+                                        <option value="21:00 - 22:00">Malam Khusus Weekend (21:00 - 22:00)</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
 
+                        <div class="space-y-4 pt-6 border-t border-gray-100">
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Instruksi Untuk Driver</label>
+                            <textarea name="instruksi_driver" rows="5" class="w-full border border-[#F6921E]/50 rounded-[14px] px-4 py-3 focus:ring-2 focus:ring-[#F6921E] outline-none resize-none" placeholder="Contoh: Titipkan ke satpam atau taruh di teras pagar hitam..."></textarea>
+                        </div>
+
+                        {{-- Garis dekoratif samping kiri bawah (khusus desktop) --}}
                         <div class="hidden md:block absolute bottom-0 -left-[1px] h-24 w-[1px] bg-[#F6921E]"></div>
+
                     </div>
                 </div>
                 <div class="mt-8 flex justify-end">
@@ -194,8 +232,6 @@
         kalkulasiDanSimpanJarak(position);
         updateAlamatDariKoordinat(position.lat, position.lng);
     });
-
-    // 🔥 LOGIKA JEMBATAN DROPDOWN YANG MERUSAK JARAK SUDAH DIHAPUS TOTAL 🔥
 
     // PENCARIAN MANUAL VIA ENTER
     const searchInput = document.getElementById('search-address');
@@ -261,4 +297,48 @@
             }
         });
     });
+
+    // 🌟 LOGIKA DINAMIS TANGGAL DELIVERY (SIAP UNTUK BANYAK LAYANAN) 🌟
+    const inputHariPickup = document.querySelector('input[name="hari_pickup"]');
+    const inputHariDelivery = document.querySelector('input[name="hari_delivery"]');
+    const jsJenisLayanan = document.getElementById('js-jenis-layanan');
+
+    if (inputHariPickup && inputHariDelivery) {
+        inputHariPickup.addEventListener('change', function() {
+            if (this.value) {
+                const datePickup = new Date(this.value);
+
+                // 1. Ambil nilai dari hidden input, jika tidak ada fallback ke URL, jika tidak ada default ke kiloan
+                let jenisLayanan = jsJenisLayanan ? jsJenisLayanan.value : '';
+                if (!jenisLayanan) {
+                    jenisLayanan = window.location.pathname.includes('permadani') ? 'permadani' : 'kiloan';
+                }
+
+                // 2. Daftar durasi proses tiap layanan (Tinggal tambah di sini kalau ada layanan baru!)
+                const durasiLayanan = {
+                    'kiloan': 3, // Kiloan nunggu 3 hari
+                    'permadani': 14, // Permadani nunggu 14 hari
+                    'sepatu': 5, // (Contoh) Cuci sepatu nunggu 5 hari
+                    'helm': 2 // (Contoh) Cuci helm nunggu 2 hari
+                };
+
+                // 3. Ambil jumlah hari berdasarkan layanan aktif (jika tidak terdaftar, default 3 hari)
+                const jumlahHari = durasiLayanan[jenisLayanan] || 3;
+
+                // 4. Tambahkan hari otomatis
+                datePickup.setDate(datePickup.getDate() + jumlahHari);
+
+                // Format kembali ke string YYYY-MM-DD
+                const year = datePickup.getFullYear();
+                const month = String(datePickup.getMonth() + 1).padStart(2, '0');
+                const day = String(datePickup.getDate()).padStart(2, '0');
+
+                const formattedDeliveryDate = `${year}-${month}-${day}`;
+
+                // Set nilai ke input delivery
+                inputHariDelivery.value = formattedDeliveryDate;
+                inputHariDelivery.min = formattedDeliveryDate;
+            }
+        });
+    }
 </script>

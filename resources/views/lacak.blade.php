@@ -105,9 +105,22 @@
                     <p class="text-gray-400">Pelanggan:</p>
                     <p class="font-bold text-gray-800 mt-0.5">{{ auth()->check() ? $order->nama_pelanggan : substr($order->nama_pelanggan, 0, 2) . '***' }}</p>
                 </div>
-                <div class="bg-gray-50 p-3 rounded-2xl text-gray-600">
-                    <p class="text-gray-400">Berat Estimasi:</p>
-                    <p class="font-bold text-gray-800 mt-0.5">{{ $order->berat_laundry }} Kg</p>
+                <div class="p-4 bg-gray-50 rounded-xl">
+                    <span class="text-xs text-gray-400 block mb-1">
+                        @if(($order->jenis_layanan ?? $order['jenis_layanan'] ?? '') == 'permadani')
+                        Luas Estimasi:
+                        @else
+                        Berat Estimasi:
+                        @endif
+                    </span>
+                    <p class="font-bold text-gray-800 mt-0.5">
+                        {{ $order->berat_laundry ?? $order['berat_laundry'] ?? 0 }}
+                        @if(($order->jenis_layanan ?? $order['jenis_layanan'] ?? '') == 'permadani')
+                        m²
+                        @else
+                        Kg
+                        @endif
+                    </p>
                 </div>
                 <div class="bg-gray-50 p-3 rounded-2xl text-gray-600">
                     <p class="text-gray-400">Paket Layanan:</p>
@@ -129,9 +142,35 @@
             <div class="mt-3 pt-3 border-t border-gray-100">
                 <p class="text-xs font-bold text-gray-700">🗓️ Jadwal Penjemputan:</p>
                 <p class="text-sm text-blue-600 font-semibold mt-0.5">
-                    {{ $order->jadwal_pickup ?? 'Segera Di-pickup' }}
+                    {{ $order->jadwal_pickup ?? $order['jadwal_pickup'] ?? 'Segera Di-pickup' }}
                 </p>
             </div>
+
+            {{-- 1. Jadwal Pengantaran Kembali --}}
+            <div class="mt-3 pt-3 border-t border-gray-100">
+                <p class="text-xs font-bold text-gray-700">📦 Jadwal Pengantaran Kembali:</p>
+                <p class="text-sm text-blue-600 font-semibold mt-0.5">
+                    {{ $order->jadwal_pengiriman ?? $order['jadwal_pengiriman'] ?? '-' }}
+                </p>
+            </div>
+
+            {{-- 2. Metode Pembayaran --}}
+            <div class="mt-3 pt-3 border-t border-gray-100">
+                <p class="text-xs font-bold text-gray-700">💳 Metode Pembayaran:</p>
+                <div class="mt-1">
+                    <span class="inline-block bg-gray-100 text-gray-800 font-bold px-2.5 py-0.5 rounded text-xs">
+                        {{ $order->metode_pembayaran ?? $order['metode_pembayaran'] ?? '-' }}
+                    </span>
+                </div>
+            </div>
+
+            {{-- 3. Box Catatan Driver --}}
+            @if(!empty($order->instruksi_driver) || !empty($order['instruksi_driver']))
+            <div class="bg-amber-50 p-3 rounded-xl text-xs text-amber-700 mt-4 border border-amber-100">
+                <span class="font-bold text-amber-800 block mb-1">📌 Catatan Untuk Driver:</span>
+                "{{ $order->instruksi_driver ?? $order['instruksi_driver'] }}"
+            </div>
+            @endif
         </div>
         @endif
 
