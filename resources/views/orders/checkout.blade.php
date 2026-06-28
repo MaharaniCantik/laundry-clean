@@ -319,7 +319,6 @@
                     'kiloan': 3, // Kiloan nunggu 3 hari
                     'permadani': 14, // Permadani nunggu 14 hari
                     'sepatu': 5, // (Contoh) Cuci sepatu nunggu 5 hari
-                    'helm': 2 // (Contoh) Cuci helm nunggu 2 hari
                 };
 
                 // 3. Ambil jumlah hari berdasarkan layanan aktif (jika tidak terdaftar, default 3 hari)
