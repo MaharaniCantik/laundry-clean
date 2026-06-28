@@ -40,6 +40,12 @@
                             <span class="text-gray-400">Status Pesanan:</span>
                             <span class="px-3 py-0.5 rounded-full text-xs font-black bg-amber-100 text-amber-700">{{ $order['status'] }}</span>
                         </div>
+                        <div class="flex justify-between py-2 border-t border-dashed">
+                            <span class="text-gray-600">Kurir Penjemput:</span>
+                            <span class="font-semibold text-blue-600">
+                               {{ $order['nama_kurir_siap'] }}
+                            </span>
+                        </div>
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-400">Tanggal Order:</span>
                             <span class="text-gray-600 text-xs">{{ date('d M Y - H:i', strtotime($order['created_at'])) }}</span>
@@ -72,50 +78,53 @@
                     </div>
 
                     <div class="space-y-2 pb-4 border-b border-dashed border-gray-200 text-sm">
-                        <div class="flex justify-between items-center py-2 border-b border-dashed border-gray-100 text-sm">
+                        {{-- 🌟 Jauh lebih dinamis, bersih, dan rapi --}}
+                        <div class="flex justify-between">
                             <span class="text-gray-500">
-                                @if(($order->jenis_layanan ?? $order['jenis_layanan'] ?? '') == 'permadani')
-                                Luas Estimasi:
-                                @else
-                                Berat Estimasi:
-                                @endif
+                                {{ (strtolower($order['jenis_layanan'] ?? '') == 'permadani') ? 'Luas Karpet:' : 'Berat Timbangan:' }}
                             </span>
                             <span class="font-bold text-gray-800">
-                                {{ $order->berat_laundry ?? $order['berat_laundry'] ?? 0 }}
-                                @if(($order->jenis_layanan ?? $order['jenis_layanan'] ?? '') == 'permadani')
-                                m²
-                                @else
-                                Kg
-                                @endif
+                                {{ $order['berat_laundry'] ?? 0 }} {{ (strtolower($order['jenis_layanan'] ?? '') == 'permadani') ? 'm²' : 'Kg' }}
                             </span>
                         </div>
 
                         <div class="flex justify-between">
+
                             <span class="text-gray-500">Ongkos Kirim ({{ $order['jarak_km'] }} Km):</span>
+
                             <span class="font-semibold text-gray-700">Rp {{ number_format($order['ongkos_kirim'], 0, ',', '.') }}</span>
+
                         </div>
 
-                        {{-- 🌟 UPDATE: LOGIKA TEKS ESTIMASI DURASI PAKET YANG LENGKAP --}}
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">
-                                @if(($order['jenis_layanan'] ?? $order->jenis_layanan ?? '') == 'permadani')
-                                {{-- Mengambil tulisan "Permadani - Tebal/Tipis" langsung dari database --}}
-                                Estimasi Biaya Laundry ({{ $order['tipe_durasi'] ?? $order->tipe_durasi }}):
-                                @else
-                                Estimasi Biaya Laundry ({{ $order['tipe_durasi'] ?? $order->tipe_durasi ?? 'Kiloan' }}):
-                                @endif
-                            </span>
-                            <span class="font-semibold text-gray-700">
-                                Rp
-                                @php
-                                $totalHarga = $order['total_harga'] ?? $order->total_harga ?? 0;
-                                $ongkosKirim = $order['ongkos_kirim'] ?? $order->ongkos_kirim ?? 0;
-                                $subtotalLaundy = $totalHarga - $ongkosKirim;
-                                @endphp
-                                {{ number_format($subtotalLaundy, 0, ',', '.') }}
-                            </span>
-                        </div>
+                       <div class="flex justify-between">
+                        <span class="text-gray-500">
+                            @if(strtolower($order['jenis_layanan'] ?? $order->jenis_layanan ?? '') == 'permadani')
+                                Estimasi Biaya Laundry ({{ ucfirst($order['tipe_durasi'] ?? $order->tipe_durasi ?? 'Tebal') }}):
+                            @else
+                                Estimasi Biaya Laundry ({{ ucfirst($order['tipe_durasi'] ?? $order->tipe_durasi ?? 'Reguler') }}):
+                            @endif
+                        </span>
+                        <span class="font-semibold text-gray-700">
+                            Rp
+                            @php
+                                // Ambil jenis layanan aman dari array atau object dan paksa huruf kecil
+                                $jenis = strtolower($order['jenis_layanan'] ?? $order->jenis_layanan ?? '');
+                                $tipe = strtolower($order['tipe_durasi'] ?? $order->tipe_durasi ?? '');
+                                $qty = $order['berat_laundry'] ?? $order->berat_laundry ?? 0;
+
+                                if ($jenis == 'permadani') {
+                                    $hargaSatuan = ($tipe == 'tebal') ? 70000 : 45000;
+                                } else {
+                                    $hargaSatuan = ($tipe == 'express') ? 9000 : 5000;
+                                }
+                                
+                                $subtotal = $qty * $hargaSatuan;
+                            @endphp
+                            {{-- 🌟 SUDAH DIPERBAIKI: Memanggil variabel $subtotal yang benar --}}
+                            {{ number_format($subtotal, 0, ',', '.') }}
+                        </span>
                     </div>
+                    </div> 
 
                     {{-- TOTAL HARGA DINAMIS --}}
                     <div class="flex justify-between items-center pt-2">

@@ -31,6 +31,13 @@
                         class="w-full bg-surface-container-lowest border border-outline-variant text-on-surface rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                     @error('email') <p class="text-error font-body-sm text-body-sm mt-1">{{ $message }}</p> @enderror
                 </div>
+                {{-- Letakkan ini tepat di bawah div Alamat Email Kurir dan di atas No. HP --}}
+                <div>
+                    <label class="block font-label-md text-label-md text-on-surface mb-2">Password Akun Kurir</label>
+                    <input type="password" name="password" required placeholder="Minimal 8 karakter untuk login"
+                        class="w-full bg-surface-container-lowest border border-outline-variant text-on-surface rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                    @error('password') <p class="text-error font-body-sm text-body-sm mt-1">{{ $message }}</p> @enderror
+                </div>
 
                 <div>
                     <label class="block font-label-md text-label-md text-on-surface mb-2">No. HP / WhatsApp</label>

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Kurir;
-// use App\Models\Order; // Di-comment dulu karena tabel/model belum siap
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Http\Controllers\Controller;
@@ -42,22 +41,31 @@ public function create()
 // 2. Fungsi untuk memproses data dari form ke database
 public function store(Request $request)
 {
-    // 1. Tambahkan validasi email di sini
     $request->validate([
         'nik' => 'required|string|max:16',
         'nama_lengkap' => 'required|string|max:255',
-        'email' => 'required|email|max:255', // <--- Tambahkan baris ini
+        'email' => 'required|email|max:255|unique:users,email',
+        'password' => 'required|string|min:8',
         'no_hp' => 'required|string|max:15',
         'kendaraan' => 'required|in:Motor,Mobil',
         'plat_nomor' => 'required|string|max:15',
         'area_tugas' => 'nullable|string|max:255',
     ]);
 
-    // 2. Tambahkan 'email' ke dalam query create
-    Kurir::create([
+    // Menggunakan alamat lengkap model agar tidak tersesat di namespace Admin
+    $user = \App\Models\User::create([
+        'name' => $request->nama_lengkap,
+        'email' => $request->email,
+        'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+        'role' => 'kurir',
+    ]);
+
+    // Begitu juga dengan Model Kurir
+    \App\Models\Kurir::create([
+        'user_id' => $user->id,
         'nik' => $request->nik,
         'nama_lengkap' => $request->nama_lengkap,
-        'email' => $request->email, // <--- Tambahkan baris ini
+        'email' => $request->email,
         'no_hp' => $request->no_hp,
         'kendaraan' => $request->kendaraan,
         'plat_nomor' => $request->plat_nomor,
@@ -67,6 +75,4 @@ public function store(Request $request)
 
     return redirect()->route('admin.armada_kurir')->with('success', 'Data kurir berhasil ditambahkan!');
 }
-    // Redirect kembali ke halaman utama dengan pesan sukses
-   
 }

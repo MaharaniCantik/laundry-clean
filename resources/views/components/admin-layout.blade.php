@@ -220,6 +220,17 @@
                     </a>
                 </div>
             </div>
+            <div class="mt-auto px-4 py-4 border-t border-outline-variant">
+                {{-- Form POST untuk memproses Logout ke sistem Laravel auth --}}
+                <form method="POST" action="{{ route('logout') }}" id="logout-form">
+                    @csrf
+                    <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl font-medium transition-colors group">
+                        {{-- Menggunakan Material Symbols Outlined agar icon-nya senada dengan tema CleanControl --}}
+                        <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">logout</span>
+                        <span>Keluar Sistem</span>
+                    </button>
+                </form>
+            </div>
         </aside>
 
         <header
@@ -237,8 +248,11 @@
             </div>
         </header>
 
+
         <div class="content-wrapper">
             {{ $slot }}
         </div>
+
+        
     </body>
 </html>

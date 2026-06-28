@@ -11,6 +11,7 @@ class Order extends Model
 
     // 1. Kasih tahu Laravel kalau model ini berpasangan dengan tabel 'orders' di Supabase
     protected $table = 'orders'; 
+    protected $appends = ['satuan'];
 
     // 2. Daftarkan kolom-kolom yang ada di database kamu agar diizinkan dibaca oleh Laravel
    protected $fillable = [
@@ -30,4 +31,30 @@ class Order extends Model
     'created_at',
     'updated_at'
 ];
+
+// Di dalam class Order extends Model
+
+    public function getSatuanAttribute()
+    {
+        switch ($this->jenis_layanan) {
+            case 'laundry kiloan':
+            case 'setrika only':
+                return 'kg';
+            case 'permadani':
+                return 'm';
+            case 'sepatu':
+            case 'boneka':
+            case 'bedcover':
+            case 'gorden':
+                return 'pcs';
+            default:
+                return 'kg';
+        }
+    }
+
+    public function kurir()
+    {
+        // instruksi_driver menyimpan ID kurir, user_id di tabel kurir adalah pemilik ID tersebut
+        return $this->belongsTo(\App\Models\Kurir::class, 'instruksi_driver', 'user_id');
+    }
 }

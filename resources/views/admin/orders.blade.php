@@ -90,6 +90,7 @@
                             <th class="p-4">Service & Durasi</th>
                             <th class="p-4">Address & Distance</th>
                             <th class="p-4">Weight & Payment</th>
+                            <th class="p-4">Date & Instruksi Driver</th>
                             <th class="p-4">Status</th>
                             <th class="p-4">Total Harga</th>
                             <th class="p-4">Action</th>
@@ -112,8 +113,9 @@
                                 <span class="inline-flex items-center px-2 py-1 rounded-md bg-surface-variant text-on-surface font-label-md text-label-md">
                                     {{ $order->jenis_layanan ?? 'Kiloan' }}
                                 </span>
+                                {{-- Ganti di baris kolom ke-4 (WEIGHT & PAYMENT) --}}
                                 <div class="font-body-sm text-body-sm text-on-surface-variant mt-1">
-                                    {{ $order->berat_laundry ?? 0 }} kg - {{ $order->tipe_durasi ?? 'Reguler' }}
+                                    {{ $order->berat_laundry ?? 0 }} {{ $order->satuan ?? 'kg' }}
                                 </div>
                             </td>
                             
@@ -127,9 +129,15 @@
                             </td>
                             
                             <td class="py-4 px-4">
-                                <div class="font-body-sm text-body-sm text-on-surface font-medium">{{ $order->berat_laundry ?? 0 }} kg</div>
+                                <div class="font-body-sm text-body-sm text-on-surface font-medium">{{ $order->berat_laundry ?? 0 }} {{ $order->satuan ?? 'kg' }}</div>
                                 <span class="text-[10px] font-bold uppercase px-1.5 py-0.5 bg-surface-variant rounded text-on-surface-variant inline-block mt-1">
                                     {{ $order->metode_pembayaran ?? 'Cash' }}
+                                </span>
+                            </td>
+                            <td class="py-4 px-4">
+                                <div class="font-body-sm text-body-sm text-on-surface font-medium">{{$order->instruksi_driver ?? 'Tidak ada instruksi khusus' }}</div>
+                                 <span class="text-[10px] font-bold uppercase px-1.5 py-0.5 bg-surface-variant rounded text-on-surface-variant inline-block mt-1">
+                                    {{ $order->jadwal_pickup ?? 'Tidak ada jam' }}
                                 </span>
                             </td>
                             

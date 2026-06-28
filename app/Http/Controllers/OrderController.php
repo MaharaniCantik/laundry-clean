@@ -228,26 +228,41 @@ class OrderController extends Controller
     /**
      * Menampilkan Halaman Riwayat / Laporan Pencucian
      */
-    public function history()
-    {
-        $order = session('order_data');
+public function history()
+{
+    $customerId = auth()->id();
 
-        if (!$order) {
-            $order = DB::table('orders')
-                ->where('user_id', auth()->id())
-                ->orderBy('created_at', 'desc')
-                ->first();
-        }
+    // 1. Ambil orderan terbaru milik customer yang sedang login
+    $orderModel = \App\Models\Order::where('user_id', $customerId)
+                    ->latest()
+                    ->first();
 
-        if (!$order) {
-            return redirect()->route('dashboard');
-        }
-
-        $order = (array) $order;
-
-        return view('orders.history', compact('order'));
+    if (!$orderModel) {
+        return redirect()->route('dashboard');
     }
 
+    // Convert ke array biasa
+    $order = $orderModel->toArray();
+
+    // Default status jika kurir belum ada
+    $namaKurirDitemukan = 'Mencari Kurir...';
+
+    // 2. Gunakan kurir_id asli untuk mencari siapa kurir yang ditugaskan
+    if (!empty($orderModel->kurir_id)) {
+        
+        // Cari ke tabel kurirs berdasarkan user_id yang sesuai dengan kurir_id di orderan
+        $kurir = \DB::table('kurirs')->where('user_id', $orderModel->kurir_id)->first();
+        
+        if ($kurir) {
+            $namaKurirDitemukan = $kurir->nama_lengkap;
+        }
+    }
+
+    // Masukkan nama kurir murni ke dalam array order agar dibaca oleh blade
+    $order['nama_kurir_siap'] = $namaKurirDitemukan;
+
+    return view('orders.history', compact('order'));
+}
     // View Informasi Singkat Layanan
     public function kiloan()
     {
