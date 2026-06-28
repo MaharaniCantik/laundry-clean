@@ -106,11 +106,16 @@
                                     @endif
                                 </td>
                                 
-                                <td class="py-4 px-4 text-right">
-                                    <button class="inline-flex items-center justify-center p-1.5 rounded-lg text-outline hover:text-primary transition-colors" title="Edit / Detail">
+                               <td class="py-4 px-4 text-right">
+                                <form action="{{ route('admin.tes_kurir_manual') }}" method="POST" class="inline">
+                                    @csrf
+                                    <input type="hidden" name="id_kurir_row" value="{{ $kurir->id }}">
+
+                                    <button type="submit" class="inline-flex items-center justify-center p-1.5 rounded-lg text-outline hover:text-primary transition-colors" title="Tugaskan Kurir Ini">
                                         <span class="material-symbols-outlined">edit</span>
                                     </button>
-                                </td>
+                                </form>
+                            </td>
                             </tr>
                         @empty
                             <tr>

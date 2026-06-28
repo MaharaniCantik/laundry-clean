@@ -9,12 +9,28 @@ class Kurir extends Model
 {
     use HasFactory;
 
-    protected $table = 'kurirs';
+    protected $fillable = [
+    'user_id',
+    'nik',
+    'nama_lengkap',
+    'email',
+    'no_hp',
+    'kendaraan',
+    'plat_nomor',
+    'area_tugas',
+    'status_kerja', // 🔥 PASTIKAN INI ADA
+    'status_aktif'
+    ];// Sesuaikan kolom Anda
 
-    protected $fillable = ['nik', 'nama_lengkap', 'email', 'no_hp', 'kendaraan', 'plat_nomor', 'area_tugas', 'status_kerja'];
-    // Relasi ke User (Jika kurir ingin melihat data loginnya)
-    public function user()
+    /**
+     * Scope untuk mengambil satu kurir acak yang berstatus tersedia (available)
+     */
+    public static function getRandomAvailableKurir()
     {
-        return $this->belongsTo(User::class);
+        // Mencari kurir yang statusnya 'available' dan user_id tidak kosong, lalu diacak (inRandomOrder)
+        return self::where('status', 'available')
+                   ->whereNotNull('user_id')
+                   ->inRandomOrder()
+                   ->first();
     }
 }

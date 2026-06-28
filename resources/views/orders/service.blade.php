@@ -47,24 +47,31 @@
                             </div>
                         </div>
 
-                        {{-- SELEKSI DURASI / JENIS KARPET (DINAMIS) --}}
-                        <div class="bg-white rounded-[20px] shadow-lg p-6 ">
+                        <div class="bg-white rounded-[20px] shadow-lg p-6">
                             @if(request('jenis_layanan') == 'permadani')
-                                <label class="text-[#0085C9] font-bold text-lg mb-4">Pilih Jenis Karpet:</label>
-                                <select name="tipe_durasi" class="w-full p-2 border rounded" required>
-                                    <option value="tipis">Tipis (Rp 45.000 / m²)</option>
-                                    <option value="tebal">Tebal (Rp 70.000 / m²)</option>
-                                </select>
+                            <label class="text-[#0085C9] font-bold text-lg block mb-2">Pilih Jenis Karpet:</label>
+                            <select id="select_durasi_permadani" name="tipe_durasi" class="w-full p-2 border rounded focus:ring-2 focus:ring-[#0085C9] outline-none text-gray-700" required>
+                                <option value="tipis">Tipis (Rp 45.000 / m²)</option>
+                                <option value="tebal">Tebal (Rp 70.000 / m²)</option>
+                            </select>
+                            {{-- Keterangan Tambahan khusus Permadani --}}
+                            <p class="text-xs text-amber-600 font-medium mt-2 bg-amber-50 p-2 rounded-lg border border-amber-100">
+                                ℹ️ Cuci permadani membutuhkan waktu proses minimal 14 hari kerja.
+                            </p>
                             @else
-                                <label class="text-[#0085C9] font-bold text-lg mb-4">Pilih Durasi Laundry:</label>
-                                <select name="tipe_durasi" class="w-full p-2 border rounded" required>
-                                    <option value="reguler">Reguler (Rp 5.000 / Kg)</option>
-                                    <option value="express">Express (Rp 9.000 / Kg)</option>
-                                </select>
+                            <label class="text-[#0085C9] font-bold text-lg block mb-2">Pilih Durasi Laundry:</label>
+                            <select id="select_durasi_kiloan" name="tipe_durasi" class="w-full p-2 border rounded focus:ring-2 focus:ring-[#0085C9] outline-none text-gray-700" required>
+                                <option value="reguler">Reguler (Rp 5.000 / Kg)</option>
+                                <option value="express">Express (Rp 9.000 / Kg)</option>
+                            </select>
+
+                            {{-- 🌟 TEKS EDUKASI DINAMIS BERDASARKAN PILIHAN DROPDOWN KILOAN --}}
+                            <div id="info_durasi_kiloan" class="text-xs font-medium mt-2 p-2 rounded-lg border transition-all duration-200">
+                            </div>
                             @endif
                         </div>
 
-                        {{-- METODE PEMBAYARAN --}}
+                        {{-- METODE PEMBAYARAN  --}}
                         <div class="bg-white rounded-[20px] shadow-lg p-6">
                             <h3 class="text-[#0085C9] font-bold text-lg mb-4">Metode Pembayaran</h3>
 
@@ -128,7 +135,6 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
 
                     {{-- ====================================================
@@ -157,11 +163,11 @@
                         <div class="bg-white rounded-[20px] shadow-lg p-6">
                             <h3 class="text-[#0085C9] font-bold text-lg mb-4">Form Penimbangan</h3>
                             <div class="bg-[#e4f3fa] rounded-2xl p-5 border border-blue-100">
-                                
+
                                 @if(request('jenis_layanan') == 'permadani')
-                                    <label class="block text-gray-700 font-semibold text-sm mb-3">Masukan Luas Karpet (m²)</label>
+                                <label class="block text-gray-700 font-semibold text-sm mb-3">Masukan Luas Karpet (m²)</label>
                                 @else
-                                    <label class="block text-gray-700 font-semibold text-sm mb-3">Masukan berat (Kg)</label>
+                                <label class="block text-gray-700 font-semibold text-sm mb-3">Masukan berat (Kg)</label>
                                 @endif
 
                                 <div class="flex items-center gap-5 mb-5">
@@ -174,9 +180,9 @@
                                     <button type="button" id="btn-plus" class="w-8 h-8 rounded-full bg-[#F6921E] text-white flex items-center justify-center shadow hover:bg-orange-600 transition-all select-none">
                                         <span class="font-bold text-base">+</span>
                                     </button>
-                                    
+
                                     @if(request('jenis_layanan') == 'permadani')
-                                        <span class="text-gray-600 font-bold text-sm">m²</span>
+                                    <span class="text-gray-600 font-bold text-sm">m²</span>
                                     @endif
                                 </div>
 
@@ -215,13 +221,14 @@
         -webkit-appearance: none;
         margin: 0;
     }
+
     .no-spinners {
         -moz-appearance: textfield;
     }
 </style>
 
 {{-- ====================================================
- SCRIPT SINKRONISASI LOGIK (Sudah Di-upgrade untuk Permadani)
+ SCRIPT SINKRONISASI LOGIK
  ==================================================== --}}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -313,6 +320,35 @@
                 });
             });
         }
+
+        // ====================================================
+        // 🌟 KODE BARU: LOGIKA TEKS EDUKASI DINAMIS KILOAN 🌟
+        // ====================================================
+        const selectDurasiKiloan = document.getElementById('select_durasi_kiloan');
+        const infoDurasiKiloan = document.getElementById('info_durasi_kiloan');
+
+        function updateInfoTeksKiloan() {
+            if (!selectDurasiKiloan || !infoDurasiKiloan) return;
+            if (selectDurasiKiloan.value === 'express') {
+                infoDurasiKiloan.className = "text-xs font-medium mt-2 p-2 rounded-lg border bg-blue-50 text-blue-700 border-blue-100";
+                infoDurasiKiloan.innerHTML = "⚡ <b>Paket Express:</b> Pakaian selesai dalam 24 jam. Pengantaran sesuai request tanggal checkout.";
+            } else {
+                infoDurasiKiloan.className = "text-xs font-medium mt-2 p-2 rounded-lg border bg-amber-50 text-amber-700 border-amber-100";
+                infoDurasiKiloan.innerHTML = "📦 <b>Paket Reguler:</b> Proses cuci butuh 3 hari. Jadwal pengantaran otomatis disesuaikan minimal H+3 dari tanggal pickup.";
+            }
+        }
+
+        if (selectDurasiKiloan) {
+            updateInfoTeksKiloan();
+            selectDurasiKiloan.addEventListener('change', updateInfoTeksKiloan);
+            selectDurasiKiloan.addEventListener('change', updateHarga);
+        }
+
+        const selectPermadani = document.getElementById('select_durasi_permadani');
+        if (selectPermadani) {
+            selectPermadani.addEventListener('change', updateHarga);
+        }
+        // ====================================================
 
         // Jalankan kalkulasi awal saat halaman selesai dimuat
         updateHarga();

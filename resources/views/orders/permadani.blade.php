@@ -44,7 +44,7 @@
                     <div class="flex justify-between items-center p-4 px-6">
                         <div class="space-y-0.5">
                             <h3 class="text-sm font-bold text-gray-700 tracking-wide">Tipis</h3>
-                            <p class="text-xs text-gray-400 font-medium">Harga Rp 45.000/1m²</p>
+                            <p class="text-xs text-gray-400 font-medium">Harga Rp 45.000/1m²|Estimasi 14 hari</p>
                         </div>
                         <span class="text-sm font-extrabold text-[#F6921E]">Rp 45.000</span>
                     </div>
@@ -52,7 +52,7 @@
                     <div class="flex justify-between items-center p-4 px-6">
                         <div class="space-y-0.5">
                             <h3 class="text-sm font-bold text-gray-700 tracking-wide">Tebal</h3>
-                            <p class="text-xs text-gray-400 font-medium">Harga Rp 70.000/1m²</p>
+                            <p class="text-xs text-gray-400 font-medium">Harga Rp 70.000/1m²|Etimasi 14 hari</p>
                         </div>
                         <span class="text-sm font-extrabold text-[#F6921E]">Rp 70.000</span>
                     </div>

@@ -1,17 +1,27 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    // 1. Notifikasi kalau ada Error (Misal: Password salah)
+    // 1. Notifikasi kalau ada Error Validasi (Dinamis sesuai error aslinya)
     @if ($errors->any())
         Swal.fire({
             icon: 'error',
             title: 'Waduh!',
-            text: 'Email atau password kamu salah, cek lagi ya!',
-            confirmButtonColor: '#F6921E', // Warna orange desain lu
+            text: "{{ $errors->first() }}", // 🔥 Mengambil pesan error pertama yang dikirim Laravel
+            confirmButtonColor: '#F6921E',
         });
     @endif
 
-    // 2. Notifikasi kalau Berhasil (Misal: Berhasil Login/Logout)
+    // 2. Notifikasi kalau ada Session Error Manual (Misal dari Auth::attempt)
+    @if (session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Waduh!',
+            text: "{{ session('error') }}",
+            confirmButtonColor: '#F6921E',
+        });
+    @endif
+
+    // 3. Notifikasi kalau Berhasil (Login/Logout/Daftar)
     @if (session('success'))
         Swal.fire({
             icon: 'success',
@@ -22,7 +32,7 @@
         });
     @endif
 
-    // 3. Notifikasi Status Umum dari Laravel Breeze
+    // 4. Notifikasi Status Umum dari Laravel Breeze
     @if (session('status'))
         Swal.fire({
             icon: 'info',

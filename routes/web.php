@@ -7,6 +7,7 @@ use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Admin\KurirController;
 use Illuminate\Support\Facades\Redirect;
+use App\Http\Controllers\Kurir\KurirDashboardController;
 
 // ==========================================
 // 1. RUTE HALAMAN UTAMA (LANDING PAGE)
@@ -67,10 +68,20 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Taruh ini di bawah rute admin.orders yang sudah ada kemarin:
     Route::post('/admin/orders/{id}/update-status', [OrderAdminController::class, 'updateStatus'])->name('admin.orders.update-status');
 
+    Route::post('/admin/order/konfirmasi/{id}', [App\Http\Controllers\Admin\OrderAdminController::class, 'konfirmasiOrder'])
+     ->name('admin.konfirmasiOrder');
+
     // TARUH DI SINI (Gua sejajarin biar gak tumpang tindih middleware-nya, dan namanya disamain):
     Route::get('/admin/armada_kurir', [KurirController::class, 'index'])->name('admin.armada_kurir');
     // Route untuk menampilkan halaman form tambah kurir
     Route::get('/admin/armada_kurir/create', [KurirController::class, 'create'])->name('admin.armada_kurir.create');
+
+    Route::post('/admin/armada-kurir/tes-tembak', [App\Http\Controllers\Admin\OrderAdminController::class, 'tesKurirManual'])
+     ->name('admin.tes_kurir_manual');
+
+     // Pastikan nama rutenya ->name('updateStatus') sesuai dengan yang dipanggil di blade kurir
+    Route::post('/kurir/task/update-status/{id}', [App\Http\Controllers\Kurir\KurirDashboardController::class, 'updateStatus'])
+     ->name('updateStatus');
 
     // Route untuk memproses penyimpanan data kurir baru
     Route::post('/admin/armada_kurir/store', [KurirController::class, 'store'])->name('admin.armada_kurir.store');
@@ -84,10 +95,22 @@ Route::middleware(['auth', 'role:owner'])->group(function () {
     })->name('owner.dashboard');
 });
 
-Route::middleware(['auth', 'role:kurir'])->group(function () {
-    Route::get('/kurir/dashboard', function () {
-       return view('kurir.dashboard');
-    })->name('kurir.dashboard');
+// Group Route khusus untuk Kurir
+// Pastikan nama class Controller-nya sesuai dengan file lu (KurirDashboardController)
+
+Route::middleware(['auth'])->prefix('kurir')->name('kurir.')->group(function () {
+    
+    // 🌟 SUDAH DIPERBAIKI: Cukup ketik '/dashboard', otomatis jadi 'kurir/dashboard'
+    Route::get('/dashboard', [KurirDashboardController::class, 'index'])->name('dashboard');
+    
+    // URL otomatis jadi: kurir/order/{id}/update-status | Nama route: kurir.updateStatus
+    Route::post('/order/{id}/update-status', [KurirDashboardController::class, 'updateStatus'])->name('updateStatus');
+    
+    // URL otomatis jadi: kurir/history | Nama route: kurir.history
+    Route::get('/history', [KurirDashboardController::class, 'history'])->name('history');
+    
+    // URL otomatis jadi: kurir/profile | Nama route: kurir.profile
+    Route::get('/profile', [KurirDashboardController::class, 'profile'])->name('profile');
 });
 
 Route::get('/', function () {

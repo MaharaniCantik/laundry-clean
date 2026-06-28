@@ -24,7 +24,7 @@
                             <span class="font-black text-blue-800 tracking-wider">{{ $order['nomor_resi'] ?? 'KODE-GENERATING' }}</span>
                         </div>
 
-                        {{-- 🌟 PERBAIKAN 1: NAMA PELANGGAN DIAMBIL DARI DATA ORDER YANG VALID & TIDAK DUPLIKAT --}}
+                        {{-- NAMA PELANGGAN --}}
                         <div class="flex justify-between text-sm pt-2">
                             <span class="text-gray-400">Nama Pelanggan:</span>
                             <span class="font-bold text-gray-800">{{ $order['nama_pelanggan'] ?? auth()->user()->name }}</span>
@@ -40,17 +40,40 @@
                             <span class="text-gray-400">Status Pesanan:</span>
                             <span class="px-3 py-0.5 rounded-full text-xs font-black bg-amber-100 text-amber-700">{{ $order['status'] }}</span>
                         </div>
+                        <div class="flex justify-between py-2 border-t border-dashed">
+                            <span class="text-gray-600">Kurir Penjemput:</span>
+                            <span class="font-semibold text-blue-600">
+                               {{ $order['nama_kurir_siap'] }}
+                            </span>
+                        </div>
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-400">Tanggal Order:</span>
                             <span class="text-gray-600 text-xs">{{ date('d M Y - H:i', strtotime($order['created_at'])) }}</span>
                         </div>
                     </div>
 
-                    {{-- 🌟 BARIS BARU: MENAMPILKAN JADWAL PICKUP YANG DIPILIH USER 🌟 --}}
+                    {{-- 🌟 UPDATE: MENAMPILKAN DETAIL TANGGAL & SLOT JAM PILIHAN PELANGGAN --}}
+                    {{-- JADWAL PICKUP --}}
                     <div class="flex justify-between text-sm pt-1">
                         <span class="text-gray-400">Jadwal Penjemputan:</span>
                         <span class="px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-xs font-bold border border-blue-100">
-                            🗓️ {{ $order['jadwal_pickup'] ?? 'Segera Di-pickup' }}
+                            🗓️ @if(!empty($order['hari_pickup']))
+                            {{ date('d M Y', strtotime($order['hari_pickup'])) }} ({{ $order['jam_pickup'] ?? 'Jam Bebas' }})
+                            @else
+                            {{ $order['jadwal_pickup'] ?? 'Segera Di-pickup' }}
+                            @endif
+                        </span>
+                    </div>
+
+                    {{-- JADWAL PENGANTARAN KEMBALI --}}
+                    <div class="flex justify-between text-sm pt-1">
+                        <span class="text-gray-400">Jadwal Pengantaran Kembali:</span>
+                        <span class="px-2 py-0.5 bg-green-50 text-green-700 rounded text-xs font-bold border border-green-100">
+                            📦 @if(!empty($order['hari_delivery']))
+                            {{ date('d M Y', strtotime($order['hari_delivery'])) }} ({{ $order['jam_delivery'] ?? 'Jam Bebas' }})
+                            @else
+                            {{ $order['jadwal_pengiriman'] ?? 'Sesuai Estimasi Selesai' }}
+                            @endif
                         </span>
                     </div>
 
@@ -74,40 +97,56 @@
                         </div>
 
                        <div class="flex justify-between">
-                            <span class="text-gray-500">
-                                Estimasi Biaya Laundry ({{ ucfirst($order['tipe_durasi'] ?? 'reguler') }}):
-                            </span>
-                            <span class="font-semibold text-gray-700">
-                                Rp
-                                @php
-                                // Ambil jenis layanan aman dari array atau object
-                                $jenis = $order['jenis_layanan'] ?? '';
-                                $tipe = $order['tipe_durasi'] ?? '';
-                                $qty = $order['berat_laundry'] ?? 0;
+                        <span class="text-gray-500">
+                            @if(strtolower($order['jenis_layanan'] ?? $order->jenis_layanan ?? '') == 'permadani')
+                                Estimasi Biaya Laundry ({{ ucfirst($order['tipe_durasi'] ?? $order->tipe_durasi ?? 'Tebal') }}):
+                            @else
+                                Estimasi Biaya Laundry ({{ ucfirst($order['tipe_durasi'] ?? $order->tipe_durasi ?? 'Reguler') }}):
+                            @endif
+                        </span>
+                        <span class="font-semibold text-gray-700">
+                            Rp
+                            @php
+                                // Ambil jenis layanan aman dari array atau object dan paksa huruf kecil
+                                $jenis = strtolower($order['jenis_layanan'] ?? $order->jenis_layanan ?? '');
+                                $tipe = strtolower($order['tipe_durasi'] ?? $order->tipe_durasi ?? '');
+                                $qty = $order['berat_laundry'] ?? $order->berat_laundry ?? 0;
+
                                 if ($jenis == 'permadani') {
-                                $hargaSatuan = ($tipe == 'tebal') ? 70000 : 45000;
+                                    $hargaSatuan = ($tipe == 'tebal') ? 70000 : 45000;
                                 } else {
-                                $hargaSatuan = ($tipe == 'express') ? 9000 : 5000;
+                                    $hargaSatuan = ($tipe == 'express') ? 9000 : 5000;
                                 }
+                                
                                 $subtotal = $qty * $hargaSatuan;
-                                @endphp
-                                {{ number_format($subtotal, 0, ',', '.') }}
-                            </span>
-                        </div>
+                            @endphp
+                            {{-- 🌟 SUDAH DIPERBAIKI: Memanggil variabel $subtotal yang benar --}}
+                            {{ number_format($subtotal, 0, ',', '.') }}
+                        </span>
+                    </div>
                     </div> 
 
                     {{-- TOTAL HARGA DINAMIS --}}
                     <div class="flex justify-between items-center pt-2">
                         <span class="text-base font-bold text-gray-800">Total Pembayaran:</span>
                         <span class="text-xl font-black text-[#0085C9]">
-                            Rp {{ number_format($order['total_harga'] ?? (( $order['berat_laundry'] * ($order['tipe_durasi'] == 'express' ? 9000 : 5000) ) + $order['ongkos_kirim']), 0, ',', '.') }}
+                            Rp {{ number_format($order['total_harga'] ?? ($subtotal + ($order['ongkos_kirim'] ?? 0)), 0, ',', '.') }}
                         </span>
                     </div>
 
+                    {{-- ALAMAT UTAMA --}}
                     <div class="bg-gray-50 p-3 rounded-xl text-xs text-gray-500 mt-4">
                         <span class="font-bold text-gray-700 block mb-1">Alamat Penjemputan:</span>
                         {{ $order['alamat_lengkap'] }}
                     </div>
+
+                    {{-- 🌟 BOX CATATAN DRIVER --}}
+                    @if(!empty($order['instruksi_driver']))
+                    <div class="bg-amber-50 p-3 rounded-xl text-xs text-amber-700 mt-2 border border-amber-100">
+                        <span class="font-bold text-amber-800 block mb-1">📌 Catatan Untuk Driver:</span>
+                        "{{ $order['instruksi_driver'] }}"
+                    </div>
+                    @endif
 
                     <div class="pt-4 text-center">
                         <a href="{{ route('dashboard') }}" class="inline-block bg-[#0085C9] hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-full text-xs shadow-md transition-transform hover:scale-105">
