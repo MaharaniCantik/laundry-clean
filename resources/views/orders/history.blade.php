@@ -43,7 +43,7 @@
                         <div class="flex justify-between py-2 border-t border-dashed">
                             <span class="text-gray-600">Kurir Penjemput:</span>
                             <span class="font-semibold text-blue-600">
-                               {{ $order['nama_kurir_siap'] }}
+                                {{ $order['nama_kurir_siap'] }}
                             </span>
                         </div>
                         <div class="flex justify-between text-sm">
@@ -78,60 +78,62 @@
                     </div>
 
                     <div class="space-y-2 pb-4 border-b border-dashed border-gray-200 text-sm">
-                        {{-- 🌟 Jauh lebih dinamis, bersih, dan rapi --}}
+                        {{-- 🧸 TAMPILAN DINAMIS BERAT / JUMLAH DENGAN SATUAN YANG BENAR --}}
                         <div class="flex justify-between">
                             <span class="text-gray-500">
-                                {{ (strtolower($order['jenis_layanan'] ?? '') == 'permadani') ? 'Luas Karpet:' : 'Berat Timbangan:' }}
+                                @php
+                                $jenisLayananLower = strtolower($order['jenis_layanan'] ?? $order->jenis_layanan ?? '');
+                                @endphp
+                                @if($jenisLayananLower == 'permadani')
+                                Luas Karpet:
+                                @elseif($jenisLayananLower == 'boneka')
+                                Jumlah Boneka:
+                                @else
+                                Berat Timbangan:
+                                @endif
                             </span>
                             <span class="font-bold text-gray-800">
-                                {{ $order['berat_laundry'] ?? 0 }} {{ (strtolower($order['jenis_layanan'] ?? '') == 'permadani') ? 'm²' : 'Kg' }}
+                                {{ number_format($order['berat_laundry'] ?? $order->berat_laundry ?? 0, 0) }}
+                                @if($jenisLayananLower == 'permadani')
+                                m²
+                                @elseif($jenisLayananLower == 'boneka')
+                                Pcs
+                                @else
+                                Kg
+                                @endif
                             </span>
                         </div>
 
+                        {{-- ONGKOS KIRIM --}}
                         <div class="flex justify-between">
-
-                            <span class="text-gray-500">Ongkos Kirim ({{ $order['jarak_km'] }} Km):</span>
-
-                            <span class="font-semibold text-gray-700">Rp {{ number_format($order['ongkos_kirim'], 0, ',', '.') }}</span>
-
+                            <span class="text-gray-500">Ongkos Kirim ({{ $order['jarak_km'] ?? $order->jarak_km ?? 0 }} Km):</span>
+                            <span class="font-semibold text-gray-700">Rp {{ number_format($order['ongkos_kirim'] ?? $order->ongkos_kirim ?? 0, 0, ',', '.') }}</span>
                         </div>
 
-                       <div class="flex justify-between">
-                        <span class="text-gray-500">
-                            @if(strtolower($order['jenis_layanan'] ?? $order->jenis_layanan ?? '') == 'permadani')
-                                Estimasi Biaya Laundry ({{ ucfirst($order['tipe_durasi'] ?? $order->tipe_durasi ?? 'Tebal') }}):
-                            @else
-                                Estimasi Biaya Laundry ({{ ucfirst($order['tipe_durasi'] ?? $order->tipe_durasi ?? 'Reguler') }}):
-                            @endif
-                        </span>
-                        <span class="font-semibold text-gray-700">
-                            Rp
-                            @php
-                                // Ambil jenis layanan aman dari array atau object dan paksa huruf kecil
-                                $jenis = strtolower($order['jenis_layanan'] ?? $order->jenis_layanan ?? '');
-                                $tipe = strtolower($order['tipe_durasi'] ?? $order->tipe_durasi ?? '');
-                                $qty = $order['berat_laundry'] ?? $order->berat_laundry ?? 0;
+                        {{-- 🧸 ESTIMASI BIAYA LAUNDRY (OTOMATIS AKURAT) --}}
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">
+                                Estimasi Biaya Laundry ({{ $order['tipe_durasi'] ?? $order->tipe_durasi ?? 'Reguler' }}):
+                            </span>
+                            <span class="font-semibold text-gray-700">
+                                Rp
+                                @php
+                                // Trik paling aman: Harga murni laundry adalah Total dikurangi Ongkir
+                                $totalHargaData = $order['total_harga'] ?? $order->total_harga ?? 0;
+                                $ongkirData = $order['ongkos_kirim'] ?? $order->ongkos_kirim ?? 0;
+                                $hargaLaundrySaja = $totalHargaData - $ongkirData;
+                                @endphp
+                                {{ number_format($hargaLaundrySaja, 0, ',', '.') }}
+                            </span>
+                        </div>
 
-                                if ($jenis == 'permadani') {
-                                    $hargaSatuan = ($tipe == 'tebal') ? 70000 : 45000;
-                                } else {
-                                    $hargaSatuan = ($tipe == 'express') ? 9000 : 5000;
-                                }
-                                
-                                $subtotal = $qty * $hargaSatuan;
-                            @endphp
-                            {{-- 🌟 SUDAH DIPERBAIKI: Memanggil variabel $subtotal yang benar --}}
-                            {{ number_format($subtotal, 0, ',', '.') }}
-                        </span>
-                    </div>
-                    </div> 
-
-                    {{-- TOTAL HARGA DINAMIS --}}
-                    <div class="flex justify-between items-center pt-2">
-                        <span class="text-base font-bold text-gray-800">Total Pembayaran:</span>
-                        <span class="text-xl font-black text-[#0085C9]">
-                            Rp {{ number_format($order['total_harga'] ?? ($subtotal + ($order['ongkos_kirim'] ?? 0)), 0, ',', '.') }}
-                        </span>
+                        {{-- TOTAL HARGA DINAMIS --}}
+                        <div class="flex justify-between items-center pt-2">
+                            <span class="text-base font-bold text-gray-800">Total Pembayaran:</span>
+                            <span class="text-xl font-black text-[#0085C9]">
+                                Rp {{ number_format($order['total_harga'] ?? $order->total_harga ?? 0, 0, ',', '.') }}
+                            </span>
+                        </div>
                     </div>
 
                     {{-- ALAMAT UTAMA --}}
@@ -139,6 +141,14 @@
                         <span class="font-bold text-gray-700 block mb-1">Alamat Penjemputan:</span>
                         {{ $order['alamat_lengkap'] }}
                     </div>
+
+                    {{-- 🌟 TAMBAHAN BLOK INSTRUKSI ALAMAT/PATOKAN USER --}}
+                    @if(!empty($order['instruksi_alamat']))
+                    <div class="bg-orange-50 p-3 rounded-xl text-xs text-orange-700 mt-2 border border-orange-100">
+                        <span class="font-bold text-orange-800 block mb-1">📍 Patokan / Instruksi Alamat:</span>
+                        {{ $order['instruksi_alamat'] }}
+                    </div>
+                    @endif
 
                     {{-- 🌟 BOX CATATAN DRIVER --}}
                     @if(!empty($order['instruksi_driver']))

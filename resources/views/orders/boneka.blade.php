@@ -153,7 +153,7 @@
 
                     {{-- CTA Button --}}
                     <div class="pt-4 flex justify-center">
-                        <a href="{{ route('order.checkout', ['layanan' => 'kiloan']) }}"
+                        <a href="{{ route('order.checkout', ['layanan' => 'boneka']) }}"
                            class="inline-block bg-orange-500 hover:bg-orange-600 text-white font-bold text-base tracking-wide rounded-xl px-12 py-3.5 shadow-md hover:shadow-orange-200 transition-all duration-150 ease-out">
                             Pesan Sekarang
                         </a>

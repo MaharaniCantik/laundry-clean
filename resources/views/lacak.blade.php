@@ -105,20 +105,28 @@
                     <p class="text-gray-400">Pelanggan:</p>
                     <p class="font-bold text-gray-800 mt-0.5">{{ auth()->check() ? $order->nama_pelanggan : substr($order->nama_pelanggan, 0, 2) . '***' }}</p>
                 </div>
+                {{-- 🧸 CARD ESTIMASI QUANTITY (DINAMIS UNTUK PERMADANI, BONEKA, & KILOAN) --}}
                 <div class="p-4 bg-gray-50 rounded-xl">
                     <span class="text-xs text-gray-400 block mb-1">
-                        @if(($order->jenis_layanan ?? $order['jenis_layanan'] ?? '') == 'permadani')
-                        Luas Estimasi:
+                        @php
+                            $jenisLayananLower = strtolower($order->jenis_layanan ?? $order['jenis_layanan'] ?? '');
+                        @endphp
+                        @if($jenisLayananLower == 'permadani')
+                            Luas Estimasi:
+                        @elseif($jenisLayananLower == 'boneka')
+                            Jumlah Boneka:
                         @else
-                        Berat Estimasi:
+                            Berat Estimasi:
                         @endif
                     </span>
                     <p class="font-bold text-gray-800 mt-0.5">
-                        {{ $order->berat_laundry ?? $order['berat_laundry'] ?? 0 }}
-                        @if(($order->jenis_layanan ?? $order['jenis_layanan'] ?? '') == 'permadani')
-                        m²
+                        {{ number_format($order->berat_laundry ?? $order['berat_laundry'] ?? 0, 0) }}
+                        @if($jenisLayananLower == 'permadani')
+                            m²
+                        @elseif($jenisLayananLower == 'boneka')
+                            Pcs
                         @else
-                        Kg
+                            Kg
                         @endif
                     </p>
                 </div>
