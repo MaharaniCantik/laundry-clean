@@ -99,6 +99,9 @@ Route::middleware(['auth', 'role:owner'])->group(function () {
     
     // 3. Halaman Monitoring Keuangan
     Route::get('/owner/laporan-keuangan', [OwnerOrderController::class, 'laporanKeuangan'])->name('owner.laporan-keuangan');
+    Route::get('/api/laporan-keuangan', [OwnerOrderController::class, 'getLaporanKeuanganApi']);
+
+    Route::get('/owner/pengaturan-harga', [OwnerOrderController::class, 'updateHarga']) ->name('owner.pengaturan-harga');
     
     // 4. Endpoint API Rahasia untuk Fetch JS Polling (Wajib di dalam middleware agar aman)
     Route::get('/owner/api/orders', [\App\Http\Controllers\Owner\OwnerOrderController::class, 'getOrdersApi'])->name('owner.api.orders');

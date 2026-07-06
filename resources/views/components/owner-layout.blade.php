@@ -5,6 +5,7 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>{{ $title ?? 'CleanFlow Owner' }}</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght=300;400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     
@@ -48,12 +49,12 @@
                 <span class="material-symbols-outlined">dashboard</span>
                 <span class="text-sm">Dashboard</span>
             </a>
-            <a class="flex items-center gap-3 px-4 py-3 {{ Request::is('owner/laporan-keungan*') ? 'bg-on-primary/10 text-on-primary' : 'text-on-primary-container hover:text-on-primary hover:bg-on-primary/5' }} rounded-lg transition-all" href="{{ route('owner.laporan-keuangan') }}">
+            <a class="flex items-center gap-3 px-4 py-3 {{ Route::is('owner.laporan-keuangan') ? 'bg-on-primary/10 text-on-primary' : 'text-on-primary-container hover:text-on-primary hover:bg-on-primary/5' }} rounded-lg transition-all" href="{{ route('owner.laporan-keuangan') }}">
                 <span class="material-symbols-outlined">payments</span>
                 <span class="text-sm">Laporan Keuangan</span>
             </a>
-            <a class="flex items-center gap-3 px-4 py-3 {{ Request::is('owner/pengaturan-harga*') ? 'bg-on-primary/10 text-on-primary' : 'text-on-primary-container hover:text-on-primary hover:bg-on-primary/5' }} rounded-lg transition-all" href="#">
-                <span class="material-symbols-outlined">payments</span>
+            <a class="flex items-center gap-3 px-4 py-3 {{ Route::is('owner.pengaturan-harga') ? 'bg-on-primary/10 text-on-primary' : 'text-on-primary-container hover:text-on-primary hover:bg-on-primary/5' }} rounded-lg transition-all" href="{{ route('owner.pengaturan-harga') }}">
+                <span class="material-symbols-outlined">analytics</span>
                 <span class="text-sm">Pengaturan Harga</span>
             </a>
             <a class="flex items-center gap-3 px-4 py-3 {{ Request::is('owner/order-history*') ? 'bg-on-primary/10 text-on-primary' : 'text-on-primary-container hover:text-on-primary hover:bg-on-primary/5' }} rounded-lg transition-all" href="{{ route('owner.order-history')}}">
