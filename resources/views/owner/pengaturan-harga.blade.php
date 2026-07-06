@@ -51,160 +51,68 @@
                             <div class="overflow-x-auto custom-scrollbar">
                                 <table class="w-full text-left border-collapse">
                                     <thead>
-                                        <tr class="bg-surface-container-low border-b border-outline-variant">
-                                            <th class="px-6 py-4 font-label-bold text-label-bold text-on-surface-variant">NAMA LAYANAN</th>
-                                            <th class="px-6 py-4 font-label-bold text-label-bold text-on-surface-variant">KATEGORI</th>
-                                            <th class="px-6 py-4 font-label-bold text-label-bold text-on-surface-variant">HARGA SAAT INI (RP)</th>
-                                            <th class="px-6 py-4 font-label-bold text-label-bold text-on-surface-variant text-right">UBAH HARGA</th>
+                                        <tr class="border-b border-outline-variant bg-surface-container-low text-on-surface-variant font-label-md text-label-md">
+                                            <th class="px-6 py-4">NAMA LAYANAN</th>
+                                            <th class="px-6 py-4">TARIF SAAT INI</th>
+                                            <th class="px-6 py-4 text-center">STATUS</th>
+                                            <th class="px-6 py-4 text-right">AKSI UBAH</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y divide-outline-variant">
-                                        
-                                        <tr class="hover:bg-primary/5 transition-colors group">
-                                            <td class="px-6 py-5">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
-                                                        <span class="material-symbols-outlined" data-icon="local_laundry_service">local_laundry_service</span>
-                                                    </div>
-                                                    <span class="font-body-md text-body-md font-medium text-on-surface">Laundry Kiloan</span>
-                                                </div>
+                                    <tbody>
+                                        @foreach($allLayanan as $key => $item)
+                                        <tr class="border-b border-outline-variant hover:bg-surface-container-lowest/50 transition-colors">
+                                            
+                                            {{-- 1. Nama Layanan --}}
+                                            <td class="px-6 py-5 font-body-md text-on-surface">
+                                                {{ $item['nama'] }}
                                             </td>
-                                            <td class="px-6 py-5">
-                                                <span class="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full font-label-bold text-[11px]">KILOAN</span>
+                                            
+                                            {{-- 2. Tarif Saat Ini --}}
+                                            <td class="px-6 py-5 font-data-tabular text-data-tabular">
+                                                Rp {{ number_format($item['harga'], 0, ',', '.') }}
                                             </td>
-                                            <td class="px-6 py-5 font-data-tabular text-data-tabular">Rp {{ number_format(config('laundry.HARGA_LAUNDRY_KILOAN', 5000), 0, ',', '.') }} / kg</td>
+                                            
+                                            {{-- 3. Tombol Toggle Aktif / Nonaktif --}}
+                                            <td class="px-6 py-5 text-center">
+                                                <form action="{{ route('owner.update-harga') }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <input type="hidden" name="toggle_key" value="{{ $key }}">
+                                                    
+                                                    @if($item['is_active'])
+                                                        <button type="submit" class="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full hover:bg-green-200 transition-colors">
+                                                            ● AKTIF
+                                                        </button>
+                                                    @else
+                                                        <button type="submit" class="px-3 py-1 bg-gray-100 text-gray-500 text-xs font-bold rounded-full hover:bg-gray-200 transition-colors">
+                                                            ○ NONAKTIF
+                                                        </button>
+                                                    @endif
+                                                </form>
+                                            </td>
+                                            
+                                            {{-- 4. Form Ubah Nominal Harga --}}
                                             <td class="px-6 py-5 text-right">
-                                                <div class="inline-flex items-center gap-2 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-1.5 focus-within:ring-2 focus-within:ring-primary transition-all">
-                                                    <span class="text-on-surface-variant text-body-sm">Rp</span>
-                                                    <input class="w-20 border-none bg-transparent p-0 font-data-tabular text-data-tabular focus:ring-0 text-right" type="number" name="HARGA_LAUNDRY_KILOAN" value="{{ config('laundry.HARGA_LAUNDRY_KILOAN', 5000) }}"/>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr class="hover:bg-primary/5 transition-colors group">
-                                            <td class="px-6 py-5">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
-                                                        <span class="material-symbols-outlined" data-icon="layers">layers</span>
+                                                <form action="{{ route('owner.update-harga') }}" method="POST" class="inline-flex items-center gap-2">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    
+                                                    <div class="inline-flex items-center gap-2 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-1.5 focus-within:ring-2 focus-within:ring-primary transition-all">
+                                                        <span class="text-on-surface-variant text-body-sm">Rp</span>
+                                                        <input class="w-20 border-none bg-transparent p-0 font-data-tabular text-data-tabular focus:ring-0 text-right text-on-surface" 
+                                                            type="number" 
+                                                            name="{{ $key }}" 
+                                                            value="{{ $item['harga'] }}"/>
                                                     </div>
-                                                    <span class="font-body-md text-body-md font-medium text-on-surface">Laundry Permadani</span>
-                                                </div>
+                                                    
+                                                    <button type="submit" class="bg-primary/10 text-primary hover:bg-primary hover:text-on-primary p-1.5 rounded-lg transition-all flex items-center">
+                                                        <span class="material-symbols-outlined text-sm">save</span>
+                                                    </button>
+                                                </form>
                                             </td>
-                                            <td class="px-6 py-5">
-                                                <span class="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full font-label-bold text-[11px]">KILOAN</span>
-                                            </td>
-                                            <td class="px-6 py-5 font-data-tabular text-data-tabular">Rp {{ number_format(config('laundry.HARGA_PERMADANI', 45000), 0, ',', '.') }} / kg</td>
-                                            <td class="px-6 py-5 text-right">
-                                                <div class="inline-flex items-center gap-2 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-1.5 focus-within:ring-2 focus-within:ring-primary transition-all">
-                                                    <span class="text-on-surface-variant text-body-sm">Rp</span>
-                                                    <input class="w-20 border-none bg-transparent p-0 font-data-tabular text-data-tabular focus:ring-0 text-right" type="number" name="HARGA_PERMADANI" value="{{ config('laundry.HARGA_PERMADANI', 45000) }}"/>
-                                                </div>
-                                            </td>
-                                        </tr>
 
-                                        <tr class="hover:bg-primary/5 transition-colors group">
-                                            <td class="px-6 py-5">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
-                                                        <span class="material-symbols-outlined" data-icon="iron">iron</span>
-                                                    </div>
-                                                    <span class="font-body-md text-body-md font-medium text-on-surface">Setrika</span>
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-5">
-                                                <span class="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full font-label-bold text-[11px]">KILOAN</span>
-                                            </td>
-                                            <td class="px-6 py-5 font-data-tabular text-data-tabular">Rp {{ number_format(env('HARGA_SETRIKA', 5000), 0, ',', '.') }} / kg</td>
-                                            <td class="px-6 py-5 text-right">
-                                                <div class="inline-flex items-center gap-2 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-1.5 focus-within:ring-2 focus-within:ring-primary transition-all">
-                                                    <span class="text-on-surface-variant text-body-sm">Rp</span>
-                                                    <input class="w-20 border-none bg-transparent p-0 font-data-tabular text-data-tabular focus:ring-0 text-right" type="number" name="HARGA_SETRIKA" value="{{ env('HARGA_SETRIKA', 5000) }}"/>
-                                                </div>
-                                            </td>
                                         </tr>
-                                        <tr class="hover:bg-primary/5 transition-colors group">
-                                            <td class="px-6 py-5">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
-                                                        <span class="material-symbols-outlined" data-icon="toys">toys</span>
-                                                    </div>
-                                                    <span class="font-body-md text-body-md font-medium text-on-surface">Boneka</span>
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-5">
-                                                <span class="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full font-label-bold text-[11px]">KILOAN</span>
-                                            </td>
-                                            <td class="px-6 py-5 font-data-tabular text-data-tabular">Rp {{ number_format(env('HARGA_BONEKA', 20000), 0, ',', '.') }} / kg</td>
-                                            <td class="px-6 py-5 text-right">
-                                                <div class="inline-flex items-center gap-2 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-1.5 focus-within:ring-2 focus-within:ring-primary transition-all">
-                                                    <span class="text-on-surface-variant text-body-sm">Rp</span>
-                                                    <input class="w-20 border-none bg-transparent p-0 font-data-tabular text-data-tabular focus:ring-0 text-right" type="number" name="HARGA_BONEKA" value="{{ env('HARGA_BONEKA', 20000) }}"/>
-                                                </div>
-                                            </td>
-                                        </tr>
-
-                                        <tr class="hover:bg-primary/5 transition-colors group">
-                                            <td class="px-6 py-5">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
-                                                        <span class="material-symbols-outlined" data-icon="steps">steps</span>
-                                                    </div>
-                                                    <span class="font-body-md text-body-md font-medium text-on-surface">Laundry Sepatu</span>
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-5">
-                                                <span class="px-3 py-1 bg-surface-variant text-on-surface-variant rounded-full font-label-bold text-[11px]">SATUAN</span>
-                                            </td>
-                                            <td class="px-6 py-5 font-data-tabular text-data-tabular">Rp {{ number_format(env('HARGA_SEPATU', 20000), 0, ',', '.') }} / psg</td>
-                                            <td class="px-6 py-5 text-right">
-                                                <div class="inline-flex items-center gap-2 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-1.5 focus-within:ring-2 focus-within:ring-primary transition-all">
-                                                    <span class="text-on-surface-variant text-body-sm">Rp</span>
-                                                    <input class="w-20 border-none bg-transparent p-0 font-data-tabular text-data-tabular focus:ring-0 text-right" type="number" name="HARGA_SEPATU" value="{{ env('HARGA_SEPATU', 20000) }}"/>
-                                                </div>
-                                            </td>
-                                        </tr>
-
-                                        <tr class="hover:bg-primary/5 transition-colors group">
-                                            <td class="px-6 py-5">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
-                                                        <span class="material-symbols-outlined" data-icon="curtains">curtains</span>
-                                                    </div>
-                                                    <span class="font-body-md text-body-md font-medium text-on-surface">Gorden</span>
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-5">
-                                                <span class="px-3 py-1 bg-surface-variant text-on-surface-variant rounded-full font-label-bold text-[11px]">SATUAN</span>
-                                            </td>
-                                            <td class="px-6 py-5 font-data-tabular text-data-tabular">Rp {{ number_format(env('HARGA_GORDEN', 25000), 0, ',', '.') }} / pcs</td>
-                                            <td class="px-6 py-5 text-right">
-                                                <div class="inline-flex items-center gap-2 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-1.5 focus-within:ring-2 focus-within:ring-primary transition-all">
-                                                    <span class="text-on-surface-variant text-body-sm">Rp</span>
-                                                    <input class="w-20 border-none bg-transparent p-0 font-data-tabular text-data-tabular focus:ring-0 text-right" type="number" name="HARGA_GORDEN" value="{{ env('HARGA_GORDEN', 25000) }}"/>
-                                                </div>
-                                            </td>
-                                        </tr>
-
-                                        <tr class="hover:bg-primary/5 transition-colors group">
-                                            <td class="px-6 py-5">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
-                                                        <span class="material-symbols-outlined" data-icon="bed">bed</span>
-                                                    </div>
-                                                    <span class="font-body-md text-body-md font-medium text-on-surface">Cuci Bedcover </span>
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-5">
-                                                <span class="px-3 py-1 bg-surface-variant text-on-surface-variant rounded-full font-label-bold text-[11px]">SATUAN</span>
-                                            </td>
-                                            <td class="px-6 py-5 font-data-tabular text-data-tabular">Rp {{ number_format(env('HARGA_BEDCOVER', 25000), 0, ',', '.') }} / pcs</td>
-                                            <td class="px-6 py-5 text-right">
-                                                <div class="inline-flex items-center gap-2 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-1.5 focus-within:ring-2 focus-within:ring-primary transition-all">
-                                                    <span class="text-on-surface-variant text-body-sm">Rp</span>
-                                                    <input class="w-20 border-none bg-transparent p-0 font-data-tabular text-data-tabular focus:ring-0 text-right" type="number" name="HARGA_BEDCOVER" value="{{ env('HARGA_BEDCOVER', 25000) }}"/>
-                                                </div>
-                                            </td>
-                                        </tr>
-
+                                        @endforeach
                                     </tbody>
                                 </table>
                             </div>

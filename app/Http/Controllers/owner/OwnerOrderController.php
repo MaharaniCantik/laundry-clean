@@ -131,34 +131,41 @@ public function getLaporanKeuanganApi(Request $request)
             ]
         ]);
     }
-    public function updateHarga(Request $request)
+        public function updateHarga(Request $request)
     {
-        // Ambil data kiriman form kecuali token
-        $dataHarga = $request->except(['_token', '_method']);
-
-        // Validasi memastikan semua input berupa angka positif
-        foreach ($dataHarga as $key => $value) {
-            if (!is_numeric($value) || $value < 0) {
-                return redirect()->back()->withErrors(['msg' => 'Harga harus berupa angka valid.']);
+        // 1. Ambil data config lama yang saat ini tersimpan
+        $currentConfig = config('laundry');
+        
+        // 2. Cek apakah ini aksi klik tombol AKTIF / NONAKTIF
+        if ($request->has('toggle_key')) {
+            $key = $request->input('toggle_key');
+            if (isset($currentConfig[$key])) {
+                // Balik status is_active nya (true jadi false, vice versa)
+                $currentConfig[$key]['is_active'] = !$currentConfig[$key]['is_active'];
+            }
+        } 
+        // 3. Jika ini aksi simpan nominal harga dari form input
+        else {
+            foreach ($request->except(['_token', '_method']) as $key => $hargaBaru) {
+                if (isset($currentConfig[$key])) {
+                    $currentConfig[$key]['harga'] = (int) $hargaBaru;
+                }
             }
         }
 
-        // Path menuju file config custom kita
+        // 4. Tulis ulang perubahannya langsung ke file config/laundry.php
         $configPath = config_path('laundry.php');
-
-        // Susun ulang struktur kode PHP secara rapi
-        $content = "<?php\n\nreturn " . var_export($dataHarga, true) . ";\n";
-
-        // Tulis data ke file config
+        $content = "<?php\n\nreturn " . var_export($currentConfig, true) . ";\n";
         file_put_contents($configPath, $content);
 
-        return redirect()->back()->with('success', 'Seluruh harga master layanan berhasil diperbarui!');
+        return redirect()->back()->with('success', 'Pengaturan master harga berhasil diperbarui!');
     }
-        public function pengaturanHarga()
+    public function pengaturanHarga()
     {
-        return view('owner.pengaturan-harga'); // Pastikan file blade lu namanya pas 'owner/pengaturan-harga.blade.php'
+        // Mengambil semua isi array dari file config/laundry.php
+        $allLayanan = config('laundry'); 
+        return view('owner.pengaturan-harga', compact('allLayanan'));
     }
-
        public function exportPdf(Request $request)
     {
         // Tangkap input dari form filter berdasarkan name yang baru
@@ -182,5 +189,17 @@ public function getLaporanKeuanganApi(Request $request)
         $pdf = Pdf::loadView('owner.laporan-pdf', compact('laporan', 'startDate', 'endDate'));
 
         return $pdf->setPaper('a4', 'portrait')->download('Laporan-Keuangan.pdf');
+    }
+        public function logout(Request $request)
+    {
+        // Proses keluar session
+        Auth::logout();
+
+        // Hapus dan amankan session token
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        // Balikin ke halaman beranda utama atau login luar
+        return redirect('/')->with('success', 'Sampai jumpa kembali, Owner!');
     }
 }

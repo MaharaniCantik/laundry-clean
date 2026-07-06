@@ -248,180 +248,64 @@
   </section>
 
   <!-- ░░░ SERVICES ░░░ -->
-  <section id="layanan"class="services-bg py-20 px-6 md:px-16 lg:px-24">
+  <section id="layanan" class="services-bg py-20 px-6 md:px-16 lg:px-24">
     <div class="max-w-6xl mx-auto">
-      <p class="text-center text-white/70 uppercase tracking-widest text-xs font-semibold mb-2">Apa yang Kami Cuci?</p>
-      <h2 class="text-center text-3xl md:text-4xl font-black text-white mb-12 drop-shadow">
-        Layanan CuciYuk Laundry
-      </h2>
+        <p class="text-center text-white/70 uppercase tracking-widest text-xs font-semibold mb-2">Apa yang Kami Cuci?</p>
+        <h2 class="text-center text-3xl md:text-4xl font-black text-white mb-12 drop-shadow">
+            Layanan CuciYuk Laundry
+        </h2>
 
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-5">
-
-        <!-- Service 1: Laundry Kiloan -->
-       <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col">
-          <div class="h-36 overflow-hidden">
-              <img src="https://i.pinimg.com/736x/de/ce/55/dece553f16399e7ae1c593451c08fe10.jpg" alt="Laundry Kiloan" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"/>
-          </div>
-          <div class="p-4 flex flex-col flex-1">
-              <p class="font-bold text-purple text-sm mb-1">Laundry Kiloan</p>
-              <p class="text-gray-400 text-xs mb-3 flex-1">Cocok untuk cucian harian rumah tangga</p>
-              
-              @auth
-                  <a href="{{ route('order.kiloan') }}" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
-                      Mulai dari Rp {{ number_format(config('laundry.HARGA_LAUNDRY_KILOAN', 5000), 0, ',', '.') }} saja!
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                  </a>
-              @else
-                  <button @click="showLogin = true" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
-                      Mulai dari Rp {{ number_format(config('laundry.HARGA_LAUNDRY_KILOAN', 5000), 0, ',', '.') }} saja!
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                  </button>
-              @endauth
-          </div>
-      </div>
-        <!-- Service 2: Laundry Permadani/Karpet -->
-        <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col">
-          <div class="h-36 overflow-hidden">
-            <img src="https://i.pinimg.com/1200x/c5/4b/9a/c54b9a59770d07b07c17474707fa3b36.jpg" alt="Laundry Permadani" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"/>
-          </div>
-          <div class="p-4 flex flex-col flex-1">
-            <p class="font-bold text-purple text-sm mb-1">Laundry Permadani</p>
-            <p class="text-gray-400 text-xs mb-3 flex-1">Karpet & permadani bersih sempurna</p>
-              @auth
-                  <a href="{{ route('order.permadani') }}" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
-                      Mulai dari Rp {{ number_format(config('laundry.HARGA_PERMADANI', 45000), 0, ',', '.') }} saja!
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                  </a>
-              @else
-                  <button @click="showLogin = true" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
-                      Mulai dari Rp {{ number_format(config('laundry.HARGA_PERMADANI', 45000), 0, ',', '.') }} saja!
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                  </button>
-              @endauth
-          </div>
-        </div>
-
-        <!-- Service 3: Setrika -->
-        <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col">
-          <div class="h-36 overflow-hidden">
-            <img src="https://i.pinimg.com/736x/a2/8d/98/a28d9833c76b3a7f667332bee6c520d4.jpg" alt="Setrika" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"/>
-          </div>
-          <div class="p-4 flex flex-col flex-1">
-            <p class="font-bold text-purple text-sm mb-1">Setrika</p>
-            <p class="text-gray-400 text-xs mb-3 flex-1">Pakaian rapi tanpa kerutan</p>
-             
-              @auth
-                  <a href="{{ route('order.setrika') }}" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
-                      Mulai dari Rp {{ number_format(config('laundry.HARGA_SETRIKA', 5000), 0, ',', '.') }} saja!
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                  </a>
-              @else
-                  <button @click="showLogin = true" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
-                      Mulai dari Rp {{ number_format(config('laundry.HARGA_SETRIKA', 5000), 0, ',', '.') }} saja!
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                  </button>
-              @endauth
-          </div>
-        </div>
-
-        <!-- Service 4: Laundry Boneka -->
-        <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col">
-          <div class="h-36 overflow-hidden">
-            <img src="https://i.pinimg.com/1200x/b0/a7/7b/b0a77b575118658fd1f3757587c1120b.jpg" alt="Laundry Boneka" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"/>
-          </div>
-          <div class="p-4 flex flex-col flex-1">
-            <p class="font-bold text-purple text-sm mb-1">Laundry Boneka</p>
-            <p class="text-gray-400 text-xs mb-3 flex-1">Boneka kesayangan bersih & wangi</p>
-             
-              @auth
-                  <a href="{{ route('order.boneka') }}" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
-                     Mulai dari Rp {{ number_format(config('laundry.HARGA_BONEKA', 20000), 0, ',', '.') }} saja!
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                  </a>
-              @else
-                  <button @click="showLogin = true" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
-                      Mulai dari Rp {{ number_format(config('laundry.HARGA_BONEKA', 20000), 0, ',', '.') }} saja!
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                  </button>
-              @endauth
-          </div>
-        </div>
-
-        <!-- Service 5: Laundry Gorden -->
-        <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col">
-          <div class="h-36 overflow-hidden">
-            <img src="https://i.pinimg.com/736x/86/cc/23/86cc2359a6bd217deea4c60d7c5b9ead.jpg" alt="Laundry Gorden" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"/>
-          </div>
-          <div class="p-4 flex flex-col flex-1">
-            <p class="font-bold text-purple text-sm mb-1">Laundry Gorden</p>
-            <p class="text-gray-400 text-xs mb-3 flex-1">Gorden bersih & bebas debu</p>
+        {{-- GRID UTAMA --}}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
             
-              @auth
-                  <a href="{{ route('order.gorden') }}" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
-                      Mulai dari Rp {{ number_format(config('laundry.HARGA_GORDEN', 25000), 0, ',', '.') }} saja!
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                  </a>
-              @else
-                  <button @click="showLogin = true" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
-                       Mulai dari Rp {{ number_format(config('laundry.HARGA_GORDEN', 25000), 0, ',', '.') }} saja!
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                  </button>
-              @endauth
-          </div>
+            @foreach(config('laundry') as $key => $item)
+                {{-- Hanya tampilkan jika statusnya AKTIF --}}
+                @if($item['is_active'])
+                    
+                    {{-- 
+                      Kuncinya di sini: 
+                      Jika ini adalah item terakhir ($loop->last), di layar desktop (lg:) 
+                      dia akan dipaksa mulai dari kolom ke-2 (tengah)
+                    --}}
+                    <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col w-full max-w-sm h-auto transition-all duration-300
+                        {{ $loop->last ? 'lg:col-start-2 sm:col-span-1' : '' }}">
+                        
+                        {{-- Area Gambar --}}
+                        <div class="h-44 w-full overflow-hidden bg-gray-100 flex-shrink-0">
+                            <img src="{{ asset($item['gambar']) }}" alt="{{ $item['nama'] }}" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"/>
+                        </div>
+                        
+                        {{-- Konten Teks & Tombol --}}
+                        <div class="p-5 pb-6 flex flex-col flex-1 bg-white">
+                            <div class="mb-5">
+                                <p class="font-bold text-purple text-base mb-1">{{ $item['nama'] }}</p>
+                                <p class="text-gray-400 text-xs leading-relaxed">{{ $item['deskripsi'] }}</p>
+                            </div>
+                            
+                            {{-- Tombol Harga --}}
+                            <div class="mt-auto">
+                                @auth
+                                    <a href="{{ route($item['route']) }}" class="w-full bg-orange text-white text-xs font-bold py-3 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-4">
+                                        <span>Mulai dari Rp {{ number_format($item['harga'], 0, ',', '.') }} saja!</span>
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                    </a>
+                                @else
+                                    <button @click="showLogin = true" class="w-full bg-orange text-white text-xs font-bold py-3 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-4">
+                                        <span>Mulai dari Rp {{ number_format($item['harga'], 0, ',', '.') }} saja!</span>
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                    </button>
+                                @endauth
+                            </div>
+                        </div>
+
+                    </div>
+
+                @endif
+            @endforeach
+
         </div>
-
-        <!-- Service 6: Laundry Bedcover -->
-        <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col">
-          <div class="h-36 overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&q=80" alt="Laundry Bedcover" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"/>
-          </div>
-          <div class="p-4 flex flex-col flex-1">
-            <p class="font-bold text-purple text-sm mb-1">Laundry Bedcover</p>
-            <p class="text-gray-400 text-xs mb-3 flex-1">Sprei & bedcover harum bersih</p>
-             
-              @auth
-                  <a href="{{ route('order.bedcover') }}" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
-                       Mulai dari Rp {{ number_format(config('laundry.HARGA_BEDCOVER', 25000), 0, ',', '.') }} saja!
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                  </a>
-              @else
-                  <button @click="showLogin = true" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
-                      Mulai dari Rp {{ number_format(config('laundry.HARGA_BEDCOVER', 25000), 0, ',', '.') }} saja!
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                  </button>
-              @endauth
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Laundry Sepatu – centered below grid -->
-      <div class="mt-5 flex justify-center">
-        <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col w-full max-w-xs">
-          <div class="h-36 overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80" alt="Laundry Sepatu" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"/>
-          </div>
-          <div class="p-4 flex flex-col flex-1">
-            <p class="font-bold text-purple text-sm mb-1">Laundry Sepatu</p>
-            <p class="text-gray-400 text-xs mb-3 flex-1">Sepatu kinclong seperti baru lagi</p>
-             
-              @auth
-                  <a href="{{ route('order.sepatu') }}" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
-                      Mulai dari Rp {{ number_format(config('laundry.HARGA_SEPATU', 20000), 0, ',', '.') }} saja!
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                  </a>
-              @else
-                  <button @click="showLogin = true" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
-                      Mulai dari Rp {{ number_format(config('laundry.HARGA_SEPATU', 20000), 0, ',', '.') }} saja!
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                  </button>
-              @endauth
-          </div>
-        </div>
-      </div>
-
     </div>
-  </section>
+</section>
 
   <!-- ░░░ TESTIMONIAL STRIP ░░░ -->
   <section class="bg-white py-16 px-6 md:px-16 lg:px-24">
@@ -663,9 +547,8 @@
     <div class="relative mt-14 pt-6 border-t border-white/20 flex flex-col md:flex-row items-center justify-between gap-4 max-w-6xl mx-auto">
       <p class="text-white/60 text-sm">© 2025 CuciYuk Laundry. All rights reserved.</p>
       <div class="flex gap-6 text-white/60 text-sm">
-        <a href="#" class="hover:text-white transition-colors">Tentang Kami</a>
-        <a href="#" class="hover:text-white transition-colors">Kontak</a>
-        <a href="#" class="hover:text-white transition-colors">Privacy</a>
+        <a href="{{ url('/#tentang-kami') }}" class="hover:text-white transition-colors">Tentang Kami</a>
+        <a href="{{ url('/#kontak') }}" class="hover:text-white transition-colors">Kontak</a>
       </div>
     </div>
   </footer>

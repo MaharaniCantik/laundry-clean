@@ -95,9 +95,8 @@ Route::middleware(['auth', 'role:owner'])->group(function () {
 
    // 1. Route untuk MEMBUKA halaman pengaturan harga
     Route::get('/owner/pengaturan-harga', [OwnerOrderController::class, 'pengaturanHarga'])->name('owner.pengaturan-harga');
-
-    // 2. Route untuk PROSES SIMPAN/UPDATE harga (Kategori PUT karena di form pake @method('PUT'))
     Route::put('/owner/update-harga', [OwnerOrderController::class, 'updateHarga'])->name('owner.update-harga');
+    Route::post('/owner/logout', [OwnerOrderController::class, 'logout'])->name('owner.logout');
 
     
     // 4. Endpoint API Rahasia untuk Fetch JS Polling (Wajib di dalam middleware agar aman)
