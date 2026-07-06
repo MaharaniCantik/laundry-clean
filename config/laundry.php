@@ -1,0 +1,11 @@
+<?php
+
+return array (
+  'HARGA_LAUNDRY_KILOAN' => '6000',
+  'HARGA_PERMADANI' => '45000',
+  'HARGA_SETRIKA' => '5000',
+  'HARGA_BONEKA' => '20000',
+  'HARGA_SEPATU' => '20000',
+  'HARGA_GORDEN' => '25000',
+  'HARGA_BEDCOVER' => '25000',
+);

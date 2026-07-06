@@ -26,17 +26,30 @@ class OrderController extends Controller
     public function showService(Request $request)
     {
         $namaUser = auth()->user()->name;
-        $alamatUser = $request->input('alamat_lengkap');
-        $layanan = $request->input('layanan_utama', 'kiloan');
+        $alamatUser = $request->input('alamat_lengkap') ?? old('alamat_lengkap');
 
-        // 🌟 TANGKAP DATA JADWAL BARU DARI STEP 1
-        $hariPickup = $request->input('hari_pickup');
-        $jamPickup  = $request->input('jam_pickup');
+        $layanan = $request->input('layanan_utama')
+            ?? $request->input('jenis_layanan')
+            ?? $request->input('layanan')
+            ?? old('jenis_layanan', 'kiloan');
 
-        // Menangkap input jarak dari maps javascript (default 1.2 Km)
-        $jarakTampil = (float) $request->input('jarak_km', 1.2);
+        $jenisLayanan = $layanan;
+        $hariPickup = $request->input('hari_pickup') ?? old('hari_pickup');
+        $jamPickup  = $request->input('jam_pickup') ?? old('jam_pickup');
 
-        // LOGIKA HITUNG ONGKIR OTOMATIS
+        // 🌟 TAMBAHKAN 3 BARIS INI BIAR TANGGAL/JAM DELIVERY & INSTRUKSI ALAMAT GA HILANG
+        $hariDelivery = $request->input('hari_delivery') ?? old('hari_delivery');
+        $jamDelivery  = $request->input('jam_delivery') ?? old('jam_delivery');
+        $instruksiAlamat = $request->input('instruksi_alamat') ?? old('instruksi_alamat');
+
+        $jarakTampil = (float) ($request->input('jarak_km') ?? old('jarak_km', 1.2));
+
+        // Logika hitung ongkir default
+        $ongkir = 0;
+        $statusOngkirText = 'Gratis Ongkir (0-5 Km)';
+        $badgeClass = 'bg-green-100 text-green-700 border-green-200';
+
+        // Logika pengecekan jarak yang lama
         if ($jarakTampil > 0 && $jarakTampil <= 5.0) {
             $ongkir = 0;
             $statusOngkirText = 'Gratis Ongkir (0-5 Km)';
@@ -49,123 +62,223 @@ class OrderController extends Controller
             $ongkir = 12000;
             $statusOngkirText = '+ Rp 12.000 (7-10 Km)';
             $badgeClass = 'bg-orange-100 text-orange-700 border-orange-200';
-        } else {
+        } elseif ($jarakTampil > 10.0) {
             $ongkir = 15000;
             $statusOngkirText = 'Di Luar Jangkauan (+ Rp 15.000)';
             $badgeClass = 'bg-red-100 text-red-700 border-red-200';
         }
 
-        // 🌟 LEMPAR $hariPickup DAN $jamPickup KE VIEW SERVICE
         return view('orders.service', compact(
             'namaUser',
             'alamatUser',
             'layanan',
+            'jenisLayanan',
             'jarakTampil',
             'ongkir',
             'statusOngkirText',
             'badgeClass',
             'hariPickup',
-            'jamPickup'
+            'jamPickup',
+            'hariDelivery',
+            'jamDelivery',
+            'instruksiAlamat' // 🔥 Tambahkan ini ke compact
         ));
     }
-
     /**
-     * Step 3: Eksekutor Final - Simpan Data Orderan Awal Berdasarkan Estimasi Pelanggan
+     * Step 3: Eksekutor Final - Simpan Data Orderan Awal
      */
-    public function store(Request $request)
+public function store(Request $request)
     {
+        // 1. VALIDASI INPUT FORM
         $request->validate([
-            'alamat_lengkap'    => 'required',
+            'alamat_lengkap'    => 'required|string',
             'berat_laundry'     => 'required|numeric|min:1',
-            'tipe_durasi'       => 'required',
-            'metode_pembayaran' => 'required',
+            'tipe_durasi'       => 'required|string',
+            'metode_pembayaran' => 'required|string',
+            'jarak_km'          => 'required',
+            'ongkos_kirim'      => 'required',
+        ], [
+            'alamat_lengkap.required' => 'Alamat pengiriman wajib diisi melalui maps.',
+            'berat_laundry.min'       => 'Minimal berat laundry adalah 1 unit/kg.',
         ]);
 
         try {
             $qtyInput     = (float) $request->input('berat_laundry', 1);
             $ongkir       = (float) $request->input('ongkos_kirim', 0);
             $jarak        = (float) $request->input('jarak_km', 0);
-            $jenisLayanan = $request->input('jenis_layanan', 'kiloan');
+            $jenisLayanan = $request->input('jenis_layanan') ?? $request->input('layanan_utama', 'kiloan');
             $tipeDurasi   = $request->input('tipe_durasi', 'reguler');
 
-            // 🌟 1. LOGIKA HITUNG HARGA DINAMIS & AMANKAN TEKS PAKET
-            if ($jenisLayanan == 'permadani') {
+            // =====================================================================
+            // 🌟 GABUNGKAN INSTRUKSI ALAMAT & DRIVER (BIAR GA USAH TAMBAH KOLOM DB)
+            // =====================================================================
+            $instruksiAlamat = $request->input('instruksi_alamat');
+            $instruksiDriver = $request->input('instruksi_driver');
+
+            $catatanDriverFinal = "";
+            if ($instruksiAlamat) {
+                $catatanDriverFinal .= "[Petunjuk Alamat]: " . $instruksiAlamat . " | ";
+            }
+            $catatanDriverFinal .= "[Pesan ke Driver]: " . ($instruksiDriver ?? '-');
+
+            // =====================================================================
+            // LOGIKA HITUNG HARGA DINAMIS & AMANKAN TEKS PAKET
+            // =====================================================================
+            if ($jenisLayanan == 'boneka') {
+                // 🧸 DETEKSI HARGA BERDASARKAN UKURAN BONEKA
+                $ukuranLower = strtolower($tipeDurasi);
+                if ($ukuranLower == 's') {
+                    $hargaPerUnit = 20000;
+                    $namaPaketTeks = "Boneka - Kecil (S)";
+                } elseif ($ukuranLower == 'm') {
+                    $hargaPerUnit = 30000;
+                    $namaPaketTeks = "Boneka - Sedang (M)";
+                } elseif ($ukuranLower == 'l') {
+                    $hargaPerUnit = 60000;
+                    $namaPaketTeks = "Boneka - Besar (L)";
+                } elseif ($ukuranLower == 'xl') {
+                    $hargaPerUnit = 75000;
+                    $namaPaketTeks = "Boneka - Sangat Besar (XL)";
+                } else {
+                    $hargaPerUnit = 20000;
+                    $namaPaketTeks = "Boneka - Kecil (S)";
+                }
+                $estimasiHarga = ($qtyInput * $hargaPerUnit) + $ongkir;
+            } elseif ($jenisLayanan == 'permadani') {
                 $hargaPerUnit = ($tipeDurasi == 'tebal') ? 70000 : 45000;
                 $estimasiHarga = ($qtyInput * $hargaPerUnit) + $ongkir;
-
-                // Format teks untuk disimpan ke kolom tipe_durasi di DB
                 $namaPaketTeks = "Permadani - " . ucfirst($tipeDurasi);
+            } elseif ($jenisLayanan == 'gorden') {
+                // 🧺 LOGIKA UPDATE: HITUNG HARGA PREMIUM GORDEN
+                $tipeGordenLower = strtolower($tipeDurasi);
+                if ($tipeGordenLower == 'vitrase') {
+                    $hargaPerUnit = 25000;
+                    $namaPaketTeks = "Gorden - Vitrase";
+                } elseif ($tipeGordenLower == 'tipis') {
+                    $hargaPerUnit = 30000;
+                    $namaPaketTeks = "Gorden - Tipis";
+                } elseif ($tipeGordenLower == 'tebal') {
+                    $hargaPerUnit = 35000;
+                    $namaPaketTeks = "Gorden - Tebal";
+                } else {
+                    $hargaPerUnit = 30000; // Fallback ke tipis jika tidak terdeteksi
+                    $namaPaketTeks = "Gorden - Tipis";
+                }
+                $estimasiHarga = ($qtyInput * $hargaPerUnit) + $ongkir;
+            } elseif ($jenisLayanan == 'setrika') {
+                if ($tipeDurasi == 'kilat') {
+                    $hargaPerKg = 12000;
+                } elseif ($tipeDurasi == 'express') {
+                    $hargaPerKg = 8000;
+                } else {
+                    $tipeDurasi = 'reguler';
+                    $hargaPerKg = 5000;
+                }
+                $estimasiHarga = ($qtyInput * $hargaPerKg) + $ongkir;
+                $namaPaketTeks = "Setrika - " . ucfirst($tipeDurasi);
             } else {
-                // Jaga-jaga kalau frontend ngirim data 'tebal'/'tipis' ke kiloan karena bug, kita paksa ke reguler/express
                 if ($tipeDurasi !== 'express' && $tipeDurasi !== 'reguler') {
                     $tipeDurasi = 'reguler';
                 }
-
                 $hargaPerKg = ($tipeDurasi == 'express') ? 9000 : 5000;
                 $estimasiHarga = ($qtyInput * $hargaPerKg) + $ongkir;
-
                 $namaPaketTeks = "Kiloan - " . ucfirst($tipeDurasi);
             }
 
-            // ====================================================
-            // 🌟 2. LOGIKA OTOMATISASI TANGGAL & JAM KEMBALI
-            // ====================================================
-            $hariPickup = $request->input('hari_pickup');
+            // =====================================================================
+            // LOGIKA OTOMATISASI TANGGAL & JAM DELIVERY
+            // =====================================================================
+            $hariPickup       = $request->input('hari_pickup');
             $hariDeliveryUser = $request->input('hari_delivery');
-            $jamDelivery = $request->input('jam_delivery') ?? 'Siang (11:00 - 13:00)';
+            $rawJamPickup     = $request->input('jam_pickup');
+            $rawJamDelivery   = $request->input('jam_delivery');
 
-            // Tentukan durasi wajib di backend biar gak bisa diakalin frontend/javascript bug
-            if ($jenisLayanan == 'permadani') {
-                $durasiProses = 14; // Paksa 14 hari kalau permadani
-            } elseif ($tipeDurasi == 'express') {
-                $durasiProses = 1;  // Paksa 1 hari kalau kiloan express
+            $mapJam = [
+                '09:00 - 11:00' => 'Pagi (09:00 - 11:00)',
+                '11:00 - 13:00' => 'Siang (11:00 - 13:00)',
+                '13:00 - 15:00' => 'Siang (13:00 - 15:00)',
+                '15:00 - 17:00' => 'Sore (15:00 - 17:00)',
+                '17:00 - 19:00' => 'Sore/Malam (17:00 - 19:00)',
+                '19:00 - 21:00' => 'Malam (19:00 - 21:00)',
+                '21:00 - 22:00' => 'Malam Khusus Weekend (21:00 - 22:00)',
+            ];
+
+            $jamPickupFinal = $mapJam[$rawJamPickup] ?? $rawJamPickup ?? 'Siang (11:00 - 13:00)';
+            $isKilat        = ($jenisLayanan == 'setrika' && $tipeDurasi == 'kilat');
+
+            if ($isKilat) {
+                $tglFinal = $hariPickup;
+                if ($rawJamPickup == '09:00 - 11:00') {
+                    $jamDeliveryFinal = $mapJam['11:00 - 13:00'];
+                } elseif ($rawJamPickup == '11:00 - 13:00') {
+                    $jamDeliveryFinal = $mapJam['13:00 - 15:00'];
+                } elseif ($rawJamPickup == '13:00 - 15:00') {
+                    $jamDeliveryFinal = $mapJam['15:00 - 17:00'];
+                } elseif ($rawJamPickup == '15:00 - 17:00') {
+                    $jamDeliveryFinal = $mapJam['17:00 - 19:00'];
+                } else {
+                    $jamDeliveryFinal = $mapJam['19:00 - 21:00'];
+                }
             } else {
-                $durasiProses = 3;  // Paksa 3 hari kalau kiloan reguler
+                // 🧸 SINKRONISASI HARI ESTIMASI SECARA SILENT (CARA 1)
+                if ($jenisLayanan == 'boneka') {
+                    $ukuranLower = strtolower($tipeDurasi);
+                    if ($ukuranLower == 's') {
+                        $durasiMinimal = 2;
+                    } elseif ($ukuranLower == 'm' || $ukuranLower == 'l') {
+                        $durasiMinimal = 4;
+                    } elseif ($ukuranLower == 'xl') {
+                        $durasiMinimal = 7;
+                    } else {
+                        $durasiMinimal = 3;
+                    }
+                } elseif ($jenisLayanan == 'permadani') {
+                    $durasiMinimal = 14;
+                } elseif ($jenisLayanan == 'gorden') {
+                    // 🧺 LOGIKA UPDATE: SINKRONISASI DURASI MINIMAL GORDEN
+                    $durasiMinimal = (strtolower($tipeDurasi) == 'tebal') ? 4 : 3;
+                } elseif ($tipeDurasi == 'express') {
+                    $durasiMinimal = 1;
+                } else {
+                    $durasiMinimal = ($jenisLayanan == 'setrika') ? 2 : 3;
+                }
+
+                $tanggalMinimalSelesai = date('Y-m-d', strtotime($hariPickup . ' + ' . $durasiMinimal . ' days'));
+                $tglFinal = (!$hariDeliveryUser || $hariDeliveryUser < $tanggalMinimalSelesai) ? $tanggalMinimalSelesai : $hariDeliveryUser;
+                $jamDeliveryFinal = $mapJam[$rawJamDelivery] ?? $rawJamDelivery ?? $jamPickupFinal;
             }
 
-            // Hitung tanggal minimal yang sah
-            $tanggalSeharusnya = date('Y-m-d', strtotime($hariPickup . ' + ' . $durasiProses . ' days'));
+            $jadwalPengiriman = $tglFinal . ' @ ' . $jamDeliveryFinal;
 
-            // VALIDASI KETAT: Mau jenis layanan apapun, kalau tanggal yang dikirim user ternyata 
-            // lebih cepat dari durasi standar laundry, langsung OVERWRITE/PAKSA pakai tanggal seharusnya!
-            if (!$hariDeliveryUser || $hariDeliveryUser < $tanggalSeharusnya) {
-                $tglFinal = $tanggalSeharusnya;
-            } else {
-                $tglFinal = $hariDeliveryUser;
-            }
+            // Generate nomor resi unik
+            $nomorResi = 'CY-' . date('ymd') . '-' . strtoupper(substr(md5(uniqid(mt_rand(), true)), 0, 4));
 
-            // Gabungkan tanggal dengan jam pengiriman kembali
-            $jadwalPengiriman = $tglFinal . ' @ ' . $jamDelivery;
-            // ====================================================
-
-            $tanggal = date('ymd');
-            $karakterAcak = strtoupper(substr(md5(uniqid(mt_rand(), true)), 0, 4));
-            $nomorResi = 'CY-' . $tanggal . '-' . $karakterAcak;
-
-            // 🌟 3. INSERT DATA KE SUPABASE
-            $orderId = DB::table('orders')->insertGetId([
+            // =====================================================================
+            // 🌟 INSERT DATA KE DATABASE
+            // =====================================================================
+            $orderId = \DB::table('orders')->insertGetId([
                 'nomor_resi'          => $nomorResi,
                 'user_id'             => auth()->id(),
                 'nama_pelanggan'      => auth()->user()->name,
                 'alamat_lengkap'      => $request->input('alamat_lengkap'),
                 'nomor_telepon_order' => $request->input('phone'),
-                'instruksi_driver'    => $request->input('instruksi_driver'),
+                'instruksi_driver'    => $catatanDriverFinal,
                 'jarak_km'            => $jarak,
                 'ongkos_kirim'        => $ongkir,
-                'tipe_durasi'         => $namaPaketTeks, // Menyimpan teks rapi: "Kiloan - Express" atau "Permadani - Tebal"
+                'tipe_durasi'         => $namaPaketTeks,
                 'berat_laundry'       => $qtyInput,
-                'total_harga'         => $estimasiHarga, // Fix sesuai hitungan backend di atas
+                'total_harga'         => $estimasiHarga,
                 'jenis_layanan'       => $jenisLayanan,
                 'metode_pembayaran'   => $request->input('metode_pembayaran'),
                 'instruksi_pencucian' => $request->input('instruksi_pencucian'),
                 'status'              => 'Pending Penjemputan',
-                'jadwal_pickup'       => $request->input('hari_pickup') . ' @ ' . $request->input('jam_pickup'),
+                'jadwal_pickup'       => $hariPickup . ' @ ' . $jamPickupFinal,
                 'jadwal_pengiriman'   => $jadwalPengiriman,
                 'created_at'          => now(),
                 'updated_at'          => now(),
             ]);
 
-            // 🌟 4. REDIRECT DAN KIRIM DATA FLASH SESSION DALAM BENTUK ARRAY
+            // REDIRECT BERHASIL KE HALAMAN HISTORY
             return redirect()->route('order.history')->with([
                 'success' => 'Pesanan laundry Anda berhasil dibuat! Kurir kami akan segera menjemput.',
                 'order_data' => [
@@ -180,14 +293,14 @@ class OrderController extends Controller
                     'jarak_km'          => $jarak,
                     'alamat_lengkap'    => $request->input('alamat_lengkap'),
                     'total_harga'       => $estimasiHarga,
-                    'jadwal_pickup'     => $request->input('hari_pickup') . ' @ ' . $request->input('jam_pickup'),
+                    'jadwal_pickup'     => $hariPickup . ' @ ' . $jamPickupFinal,
                     'jadwal_pengiriman' => $jadwalPengiriman,
-                    'instruksi_driver'  => $request->input('instruksi_driver'),
+                    'instruksi_driver'  => $catatanDriverFinal,
                     'created_at'        => now()
                 ]
             ]);
         } catch (\Exception $e) {
-            return back()->withInput()->with('error', 'Terjadi kesalahan sistem saat menyimpan pesanan. Silakan coba lagi.');
+            return back()->withInput()->with('error', 'Gagal menyimpan pesanan: ' . $e->getMessage());
         }
     }
 
@@ -207,10 +320,53 @@ class OrderController extends Controller
                 return back()->with('error', 'Orderan tidak ditemukan.');
             }
 
-            $hargaPerKg = ($order->tipe_durasi == 'express') ? 9000 : 5000;
-            $beratReal = (float) $request->input('berat_asli');
+            $tipeDurasiLower = strtolower($order->tipe_durasi);
 
-            $totalHargaFix = ($beratReal * $hargaPerKg) + $order->ongkos_kirim;
+            // =====================================================================
+            // 🌟 LOGIKA HITUNG HARGA REAL ADMIN (DIPERBAIKI UNTUK GORDEN)
+            // =====================================================================
+            if ($order->jenis_layanan == 'boneka') {
+                if (str_contains($tipeDurasiLower, 'kecil') || str_contains($tipeDurasiLower, '(s)')) {
+                    $hargaPerUnit = 20000;
+                } elseif (str_contains($tipeDurasiLower, 'sedang') || str_contains($tipeDurasiLower, '(m)')) {
+                    $hargaPerUnit = 30000;
+                } elseif (str_contains($tipeDurasiLower, 'besar') || str_contains($tipeDurasiLower, '(l)')) {
+                    $hargaPerUnit = 60000;
+                } elseif (str_contains($tipeDurasiLower, 'sangat besar') || str_contains($tipeDurasiLower, '(xl)')) {
+                    $hargaPerUnit = 75000;
+                } else {
+                    $hargaPerUnit = 20000;
+                }
+                $hargaFinalPerItem = $hargaPerUnit;
+            } elseif ($order->jenis_layanan == 'gorden') {
+                // 🧺 AMANKAN HARGA REAL KHUSUS LAYANAN GORDEN PREMIUM
+                if (str_contains($tipeDurasiLower, 'vitrase')) {
+                    $hargaFinalPerItem = 25000;
+                } elseif (str_contains($tipeDurasiLower, 'tipis')) {
+                    $hargaFinalPerItem = 30000;
+                } elseif (str_contains($tipeDurasiLower, 'tebal')) {
+                    $hargaFinalPerItem = 35000;
+                } else {
+                    $hargaFinalPerItem = 30000; // Fallback gorden tipis
+                }
+            } elseif ($order->jenis_layanan == 'permadani') {
+                // 🎪 Pisahkan permadani dari kiloan karena harganya beda jauh
+                $hargaFinalPerItem = (str_contains($tipeDurasiLower, 'tebal')) ? 70000 : 45000;
+            } elseif ($order->jenis_layanan == 'setrika') {
+                if (str_contains($tipeDurasiLower, 'kilat')) {
+                    $hargaFinalPerItem = 12000;
+                } elseif (str_contains($tipeDurasiLower, 'express')) {
+                    $hargaFinalPerItem = 8000;
+                } else {
+                    $hargaFinalPerItem = 5000;
+                }
+            } else {
+                // Khusus laundry kiloan biasa
+                $hargaFinalPerItem = (str_contains($tipeDurasiLower, 'express')) ? 9000 : 5000;
+            }
+
+            $beratReal = (float) $request->input('berat_asli');
+            $totalHargaFix = ($beratReal * $hargaFinalPerItem) + $order->ongkos_kirim;
 
             DB::table('orders')->where('id', $id)->update([
                 'berat_laundry' => $beratReal,
@@ -219,7 +375,7 @@ class OrderController extends Controller
                 'updated_at'    => now(),
             ]);
 
-            return back()->with('success', 'Berat asli berhasil diperbarui! Harga dihitung otomatis oleh sistem.');
+            return back()->with('success', 'Berat/Jumlah asli berhasil diperbarui! Harga dihitung otomatis oleh sistem.');
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal mengupdate data timbangan: ' . $e->getMessage());
         }
@@ -228,41 +384,41 @@ class OrderController extends Controller
     /**
      * Menampilkan Halaman Riwayat / Laporan Pencucian
      */
-public function history()
-{
-    $customerId = auth()->id();
+    public function history()
+    {
+        $customerId = auth()->id();
 
-    // 1. Ambil orderan terbaru milik customer yang sedang login
-    $orderModel = \App\Models\Order::where('user_id', $customerId)
-                    ->latest()
-                    ->first();
+        // 1. Ambil orderan terbaru milik customer yang sedang login
+        $orderModel = \App\Models\Order::where('user_id', $customerId)
+            ->latest()
+            ->first();
 
-    if (!$orderModel) {
-        return redirect()->route('dashboard');
-    }
-
-    // Convert ke array biasa
-    $order = $orderModel->toArray();
-
-    // Default status jika kurir belum ada
-    $namaKurirDitemukan = 'Mencari Kurir...';
-
-    // 2. Gunakan kurir_id asli untuk mencari siapa kurir yang ditugaskan
-    if (!empty($orderModel->kurir_id)) {
-        
-        // Cari ke tabel kurirs berdasarkan user_id yang sesuai dengan kurir_id di orderan
-        $kurir = \DB::table('kurirs')->where('user_id', $orderModel->kurir_id)->first();
-        
-        if ($kurir) {
-            $namaKurirDitemukan = $kurir->nama_lengkap;
+        if (!$orderModel) {
+            return redirect()->route('dashboard');
         }
+
+        // Convert ke array biasa
+        $order = $orderModel->toArray();
+
+        // Default status jika kurir belum ada
+        $namaKurirDitemukan = 'Mencari Kurir...';
+
+        // 2. Gunakan kurir_id asli untuk mencari siapa kurir yang ditugaskan
+        if (!empty($orderModel->kurir_id)) {
+
+            // Cari ke tabel kurirs berdasarkan user_id yang sesuai dengan kurir_id di orderan
+            $kurir = \DB::table('kurirs')->where('user_id', $orderModel->kurir_id)->first();
+
+            if ($kurir) {
+                $namaKurirDitemukan = $kurir->nama_lengkap;
+            }
+        }
+
+        // Masukkan nama kurir murni ke dalam array order agar dibaca oleh blade
+        $order['nama_kurir_siap'] = $namaKurirDitemukan;
+
+        return view('orders.history', compact('order'));
     }
-
-    // Masukkan nama kurir murni ke dalam array order agar dibaca oleh blade
-    $order['nama_kurir_siap'] = $namaKurirDitemukan;
-
-    return view('orders.history', compact('order'));
-}
     // View Informasi Singkat Layanan
     public function kiloan()
     {

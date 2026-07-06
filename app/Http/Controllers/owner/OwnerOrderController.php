@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class OwnerOrderController extends Controller
 {
@@ -130,35 +131,56 @@ public function getLaporanKeuanganApi(Request $request)
             ]
         ]);
     }
-
-        public function updateHarga(Request $request)
+    public function updateHarga(Request $request)
     {
-        // Ambil semua input kiriman form kecuali token csrf dan method put
+        // Ambil data kiriman form kecuali token
         $dataHarga = $request->except(['_token', '_method']);
 
-        $path = base_path('.env');
-
-        if (file_exists($path)) {
-            $oldEnv = file_get_contents($path);
-
-            // Lakukan looping untuk mendeteksi setiap key harga yang dikirim
-            foreach ($dataHarga as $key => $value) {
-                // Validasi untuk memastikan nilai yang dimasukkan adalah angka positif
-                if (is_numeric($value) && $value >= 0) {
-                    if (str_contains($oldEnv, $key)) {
-                        // Jika key sudah ada di .env, kita tindas nilainya
-                        $oldEnv = preg_replace("/{$key}=.*/", "{$key}={$value}", $oldEnv);
-                    } else {
-                        // Jika belum ada, pasang di baris baru
-                        $oldEnv .= "\n{$key}={$value}";
-                    }
-                }
+        // Validasi memastikan semua input berupa angka positif
+        foreach ($dataHarga as $key => $value) {
+            if (!is_numeric($value) || $value < 0) {
+                return redirect()->back()->withErrors(['msg' => 'Harga harus berupa angka valid.']);
             }
-
-            // Tulis kembali data terbaru ke dalam file .env
-            file_put_contents($path, $oldEnv);
         }
 
+        // Path menuju file config custom kita
+        $configPath = config_path('laundry.php');
+
+        // Susun ulang struktur kode PHP secara rapi
+        $content = "<?php\n\nreturn " . var_export($dataHarga, true) . ";\n";
+
+        // Tulis data ke file config
+        file_put_contents($configPath, $content);
+
         return redirect()->back()->with('success', 'Seluruh harga master layanan berhasil diperbarui!');
+    }
+        public function pengaturanHarga()
+    {
+        return view('owner.pengaturan-harga'); // Pastikan file blade lu namanya pas 'owner/pengaturan-harga.blade.php'
+    }
+
+       public function exportPdf(Request $request)
+    {
+        // Tangkap input dari form filter berdasarkan name yang baru
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        // Mulai query model database lu
+        $query = Order::orderBy('created_at', 'desc'); // Ganti 'Order' dengan nama Model lu (misal Transaksi)
+
+        // Jika filter tanggal diisi, lakukan penyaringan data
+        if ($startDate && $endDate) {
+            $query->whereBetween('created_at', [
+                $startDate . ' 00:00:00', 
+                $endDate . ' 23:59:59'
+            ]);
+        }
+
+        $laporan = $query->get();
+
+        // Lempar data ke view PDF
+        $pdf = Pdf::loadView('owner.laporan-pdf', compact('laporan', 'startDate', 'endDate'));
+
+        return $pdf->setPaper('a4', 'portrait')->download('Laporan-Keuangan.pdf');
     }
 }

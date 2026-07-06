@@ -21,36 +21,47 @@
         </header>
 
         <div class="p-8 max-w-container-max w-full mx-auto animate-fadeIn">
-            <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
-                <div>
-                    <h2 class="font-display-lg text-display-lg text-on-surface">Laporan Keuangan</h2>
-                    <p class="text-on-surface-variant font-body-md text-body-md">Analisis performa pendapatan dan arus kas bisnis Anda.</p>
-                </div>
-                
-                <form method="GET" action="{{ route('owner.laporan-keuangan') }}" class="bg-surface-container-lowest p-4 rounded-xl shadow-sm border border-outline-variant flex items-center gap-4">
-                    <div class="flex flex-col gap-1">
-                        <label class="font-label-bold text-label-bold text-on-surface-variant">DARI TANGGAL</label>
-                        <div class="flex items-center gap-2 border-b-2 border-outline-variant focus-within:border-primary transition-colors pb-1">
-                            <span class="material-symbols-outlined text-sm text-on-surface-variant">calendar_today</span>
-                            <input type="date" name="start_date" value="{{ $startDate }}" class="bg-transparent border-none p-0 text-data-tabular font-data-tabular focus:ring-0 text-on-surface" />
-                        </div>
-                    </div>
-                    <div class="text-outline-variant mt-4">
-                        <span class="material-symbols-outlined">arrow_forward</span>
-                    </div>
-                    <div class="flex flex-col gap-1">
-                        <label class="font-label-bold text-label-bold text-on-surface-variant">SAMPAI TANGGAL</label>
-                        <div class="flex items-center gap-2 border-b-2 border-outline-variant focus-within:border-primary transition-colors pb-1">
-                            <span class="material-symbols-outlined text-sm text-on-surface-variant">event</span>
-                            <input type="date" name="end_date" value="{{ $endDate }}" class="bg-transparent border-none p-0 text-data-tabular font-data-tabular focus:ring-0 text-on-surface" />
-                        </div>
+            <div class="p-8 max-w-container-max w-full mx-auto animate-fadeIn">
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+                    <div>
+                        <h2 class="font-display-lg text-display-lg text-on-surface">Laporan Keuangan</h2>
+                        <p class="text-on-surface-variant font-body-md text-body-md">Analisis performa pendapatan dan arus kas bisnis Anda.</p>
                     </div>
                     
-                    <button type="submit" class="ml-2 bg-primary text-on-primary px-4 py-2 rounded-lg font-label-bold text-label-bold hover:opacity-90 transition-all flex items-center gap-2">
-                        <span class="material-symbols-outlined text-sm">filter_list</span>
-                        TERAPKAN
-                    </button>
-                </form>
+                    {{-- SEKARANG TOMBOL EXPORT BERADA DI DALAM FORM, DAN DIUBAH JADI BUTTON SUBMIT KHUSUS --}}
+                    <form method="GET" action="{{ route('owner.laporan-keuangan') }}" id="filterForm" class="bg-surface-container-lowest p-4 rounded-xl shadow-sm border border-outline-variant flex items-center gap-4">
+                        
+                        {{-- Tombol Export PDF ditaruh di sini, kita arahkan ke route PDF lewat onclick --}}
+                        <button type="button" onclick="exportKePdf()" class="flex items-center gap-2 px-4 py-2 bg-surface-container-lowest border border-outline-variant text-primary font-body-md rounded-lg hover:bg-surface-container transition-colors">
+                            <span class="material-symbols-outlined" data-icon="file_download">file_download</span> Export PDF
+                        </button>
+
+                        <div class="flex flex-col gap-1">
+                            <label class="font-label-bold text-label-bold text-on-surface-variant">DARI TANGGAL</label>
+                            <div class="flex items-center gap-2 border-b-2 border-outline-variant focus-within:border-primary transition-colors pb-1">
+                                <span class="material-symbols-outlined text-sm text-on-surface-variant">calendar_today</span>
+                                <input type="date" id="start_date" name="start_date" value="{{ request('start_date', $startDate) }}" class="bg-transparent border-none p-0 text-data-tabular font-data-tabular focus:ring-0 text-on-surface" />
+                            </div>
+                        </div>
+                        
+                        <div class="text-outline-variant mt-4">
+                            <span class="material-symbols-outlined">arrow_forward</span>
+                        </div>
+                        
+                        <div class="flex flex-col gap-1">
+                            <label class="font-label-bold text-label-bold text-on-surface-variant">SAMPAI TANGGAL</label>
+                            <div class="flex items-center gap-2 border-b-2 border-outline-variant focus-within:border-primary transition-colors pb-1">
+                                <span class="material-symbols-outlined text-sm text-on-surface-variant">event</span>
+                                <input type="date" id="end_date" name="end_date" value="{{ request('end_date', $endDate) }}" class="bg-transparent border-none p-0 text-data-tabular font-data-tabular focus:ring-0 text-on-surface" />
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="ml-2 bg-primary text-on-primary px-4 py-2 rounded-lg font-label-bold text-label-bold hover:opacity-90 transition-all flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm">filter_list</span>
+                            TERAPKAN
+                        </button>
+                    </form>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
@@ -175,4 +186,14 @@
             </div>
         </div>
     </main>
+    <script>
+function exportKePdf() {
+    // Ambil tanggal yang sedang terisi di input box saat ini
+    const startDate = document.getElementById('start_date').value;
+    const endDate = document.getElementById('end_date').value;
+    
+    // Alihkan halaman ke route cetak PDF sambil membawa tanggal ter-update
+    window.location.href = `{{ route('owner.laporan-pdf') }}?start_date=${startDate}&end_date=${endDate}`;
+}
+</script>
 </x-owner-layout>  

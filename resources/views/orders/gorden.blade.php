@@ -38,29 +38,30 @@
                     Pricelist Laundry Gorden
                 </h2>
                <div class="bg-white rounded-2xl shadow-sm px-5 py-4">
+                    <div class="flex justify-between items-center p-4 px-6">
+                        <div class="space-y-0.5">
+                            <h3 class="text-sm font-bold text-gray-700 tracking-wide">Vitrase</h3>
+                            <p class="text-xs text-gray-400 font-medium">Gorden kain transparan / kelambu dalaman|Estimasi 3 hari </p>
+                        </div>
+                        <span class="text-sm font-extrabold text-[#F6921E]">Rp 25.000/1m²</span>
+                    </div>
+
                    <div class="flex justify-between items-center p-4 px-6">
                         <div class="space-y-0.5">
                             <h3 class="text-sm font-bold text-gray-700 tracking-wide">Tipis</h3>
-                            <p class="text-xs text-gray-400 font-medium">Harga Permeter</p>
+                            <p class="text-xs text-gray-400 font-medium">Bahan katun ringan / gorden standar harian|Estimasi 3 hari</p>
                         </div>
-                        <span class="text-sm font-extrabold text-[#F6921E]">Rp 30.000</span>
+                        <span class="text-sm font-extrabold text-[#F6921E]">Rp 30.000/1m²</span>
                     </div>
 
                     <div class="flex justify-between items-center p-4 px-6">
                         <div class="space-y-0.5">
                             <h3 class="text-sm font-bold text-gray-700 tracking-wide">Tebal</h3>
-                            <p class="text-xs text-gray-400 font-medium">Harga Permeter</p>
+                            <p class="text-xs text-gray-400 font-medium">Bahan blackout, beludru, atau gorden berat|Estimasi 4 hari</p>
                         </div>
-                        <span class="text-sm font-extrabold text-[#F6921E]">Rp 35.000</span>
+                        <span class="text-sm font-extrabold text-[#F6921E]">Rp 35.000/1m²</span>
                     </div>
 
-                    <div class="flex justify-between items-center p-4 px-6">
-                        <div class="space-y-0.5">
-                            <h3 class="text-sm font-bold text-gray-700 tracking-wide">Vitrage</h3>
-                            <p class="text-xs text-gray-400 font-medium">Harga Permeter</p>
-                        </div>
-                        <span class="text-sm font-extrabold text-[#F6921E]">Rp 25.000</span>
-                    </div>
                 </div>
             </div>
             {{-- PICKUP & DELIVERY PRICING --}}
@@ -145,7 +146,7 @@
 
                     {{-- CTA Button --}}
                     <div class="pt-4 flex justify-center">
-                        <a href="{{ route('order.checkout', ['layanan' => 'kiloan']) }}"
+                        <a href="{{ route('order.checkout', ['layanan' => 'gorden']) }}"
                            class="inline-block bg-orange-500 hover:bg-orange-600 text-white font-bold text-base tracking-wide rounded-xl px-12 py-3.5 shadow-md hover:shadow-orange-200 transition-all duration-150 ease-out">
                             Pesan Sekarang
                         </a>

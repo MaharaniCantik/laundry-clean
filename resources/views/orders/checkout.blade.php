@@ -172,6 +172,8 @@
                     </div>
                 </div>
                 <div class="mt-8 flex justify-end">
+                    <input type="hidden" name="layanan_utama" value="{{ $layanan }}">
+
                     <button type="submit" class="bg-[#F6921E] hover:bg-orange-600 text-white font-bold py-2.5 px-8 rounded-full shadow-md transition-transform hover:scale-105 text-sm">
                         Lanjut ke Layanan →
                     </button>
@@ -298,7 +300,7 @@
         });
     });
 
-    // 🌟 LOGIKA DINAMIS TANGGAL DELIVERY (SIAP UNTUK BANYAK LAYANAN) 🌟
+// 🌟 LOGIKA DINAMIS TANGGAL DELIVERY (SIAP UNTUK BANYAK LAYANAN) 🌟
     const inputHariPickup = document.querySelector('input[name="hari_pickup"]');
     const inputHariDelivery = document.querySelector('input[name="hari_delivery"]');
     const jsJenisLayanan = document.getElementById('js-jenis-layanan');
@@ -311,15 +313,27 @@
                 // 1. Ambil nilai dari hidden input, jika tidak ada fallback ke URL, jika tidak ada default ke kiloan
                 let jenisLayanan = jsJenisLayanan ? jsJenisLayanan.value : '';
                 if (!jenisLayanan) {
-                    jenisLayanan = window.location.pathname.includes('permadani') ? 'permadani' : 'kiloan';
+                    // 🧸 UPDATE: Tambahkan kondisi deteksi 'boneka' dari path URL
+                    if (window.location.pathname.includes('permadani')) {
+                        jenisLayanan = 'permadani';
+                    } else if (window.location.pathname.includes('setrika')) {
+                        jenisLayanan = 'setrika';
+                    } else if (window.location.pathname.includes('boneka')) {
+                        jenisLayanan = 'boneka';
+                    } else if (window.location.pathname.includes('gorden')) {
+                        jenisLayanan = 'gorden';
+                    } else {
+                        jenisLayanan = 'kiloan';
+                    }
                 }
 
-                // 2. Daftar durasi proses tiap layanan (Tinggal tambah di sini kalau ada layanan baru!)
+                // 2. Daftar durasi proses tiap layanan
                 const durasiLayanan = {
-                    'kiloan': 3, // Kiloan nunggu 3 hari
+                    'kiloan': 3,     // Kiloan nunggu 3 hari
                     'permadani': 14, // Permadani nunggu 14 hari
-                    'sepatu': 5, // (Contoh) Cuci sepatu nunggu 5 hari
-                    'helm': 2 // (Contoh) Cuci helm nunggu 2 hari
+                    'setrika': 2,    // Setrika nunggu 2 hari
+                    'boneka': 2,     // 🧸 UPDATE: Boneka default nunggu 2 hari (Ukuran S)
+                    'gorden':3, // Gorden 3 hari
                 };
 
                 // 3. Ambil jumlah hari berdasarkan layanan aktif (jika tidak terdaftar, default 3 hari)

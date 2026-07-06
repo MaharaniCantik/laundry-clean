@@ -56,39 +56,30 @@ Route::get('/dashboard', function () {
     return redirect('/');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-// ==========================================
-// 4. GRUP MULTI-ROLE (KENDALI DASHBOARD)
-// ==========================================
+// =====================================================================
+// 4. GRUP MULTI-ROLE (KENDALI DASHBOARD ADMIN)
+// =====================================================================
 Route::middleware(['auth', 'role:admin'])->group(function () {
-    // 1. Ini route dashboard yang benar
+    // 1. Ini route dashboard admin
     Route::get('/admin/dashboard', [OrderAdminController::class, 'index'])->name('admin.dashboard');
 
-    // 2. Ini route orders Anda yang sudah benar
+    // 2. Ini route orders admin
     Route::get('/admin/orders',[OrderAdminController::class, 'ordersPage'])->name('admin.orders');
 
-    // Taruh ini di bawah rute admin.orders yang sudah ada kemarin:
+    // Route update status versi admin
     Route::post('/admin/orders/{id}/update-status', [OrderAdminController::class, 'updateStatus'])->name('admin.orders.update-status');
 
-    Route::post('/admin/order/konfirmasi/{id}', [App\Http\Controllers\Admin\OrderAdminController::class, 'konfirmasiOrder'])
-     ->name('admin.konfirmasiOrder');
+    Route::post('/admin/order/konfirmasi/{id}', [OrderAdminController::class, 'konfirmasiOrder'])->name('admin.konfirmasiOrder');
 
-    // TARUH DI SINI (Gua sejajarin biar gak tumpang tindih middleware-nya, dan namanya disamain):
+    // Manajemen Armada Kurir oleh Admin
     Route::get('/admin/armada_kurir', [KurirController::class, 'index'])->name('admin.armada_kurir');
-    // Route untuk menampilkan halaman form tambah kurir
     Route::get('/admin/armada_kurir/create', [KurirController::class, 'create'])->name('admin.armada_kurir.create');
-
-    Route::post('/admin/armada-kurir/tes-tembak', [App\Http\Controllers\Admin\OrderAdminController::class, 'tesKurirManual'])
-     ->name('admin.tes_kurir_manual');
-
-     // Pastikan nama rutenya ->name('updateStatus') sesuai dengan yang dipanggil di blade kurir
-    Route::post('/kurir/task/update-status/{id}', [App\Http\Controllers\Kurir\KurirDashboardController::class, 'updateStatus'])
-     ->name('updateStatus');
-
-    // Route untuk memproses penyimpanan data kurir baru
     Route::post('/admin/armada_kurir/store', [KurirController::class, 'store'])->name('admin.armada_kurir.store');
+
+    Route::post('/admin/armada-kurir/tes-tembak', [OrderAdminController::class, 'tesKurirManual'])->name('admin.tes_kurir_manual');
+    
+    // ❌ NOTE: Route updateStatus kurir yang tadinya di sini SUDAH DIHAPUS & DIPINDAHKAN ke grup kurir di bawah!
 });
-
-
 
 Route::middleware(['auth', 'role:owner'])->group(function () {
     // 1. Halaman Dashboard Utama Owner
@@ -99,9 +90,15 @@ Route::middleware(['auth', 'role:owner'])->group(function () {
     
     // 3. Halaman Monitoring Keuangan
     Route::get('/owner/laporan-keuangan', [OwnerOrderController::class, 'laporanKeuangan'])->name('owner.laporan-keuangan');
+    Route::get('/owner/laporan-keuangan/laporan-pdf', [OwnerOrderController::class, 'exportPdf'])->name('owner.laporan-pdf');
     Route::get('/api/laporan-keuangan', [OwnerOrderController::class, 'getLaporanKeuanganApi']);
 
-    Route::get('/owner/pengaturan-harga', [OwnerOrderController::class, 'updateHarga']) ->name('owner.pengaturan-harga');
+   // 1. Route untuk MEMBUKA halaman pengaturan harga
+    Route::get('/owner/pengaturan-harga', [OwnerOrderController::class, 'pengaturanHarga'])->name('owner.pengaturan-harga');
+
+    // 2. Route untuk PROSES SIMPAN/UPDATE harga (Kategori PUT karena di form pake @method('PUT'))
+    Route::put('/owner/update-harga', [OwnerOrderController::class, 'updateHarga'])->name('owner.update-harga');
+
     
     // 4. Endpoint API Rahasia untuk Fetch JS Polling (Wajib di dalam middleware agar aman)
     Route::get('/owner/api/orders', [\App\Http\Controllers\Owner\OwnerOrderController::class, 'getOrdersApi'])->name('owner.api.orders');
@@ -110,18 +107,24 @@ Route::middleware(['auth', 'role:owner'])->group(function () {
 // Group Route khusus untuk Kurir
 // Pastikan nama class Controller-nya sesuai dengan file lu (KurirDashboardController)
 
+// =====================================================================
+// 5. GRUP KHUSUS ARMARDA KURIR (SINKRON & AMAN)
+// =====================================================================
 Route::middleware(['auth'])->prefix('kurir')->name('kurir.')->group(function () {
     
-    // 🌟 SUDAH DIPERBAIKI: Cukup ketik '/dashboard', otomatis jadi 'kurir/dashboard'
+    // Dashboard Utama Kurir (Menampilkan Orderan Masuk & Tugas Aktif)
     Route::get('/dashboard', [KurirDashboardController::class, 'index'])->name('dashboard');
     
-    // URL otomatis jadi: kurir/order/{id}/update-status | Nama route: kurir.updateStatus
+    // 🌟 FITUR BARU: Ambil/Klaim Orderan dari Dashboard (URL: kurir/ambil/{id})
+    Route::post('/ambil/{id}', [KurirDashboardController::class, 'ambilPesanan'])->name('ambil');
+    
+    // Update Status Proses Kerja Kurir (URL: kurir/order/{id}/update-status)
     Route::post('/order/{id}/update-status', [KurirDashboardController::class, 'updateStatus'])->name('updateStatus');
     
-    // URL otomatis jadi: kurir/history | Nama route: kurir.history
+    // Riwayat Tugas Selesai Kurir (URL: kurir/history)
     Route::get('/history', [KurirDashboardController::class, 'history'])->name('history');
     
-    // URL otomatis jadi: kurir/profile | Nama route: kurir.profile
+    // Profil Fleet Kurir (URL: kurir/profile)
     Route::get('/profile', [KurirDashboardController::class, 'profile'])->name('profile');
 });
 
