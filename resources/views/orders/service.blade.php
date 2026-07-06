@@ -287,7 +287,7 @@
 </style>
 
 {{-- ====================================================
- SCRIPT SINKRONISASI LOGIK (KILOAN, PERMADANI & SETRIKA)
+ SCRIPT SINKRONISASI LOGIK (KILOAN, PERMADANI, BONEKA & GORDEN)
  ==================================================== --}}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -309,23 +309,30 @@
                 if (durasiValue === 'm') return 30000;
                 if (durasiValue === 'l') return 60000;
                 if (durasiValue === 'xl') return 75000;
-                return 20000; // fallback jika kosong
+                return 20000;
             }
 
+            // 🎪 2. LOGIKA TARIF LAUNDRY PERMADANI
             if (jenisLayanan === 'permadani') {
                 return (durasiValue === 'tebal') ? 70000 : 45000;
             }
 
-            if (jenisLayanan === 'setrika') {
-                if (durasiValue === 'kilat') {
-                    return 12000;
-                } else if (durasiValue === 'express') {
-                    return 8000;
-                } else {
-                    return 5000;
-                }
+            // 🧺 3. LOGIKA UPDATE: TARIF PREMIUM GORDEN (PER METER PERSEGI)
+            if (jenisLayanan === 'gorden') {
+                if (durasiValue === 'vitrase') return 25000;
+                if (durasiValue === 'tipis') return 30000;
+                if (durasiValue === 'tebal') return 35000;
+                return 30000; // fallback jika kosong
             }
 
+            // 👔 4. LOGIKA TARIF LAUNDRY SETRIKA
+            if (jenisLayanan === 'setrika') {
+                if (durasiValue === 'kilat') return 12000;
+                if (durasiValue === 'express') return 8000;
+                return 5000;
+            }
+
+            // 👕 5. FALLBACK LAUNDRY KILOAN BIASA
             return (durasiValue === 'express') ? 9000 : 5000;
         }
 
@@ -369,7 +376,20 @@
                     infoDurasiEd.innerHTML = "🧸 <b>Laundry Boneka Satuan:</b> Estimasi pengerjaan disesuaikan dengan ukuran boneka demi menjaga kebersihan & kering maksimal.";
                 }
             }
-            // 🧺 2. LOGIKA UNTUK LAUNDRY SETRIKA
+            // 🧺 2. LOGIKA UPDATE: TEKS EDUKASI REAL-TIME UNTUK GORDEN PREMIUM
+            else if (jenisLayanan === 'gorden') {
+                if (durasiValue === 'tebal') {
+                    infoDurasiEd.className = "text-xs font-medium mt-2 p-2 rounded-lg border bg-amber-50 text-amber-700 border-amber-100";
+                    infoDurasiEd.innerHTML = "📦 <b>Gorden Tebal / Blackout:</b> Bahan kain tebal & berat membutuhkan waktu pengeringan ekstra. Estimasi selesai dalam <b>4 Hari</b>.";
+                } else if (durasiValue === 'vitrase') {
+                    infoDurasiEd.className = "text-xs font-medium mt-2 p-2 rounded-lg border bg-blue-50 text-blue-700 border-blue-100";
+                    infoDurasiEd.innerHTML = "⚡ <b>Gorden Vitrase:</b> Bahan kain kelambu ringan transparan diproses cepat. Estimasi selesai dalam <b>3 Hari</b>.";
+                } else {
+                    infoDurasiEd.className = "text-xs font-medium mt-2 p-2 rounded-lg border bg-blue-50 text-blue-700 border-blue-100";
+                    infoDurasiEd.innerHTML = "⚡ <b>Gorden Tipis / Standard:</b> Bahan katun atau kain harian standar rumah. Estimasi selesai dalam <b>3 Hari</b>.";
+                }
+            }
+            // 🧺 3. LOGIKA UNTUK LAUNDRY SETRIKA
             else if (jenisLayanan === 'setrika') {
                 if (durasiValue === 'kilat') {
                     infoDurasiEd.className = "text-xs font-medium mt-2 p-3 rounded-xl border bg-blue-50 text-blue-700 border-blue-100";
@@ -382,7 +402,7 @@
                     infoDurasiEd.innerHTML = "📦 <b>Setrika Reguler:</b> Pakaian disetrika rapi dengan estimasi proses selesai dalam 2 Hari.";
                 }
             }
-            // 🧺 3. LOGIKA UNTUK LAUNDRY KILOAN
+            // 🧺 4. LOGIKA UNTUK LAUNDRY KILOAN
             else if (jenisLayanan === 'kiloan') {
                 if (durasiValue === 'express') {
                     infoDurasiEd.className = "text-xs font-medium mt-2 p-2 rounded-lg border bg-blue-50 text-blue-700 border-blue-100";
@@ -392,7 +412,7 @@
                     infoDurasiEd.innerHTML = "📦 <b>Paket Reguler:</b> Proses cuci butuh 3 hari. Jadwal pengantaran otomatis disesuaikan minimal H+3 dari tanggal pickup.";
                 }
             }
-            // 📦 4. LOGIKA UNTUK PERMADANI (JIKA JURUSAN LAIN TIDAK TERPENUHI ATAU FALLBACK)
+            // 📦 5. LOGIKA UNTUK PERMADANI
             else if (jenisLayanan === 'permadani') {
                 infoDurasiEd.className = "text-xs font-medium mt-2 p-2 rounded-lg border bg-amber-50 text-amber-700 border-amber-100";
                 infoDurasiEd.innerHTML = "ℹ️ Cuci permadani membutuhkan waktu proses minimal 14 hari kerja.";
@@ -432,7 +452,6 @@
         const infoCard = document.getElementById('info-card');
 
         if (radioMetode.length > 0) {
-            // Trigger layout awal sesuai default check
             const checkedRadio = document.querySelector('input[name="metode_pembayaran"]:checked');
             if (checkedRadio) checkedRadio.dispatchEvent(new Event('change'));
 
