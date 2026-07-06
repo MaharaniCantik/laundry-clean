@@ -8,6 +8,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Admin\KurirController;
 use Illuminate\Support\Facades\Redirect;
 use App\Http\Controllers\Kurir\KurirDashboardController;
+use App\Http\Controllers\Owner\OwnerOrderController;
 
 // ==========================================
 // 1. RUTE HALAMAN UTAMA (LANDING PAGE)
@@ -90,9 +91,17 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
 
 Route::middleware(['auth', 'role:owner'])->group(function () {
-    Route::get('/owner/dashboard', function () {
-        return view('owner.dashboard');
-    })->name('owner.dashboard');
+    // 1. Halaman Dashboard Utama Owner
+    Route::get('/owner/dashboard', [OwnerOrderController::class, 'dashboard'])->name('owner.dashboard');
+    
+    // 2. Halaman Index Arsip Riwayat Order (Real-time View)
+    Route::get('/owner/order-history', [OwnerOrderController::class, 'index'])->name('owner.order-history');
+    
+    // 3. Halaman Monitoring Keuangan
+    Route::get('/owner/laporan-keuangan', [OwnerOrderController::class, 'laporanKeuangan'])->name('owner.laporan-keuangan');
+    
+    // 4. Endpoint API Rahasia untuk Fetch JS Polling (Wajib di dalam middleware agar aman)
+    Route::get('/owner/api/orders', [\App\Http\Controllers\Owner\OwnerOrderController::class, 'getOrdersApi'])->name('owner.api.orders');
 });
 
 // Group Route khusus untuk Kurir
@@ -112,6 +121,7 @@ Route::middleware(['auth'])->prefix('kurir')->name('kurir.')->group(function () 
     // URL otomatis jadi: kurir/profile | Nama route: kurir.profile
     Route::get('/profile', [KurirDashboardController::class, 'profile'])->name('profile');
 });
+
 
 Route::get('/', function () {
     return view('welcome'); // Langsung buka halaman user/customer biasa
