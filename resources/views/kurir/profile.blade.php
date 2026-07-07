@@ -1,15 +1,15 @@
 <x-kurir-layout>
     <div class="h-[calc(100vh-140px)] overflow-y-auto px-6 py-8 pb-32 bg-slate-50/50">
         <div class="max-w-[1200px] mx-auto font-['Poppins',sans-serif] grid grid-cols-1 md:grid-cols-12 gap-6">
-            
+
             <div class="md:col-span-4 space-y-6">
                 <div class="bg-white border border-slate-100 rounded-2xl p-6 flex flex-col items-center text-center shadow-sm">
-                    
+
                     <div class="relative group">
                         <div class="w-28 h-28 rounded-full overflow-hidden border-4 border-emerald-500/20 shadow-inner">
                             <img class="w-full h-full object-cover"
-                                 alt="Foto profil {{ $profile->name }}"
-                                 src="{{ $profile->avatar_url ?? 'https://via.placeholder.com/150' }}" />
+                                alt="Foto profil {{ $profile->name }}"
+                                src="{{ $profile->avatar_url ?? 'https://via.placeholder.com/150' }}" />
                         </div>
                     </div>
 
@@ -24,7 +24,7 @@
                         <div class="bg-slate-50/80 rounded-xl p-3 border border-slate-100">
                             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Total Tugas</p>
                             <p class="text-xl font-extrabold text-slate-800 mt-0.5">
-                                {{ number_format($profile->total_tasks ?? 0, 0, ',', '.') }}
+                                {{ $totalSelesai ?? number_format($profile->total_tasks ?? 0, 0, ',', '.') }}
                             </p>
                         </div>
                         <div class="bg-slate-50/80 rounded-xl p-3 border border-slate-100">
@@ -53,7 +53,7 @@
                     </h2>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        
+
                         <a href="{{ route('kurir.profile') }}" class="group p-4 bg-slate-50 hover:bg-slate-100 border border-slate-200/60 rounded-xl transition-all flex items-center justify-between active:scale-95">
                             <div class="flex items-center gap-3">
                                 <div class="bg-white p-2.5 rounded-lg border border-slate-200/50 text-slate-700 shadow-sm">
@@ -66,14 +66,17 @@
                                     <p class="text-[11px] text-slate-400 mt-0.5">KTP, Email, & No. HP</p>
                                 </div>
                             </div>
-                            <svg class="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                            <svg class="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
                         </a>
 
                         <div class="group p-4 bg-slate-50 hover:bg-slate-100 border border-slate-200/60 rounded-xl transition-all flex items-center justify-between cursor-pointer active:scale-95">
                             <div class="flex items-center gap-3">
                                 <div class="bg-white p-2.5 rounded-lg border border-slate-200/50 text-slate-700 shadow-sm">
                                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
                                     </svg>
                                 </div>
                                 <div>
@@ -81,7 +84,9 @@
                                     <p class="text-[11px] text-slate-400 mt-0.5">SIM, STNK, & Plat Motor</p>
                                 </div>
                             </div>
-                            <svg class="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                            <svg class="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
                         </div>
                     </div>
 

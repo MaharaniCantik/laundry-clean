@@ -15,7 +15,7 @@
         <input type="hidden" name="hari_pickup" value="{{ old('hari_pickup', $hariPickup) }}">
         <input type="hidden" name="jam_pickup" value="{{ old('jam_pickup', $jamPickup) }}">
 
-        {{-- 🌟 TAMBAHKAN 2 BARIS INI BIAR JADWAL DELIVERY (ANTAR KEMBALI) GA BANDEL LAGI --}}
+        {{-- 🌟 TAMBAHKAN 2 BARIS INI BIAR JADWAL DELIVERY (ANTAR KEMBALI) --}}
         <input type="hidden" name="hari_delivery" value="{{ old('hari_delivery', $hariDelivery) }}">
         <input type="hidden" name="jam_delivery" value="{{ old('jam_delivery', $jamDelivery) }}">
 
@@ -33,6 +33,10 @@
         $currentLayanan = 'boneka';
         } elseif (str_contains($urlSebelumnya, 'gorden') || (isset($jenisLayanan) && $jenisLayanan == 'gorden')) {
         $currentLayanan = 'gorden';
+        } elseif (str_contains($urlSebelumnya, 'bedcover') || (isset($jenisLayanan) && $jenisLayanan == 'bedcover')) {
+        $currentLayanan = 'bedcover';
+        } elseif (str_contains($urlSebelumnya, 'sepatu') || (isset($jenisLayanan) && $jenisLayanan == 'sepatu')) {
+        $currentLayanan = 'sepatu';
         } else {
         $currentLayanan = 'kiloan';
         }
@@ -114,10 +118,28 @@
                             </select>
                             <div id="info_durasi_edukasi" class="text-xs font-medium mt-2 p-2 rounded-lg border transition-all duration-200"></div>
 
+                            @elseif($currentLayanan == 'bedcover')
+                            <label class="text-[#0085C9] font-bold text-lg block mb-2">Pilih Ukuran Bedcover:</label>
+                            <select id="select_durasi_layanan" name="tipe_durasi" class="w-full p-2 border rounded focus:ring-2 focus:ring-[#0085C9] outline-none text-gray-700" required>
+                                <option value="single" {{ old('tipe_durasi') == 'single' ? 'selected' : '' }}>Single (Rp 40.000 / Pcs)</option>
+                                <option value="double" {{ old('tipe_durasi') == 'double' ? 'selected' : '' }}>Double (Rp 55.000 / Pcs)</option>
+                                <option value="king" {{ old('tipe_durasi') == 'king' ? 'selected' : '' }}>King (Rp 70.000 / Pcs)</option>
+                            </select>
+                            <div id="info_durasi_edukasi" class="text-xs font-medium mt-2 p-2 rounded-lg border transition-all duration-200"></div>
+
+                            @elseif($currentLayanan == 'sepatu')
+                            <label class="text-[#0085C9] font-bold text-lg block mb-2">Pilih Perawatan Sepatu:</label>
+                            <select id="select_durasi_layanan" name="tipe_durasi" class="w-full p-2 border rounded focus:ring-2 focus:ring-[#0085C9] outline-none text-gray-700" required>
+                                <option value="fast_clean" {{ old('tipe_durasi') == 'fast_clean' ? 'selected' : '' }}>Fast Clean (Rp 20.000 / Pasang)</option>
+                                <option value="deep_clean" {{ old('tipe_durasi') == 'deep_clean' ? 'selected' : '' }}>Deep Clean (Rp 40.000 / Pasang)</option>
+                                <option value="unyellowing" {{ old('tipe_durasi') == 'unyellowing' ? 'selected' : '' }}>Unyellowing (Rp 55.000 / Pasang)</option>
+                            </select>
+                            <div id="info_durasi_edukasi" class="text-xs font-medium mt-2 p-2 rounded-lg border transition-all duration-200"></div>
+
                             @else
                             <label class="text-[#0085C9] font-bold text-lg block mb-2">Pilih Durasi Laundry Kiloan:</label>
                             <select id="select_durasi_layanan" name="tipe_durasi" class="w-full p-2 border rounded focus:ring-2 focus:ring-[#0085C9] outline-none text-gray-700" required>
-                                <option value="reguler" {{ old('tipe_durasi') == 'reguler' ? 'selected' : '' }}>Reguler (Rp 5.000 / Kg)</option>
+                                <option value="reguler" {{ old('tipe_durasi') == 'reguler' ? 'selected' : '' }}>Reguler (Rp 6.000 / Kg)</option>
                                 <option value="express" {{ old('tipe_durasi') == 'express' ? 'selected' : '' }}>Express (Rp 9.000 / Kg)</option>
                             </select>
                             <div id="info_durasi_edukasi" class="text-xs font-medium mt-2 p-2 rounded-lg border transition-all duration-200"></div>
@@ -218,13 +240,17 @@
                             <div class="bg-[#e4f3fa] rounded-2xl p-5 border border-blue-100">
 
                                 @if($currentLayanan == 'permadani')
-                                <label class="block text-gray-700 font-semibold text-sm mb-3">Masukan Luas Karpet (m²)</label>
+                                <label class="block text-gray-700 font-semibold text-sm mb-3">Masukan Luas Karpet</label>
                                 @elseif($currentLayanan == 'gorden')
-                                <label class="block text-gray-700 font-semibold text-sm mb-3">Masukan Luas Gorden (m²)</label>
+                                <label class="block text-gray-700 font-semibold text-sm mb-3">Masukan Luas Gorden</label>
                                 @elseif($currentLayanan == 'boneka')
-                                <label class="block text-gray-700 font-semibold text-sm mb-3">Masukan Jumlah Boneka (Pcs)</label>
+                                <label class="block text-gray-700 font-semibold text-sm mb-3">Masukan Jumlah Boneka</label>
+                                @elseif($currentLayanan == 'bedcover')
+                                <label class="block text-gray-700 font-semibold text-sm mb-3">Masukan Jumlah Bedcover</label>
+                                @elseif($currentLayanan == 'sepatu')
+                                <label class="block text-gray-700 font-semibold text-sm mb-3">Masukan Jumlah Sepatu</label>
                                 @else
-                                <label class="block text-gray-700 font-semibold text-sm mb-3">Masukan berat (Kg)</label>
+                                <label class="block text-gray-700 font-semibold text-sm mb-3">Masukan berat</label>
                                 @endif
 
                                 <div class="flex items-center gap-5 mb-5">
@@ -238,8 +264,10 @@
                                     @if($currentLayanan == 'permadani' || $currentLayanan == 'gorden')
                                     {{-- 🧺 Gorden disamakan satuannya m² dengan permadani --}}
                                     <span class="text-gray-600 font-bold text-sm">m²</span>
-                                    @elseif($currentLayanan == 'boneka')
+                                    @elseif($currentLayanan == 'boneka' || $currentLayanan == 'bedcover')
                                     <span class="text-gray-600 font-bold text-sm">Pcs</span>
+                                    @elseif($currentLayanan == 'sepatu')
+                                    <span class="text-gray-600 font-bold text-sm">Pasang</span>
                                     @else
                                     <span class="text-gray-600 font-bold text-sm">Kg</span>
                                     @endif
@@ -287,7 +315,7 @@
 </style>
 
 {{-- ====================================================
- SCRIPT SINKRONISASI LOGIK (KILOAN, PERMADANI, BONEKA & GORDEN)
+ SCRIPT SINKRONISASI LOGIK (KILOAN, PERMADANI, BONEKA, GORDEN, BEDCOVER & SEPATU)
  ==================================================== --}}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -317,23 +345,39 @@
                 return (durasiValue === 'tebal') ? 70000 : 45000;
             }
 
-            // 🧺 3. LOGIKA UPDATE: TARIF PREMIUM GORDEN (PER METER PERSEGI)
+            // 🧺 3. LOGIKA TARIF PREMIUM GORDEN
             if (jenisLayanan === 'gorden') {
                 if (durasiValue === 'vitrase') return 25000;
                 if (durasiValue === 'tipis') return 30000;
                 if (durasiValue === 'tebal') return 35000;
-                return 30000; // fallback jika kosong
+                return 30000;
             }
 
-            // 👔 4. LOGIKA TARIF LAUNDRY SETRIKA
+            // 🧺 4. LOGIKA TARIF BEDCOVER (UKURAN FIXED BARU)
+            if (jenisLayanan === 'bedcover') {
+                if (durasiValue === 'single') return 40000;
+                if (durasiValue === 'double') return 55000;
+                if (durasiValue === 'king') return 70000;
+                return 40000;
+            }
+
+            // 👟 5. LOGIKA TARIF LAUNDRY SEPATU
+            if (jenisLayanan === 'sepatu') {
+                if (durasiValue === 'fast_clean') return 20000;
+                if (durasiValue === 'deep_clean') return 40000;
+                if (durasiValue === 'unyellowing') return 55000;
+                return 20000;
+            }
+
+            // 👔 6. LOGIKA TARIF LAUNDRY SETRIKA
             if (jenisLayanan === 'setrika') {
                 if (durasiValue === 'kilat') return 12000;
                 if (durasiValue === 'express') return 8000;
                 return 5000;
             }
 
-            // 👕 5. FALLBACK LAUNDRY KILOAN BIASA
-            return (durasiValue === 'express') ? 9000 : 5000;
+            // 👕 7. FALLBACK LAUNDRY KILOAN BIASA
+            return (durasiValue === 'express') ? 9000 : 6000;
         }
 
         function dapatkanOngkirDariLayar() {
@@ -360,59 +404,72 @@
             const jenisLayanan = jsJenisLayanan ? jsJenisLayanan.value : 'kiloan';
             const durasiValue = selectDurasiElement.value;
 
-            // 🧸 1. LOGIKA TEKS EDUKASI REAL-TIME UNTUK LAUNDRY BONEKA
+            // 🧸 1. TEKS EDUKASI LAUNDRY BONEKA
             if (jenisLayanan === 'boneka') {
                 infoDurasiEd.className = "text-xs font-medium mt-2 p-2 rounded-lg border bg-blue-50 text-blue-700 border-blue-100";
-
-                if (durasiValue === 's') {
-                    infoDurasiEd.innerHTML = "🧸 <b>Boneka Kecil (S):</b> Estimasi proses cuci & pengeringan membutuhkan waktu <b>2 Hari</b>.";
-                } else if (durasiValue === 'm') {
-                    infoDurasiEd.innerHTML = "🧸 <b>Boneka Sedang (M):</b> Estimasi proses cuci & pengeringan membutuhkan waktu <b>4 Hari</b>.";
-                } else if (durasiValue === 'l') {
-                    infoDurasiEd.innerHTML = "🧸 <b>Boneka Besar (L):</b> Estimasi proses cuci & pengeringan membutuhkan waktu <b>4 Hari</b>.";
-                } else if (durasiValue === 'xl') {
-                    infoDurasiEd.innerHTML = "🧸 <b>Boneka Sangat Besar (XL):</b> Estimasi proses cuci & pengeringan membutuhkan waktu <b>7 Hari</b> (Seminggu) agar bagian dalam benar-benar kering maksimal.";
-                } else {
-                    infoDurasiEd.innerHTML = "🧸 <b>Laundry Boneka Satuan:</b> Estimasi pengerjaan disesuaikan dengan ukuran boneka demi menjaga kebersihan & kering maksimal.";
-                }
+                if (durasiValue === 's') infoDurasiEd.innerHTML = "🧸 <b>Boneka Kecil (S):</b> Estimasi proses <b>2 Hari</b>.";
+                else if (durasiValue === 'm') infoDurasiEd.innerHTML = "🧸 <b>Boneka Sedang (M):</b> Estimasi proses <b>4 Hari</b>.";
+                else if (durasiValue === 'l') infoDurasiEd.innerHTML = "🧸 <b>Boneka Besar (L):</b> Estimasi proses <b>4 Hari</b>.";
+                else if (durasiValue === 'xl') infoDurasiEd.innerHTML = "🧸 <b>Boneka Sangat Besar (XL):</b> Estimasi proses <b>7 Hari</b>.";
             }
-            // 🧺 2. LOGIKA UPDATE: TEKS EDUKASI REAL-TIME UNTUK GORDEN PREMIUM
+            // 🧺 2. TEKS EDUKASI GORDEN PREMIUM
             else if (jenisLayanan === 'gorden') {
+                infoDurasiEd.className = "text-xs font-medium mt-2 p-2 rounded-lg border bg-blue-50 text-blue-700 border-blue-100";
                 if (durasiValue === 'tebal') {
                     infoDurasiEd.className = "text-xs font-medium mt-2 p-2 rounded-lg border bg-amber-50 text-amber-700 border-amber-100";
-                    infoDurasiEd.innerHTML = "📦 <b>Gorden Tebal / Blackout:</b> Bahan kain tebal & berat membutuhkan waktu pengeringan ekstra. Estimasi selesai dalam <b>4 Hari</b>.";
+                    infoDurasiEd.innerHTML = "📦 <b>Gorden Tebal / Blackout:</b> Estimasi selesai dalam <b>4 Hari</b>.";
                 } else if (durasiValue === 'vitrase') {
-                    infoDurasiEd.className = "text-xs font-medium mt-2 p-2 rounded-lg border bg-blue-50 text-blue-700 border-blue-100";
-                    infoDurasiEd.innerHTML = "⚡ <b>Gorden Vitrase:</b> Bahan kain kelambu ringan transparan diproses cepat. Estimasi selesai dalam <b>3 Hari</b>.";
+                    infoDurasiEd.innerHTML = "⚡ <b>Gorden Vitrase:</b> Estimasi selesai dalam <b>3 Hari</b>.";
                 } else {
-                    infoDurasiEd.className = "text-xs font-medium mt-2 p-2 rounded-lg border bg-blue-50 text-blue-700 border-blue-100";
-                    infoDurasiEd.innerHTML = "⚡ <b>Gorden Tipis / Standard:</b> Bahan katun atau kain harian standar rumah. Estimasi selesai dalam <b>3 Hari</b>.";
+                    infoDurasiEd.innerHTML = "⚡ <b>Gorden Tipis / Standard:</b> Estimasi selesai dalam <b>3 Hari</b>.";
                 }
             }
-            // 🧺 3. LOGIKA UNTUK LAUNDRY SETRIKA
+            // 🧺 3. TEKS EDUKASI BEDCOVER
+            else if (jenisLayanan === 'bedcover') {
+                if (durasiValue === 'single') {
+                    infoDurasiEd.className = "text-xs font-medium mt-2 p-2 rounded-lg border bg-blue-50 text-blue-700 border-blue-100";
+                    infoDurasiEd.innerHTML = "🧺 <b>Bedcover Single:</b> FREE Stain Removal & Linen Spray | Estimasi proses selesai dalam <b>4 Hari</b>.";
+                } else {
+                    infoDurasiEd.className = "text-xs font-medium mt-2 p-2 rounded-lg border bg-amber-50 text-amber-700 border-amber-100";
+                    infoDurasiEd.innerHTML = `🧺 <b>Bedcover ${durasiValue.charAt(0).toUpperCase() + durasiValue.slice(1)}:</b> Ukuran besar membutuhkan pengeringan ekstra agar serat busa bersih sempurna | Estimasi proses selesai dalam <b>7 Hari</b>.`;
+                }
+            }
+            // 👟 4. TEKS EDUKASI LAUNDRY SEPATU
+            else if (jenisLayanan === 'sepatu') {
+                infoDurasiEd.className = "text-xs font-medium mt-2 p-2 rounded-lg border bg-blue-50 text-blue-700 border-blue-100";
+                if (durasiValue === 'fast_clean') {
+                    infoDurasiEd.innerHTML = "⚡ <b>Sepatu Fast Clean:</b> Pembersihan cepat bagian luar (sol samping & bawah). Estimasi <b>3 Hari</b>.";
+                } else if (durasiValue === 'deep_clean') {
+                    infoDurasiEd.innerHTML = "👟 <b>Sepatu Deep Clean:</b> Cuci menyeluruh seluruh bagian luar-dalam + Anti-Jamur. Estimasi <b>3 Hari</b>.";
+                } else if (durasiValue === 'unyellowing') {
+                    infoDurasiEd.className = "text-xs font-medium mt-2 p-2 rounded-lg border bg-amber-50 text-amber-700 border-amber-100";
+                    infoDurasiEd.innerHTML = "✨ <b>Sepatu Unyellowing:</b> Treatment pemutihan sol kuning menggunakan chemical khusus. Estimasi <b>3 Hari</b>.";
+                }
+            }
+            // 👔 5. TEKS EDUKASI LAUNDRY SETRIKA
             else if (jenisLayanan === 'setrika') {
                 if (durasiValue === 'kilat') {
                     infoDurasiEd.className = "text-xs font-medium mt-2 p-3 rounded-xl border bg-blue-50 text-blue-700 border-blue-100";
-                    infoDurasiEd.innerHTML = "🚀 <b>Setrika Kilat (2 Jam Beres):</b> Pakaian Anda akan selesai super cepat! Jadwal pengantaran kembali otomatis disesuaikan menjadi 2 jam (1 slot jam) setelah kurir menjemput pakaian Anda hari ini, mengabaikan opsi pengantaran di halaman awal.";
+                    infoDurasiEd.innerHTML = "🚀 <b>Setrika Kilat (2 Jam Beres):</b> Jadwal pengantaran kembali otomatis disesuaikan menjadi 2 jam setelah pickup.";
                 } else if (durasiValue === 'express') {
                     infoDurasiEd.className = "text-xs font-medium mt-2 p-2 rounded-lg border bg-blue-50 text-blue-700 border-blue-100";
-                    infoDurasiEd.innerHTML = "⚡ <b>Setrika Express:</b> Rapi dalam 24 jam. Pengantaran dipercepat sesuai request tanggal checkout.";
+                    infoDurasiEd.innerHTML = "⚡ <b>Setrika Express:</b> Rapi dalam 24 jam.";
                 } else {
                     infoDurasiEd.className = "text-xs font-medium mt-2 p-2 rounded-lg border bg-amber-50 text-amber-700 border-amber-100";
-                    infoDurasiEd.innerHTML = "📦 <b>Setrika Reguler:</b> Pakaian disetrika rapi dengan estimasi proses selesai dalam 2 Hari.";
+                    infoDurasiEd.innerHTML = "📦 <b>Setrika Reguler:</b> Estimasi proses selesai dalam 2 Hari.";
                 }
             }
-            // 🧺 4. LOGIKA UNTUK LAUNDRY KILOAN
+            // 👕 6. TEKS EDUKASI LAUNDRY KILOAN
             else if (jenisLayanan === 'kiloan') {
                 if (durasiValue === 'express') {
                     infoDurasiEd.className = "text-xs font-medium mt-2 p-2 rounded-lg border bg-blue-50 text-blue-700 border-blue-100";
-                    infoDurasiEd.innerHTML = "⚡ <b>Paket Express:</b> Pakaian selesai dalam 24 jam. Pengantaran sesuai request tanggal checkout.";
+                    infoDurasiEd.innerHTML = "⚡ <b>Paket Express:</b> Pakaian selesai dalam 24 jam.";
                 } else {
                     infoDurasiEd.className = "text-xs font-medium mt-2 p-2 rounded-lg border bg-amber-50 text-amber-700 border-amber-100";
-                    infoDurasiEd.innerHTML = "📦 <b>Paket Reguler:</b> Proses cuci butuh 3 hari. Jadwal pengantaran otomatis disesuaikan minimal H+3 dari tanggal pickup.";
+                    infoDurasiEd.innerHTML = "📦 <b>Paket Reguler:</b> Proses cuci butuh 3 hari.";
                 }
             }
-            // 📦 5. LOGIKA UNTUK PERMADANI
+            // 📦 7. TEKS EDUKASI PERMADANI
             else if (jenisLayanan === 'permadani') {
                 infoDurasiEd.className = "text-xs font-medium mt-2 p-2 rounded-lg border bg-amber-50 text-amber-700 border-amber-100";
                 infoDurasiEd.innerHTML = "ℹ️ Cuci permadani membutuhkan waktu proses minimal 14 hari kerja.";

@@ -8,9 +8,8 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel=<script src="https://cdn.tailwindcss.com">
+    </script>
     <script>
         tailwind.config = {
             theme: {
@@ -105,28 +104,38 @@
                     <p class="text-gray-400">Pelanggan:</p>
                     <p class="font-bold text-gray-800 mt-0.5">{{ auth()->check() ? $order->nama_pelanggan : substr($order->nama_pelanggan, 0, 2) . '***' }}</p>
                 </div>
-                {{-- 🧸 CARD ESTIMASI QUANTITY (DINAMIS UNTUK PERMADANI, BONEKA, & KILOAN) --}}
+                {{-- 🧸 CARD ESTIMASI QUANTITY (DINAMIS UNTUK GORDEN, BEDCOVER, SEPATU, DLL) --}}
                 <div class="p-4 bg-gray-50 rounded-xl">
                     <span class="text-xs text-gray-400 block mb-1">
                         @php
-                            $jenisLayananLower = strtolower($order->jenis_layanan ?? $order['jenis_layanan'] ?? '');
+                        $jenisLayananLower = strtolower($order->jenis_layanan ?? $order['jenis_layanan'] ?? '');
                         @endphp
-                        @if($jenisLayananLower == 'permadani')
-                            Luas Estimasi:
-                        @elseif($jenisLayananLower == 'boneka')
-                            Jumlah Boneka:
+
+                        @if(str_contains($jenisLayananLower, 'permadani') || str_contains($jenisLayananLower, 'karpet'))
+                        Luas Karpet:
+                        @elseif(str_contains($jenisLayananLower, 'boneka'))
+                        Jumlah Boneka:
+                        @elseif(str_contains($jenisLayananLower, 'gorden'))
+                        Luas Gorden:
+                        @elseif(str_contains($jenisLayananLower, 'bedcover'))
+                        Jumlah Bedcover:
+                        @elseif(str_contains($jenisLayananLower, 'sepatu'))
+                        Jumlah Sepatu:
                         @else
-                            Berat Estimasi:
+                        Berat Estimasi:
                         @endif
                     </span>
                     <p class="font-bold text-gray-800 mt-0.5">
                         {{ number_format($order->berat_laundry ?? $order['berat_laundry'] ?? 0, 0) }}
-                        @if($jenisLayananLower == 'permadani')
-                            m²
-                        @elseif($jenisLayananLower == 'boneka')
-                            Pcs
+
+                        @if(str_contains($jenisLayananLower, 'permadani') || str_contains($jenisLayananLower, 'karpet') || str_contains($jenisLayananLower, 'gorden'))
+                        m²
+                        @elseif(str_contains($jenisLayananLower, 'boneka') || str_contains($jenisLayananLower, 'bedcover'))
+                        Pcs
+                        @elseif(str_contains($jenisLayananLower, 'sepatu'))
+                        Pasang
                         @else
-                            Kg
+                        Kg
                         @endif
                     </p>
                 </div>
@@ -151,6 +160,14 @@
                 <p class="text-xs font-bold text-gray-700">🗓️ Jadwal Penjemputan:</p>
                 <p class="text-sm text-blue-600 font-semibold mt-0.5">
                     {{ $order->jadwal_pickup ?? $order['jadwal_pickup'] ?? 'Segera Di-pickup' }}
+                </p>
+            </div>
+
+            {{-- Tambahan Tampilan Kurir di Halaman Lacak --}}
+            <div class="mt-3 pt-3 border-t border-gray-100">
+                <p class="text-xs font-bold text-gray-700">🛵 Kurir Penjemput:</p>
+                <p class="text-sm text-blue-600 font-semibold mt-0.5">
+                    {{ $order->nama_kurir_siap ?? 'Sedang mencari kurir terdekat...' }}
                 </p>
             </div>
 

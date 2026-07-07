@@ -381,12 +381,12 @@
              
               @auth
                   <a href="{{ route('order.bedcover') }}" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
-                       Mulai dari Rp {{ number_format(config('laundry.HARGA_BEDCOVER', 25000), 0, ',', '.') }} saja!
+                       Mulai dari Rp {{ number_format(config('laundry.HARGA_BEDCOVER', 85000), 0, ',', '.') }} saja!
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                   </a>
               @else
                   <button @click="showLogin = true" class="w-full bg-orange text-white text-xs font-bold py-2.5 rounded-xl hover:bg-orangeHot hover:scale-105 transition-all duration-300 flex items-center justify-between px-3">
-                      Mulai dari Rp {{ number_format(config('laundry.HARGA_BEDCOVER', 25000), 0, ',', '.') }} saja!
+                      Mulai dari Rp {{ number_format(config('laundry.HARGA_BEDCOVER', 85000), 0, ',', '.') }} saja!
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                   </button>
               @endauth

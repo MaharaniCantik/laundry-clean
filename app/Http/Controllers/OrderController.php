@@ -87,7 +87,7 @@ class OrderController extends Controller
     /**
      * Step 3: Eksekutor Final - Simpan Data Orderan Awal
      */
-public function store(Request $request)
+    public function store(Request $request)
     {
         // 1. VALIDASI INPUT FORM
         $request->validate([
@@ -110,7 +110,7 @@ public function store(Request $request)
             $tipeDurasi   = $request->input('tipe_durasi', 'reguler');
 
             // =====================================================================
-            // 🌟 GABUNGKAN INSTRUKSI ALAMAT & DRIVER (BIAR GA USAH TAMBAH KOLOM DB)
+            // 🌟 GABUNGKAN INSTRUKSI ALAMAT & DRIVER
             // =====================================================================
             $instruksiAlamat = $request->input('instruksi_alamat');
             $instruksiDriver = $request->input('instruksi_driver');
@@ -125,7 +125,6 @@ public function store(Request $request)
             // LOGIKA HITUNG HARGA DINAMIS & AMANKAN TEKS PAKET
             // =====================================================================
             if ($jenisLayanan == 'boneka') {
-                // 🧸 DETEKSI HARGA BERDASARKAN UKURAN BONEKA
                 $ukuranLower = strtolower($tipeDurasi);
                 if ($ukuranLower == 's') {
                     $hargaPerUnit = 20000;
@@ -149,7 +148,6 @@ public function store(Request $request)
                 $estimasiHarga = ($qtyInput * $hargaPerUnit) + $ongkir;
                 $namaPaketTeks = "Permadani - " . ucfirst($tipeDurasi);
             } elseif ($jenisLayanan == 'gorden') {
-                // 🧺 LOGIKA UPDATE: HITUNG HARGA PREMIUM GORDEN
                 $tipeGordenLower = strtolower($tipeDurasi);
                 if ($tipeGordenLower == 'vitrase') {
                     $hargaPerUnit = 25000;
@@ -161,8 +159,42 @@ public function store(Request $request)
                     $hargaPerUnit = 35000;
                     $namaPaketTeks = "Gorden - Tebal";
                 } else {
-                    $hargaPerUnit = 30000; // Fallback ke tipis jika tidak terdeteksi
+                    $hargaPerUnit = 30000;
                     $namaPaketTeks = "Gorden - Tipis";
+                }
+                $estimasiHarga = ($qtyInput * $hargaPerUnit) + $ongkir;
+            } elseif ($jenisLayanan == 'bedcover') {
+                // 🧺 LOGIKA UPDATE: TARIF FIXED BARU BEDCOVER
+                $tipeBedcoverLower = strtolower($tipeDurasi);
+                if ($tipeBedcoverLower == 'single') {
+                    $hargaPerUnit = 40000;
+                    $namaPaketTeks = "Bedcover - Single";
+                } elseif ($tipeBedcoverLower == 'double') {
+                    $hargaPerUnit = 55000;
+                    $namaPaketTeks = "Bedcover - Double";
+                } elseif ($tipeBedcoverLower == 'king') {
+                    $hargaPerUnit = 70000;
+                    $namaPaketTeks = "Bedcover - King";
+                } else {
+                    $hargaPerUnit = 40000;
+                    $namaPaketTeks = "Bedcover - Single";
+                }
+                $estimasiHarga = ($qtyInput * $hargaPerUnit) + $ongkir;
+            } elseif ($jenisLayanan == 'sepatu') {
+                // 👟 LOGIKA UPDATE: TARIF LAUNDRY SEPATU
+                $tipeSepatuLower = strtolower($tipeDurasi);
+                if ($tipeSepatuLower == 'fast_clean') {
+                    $hargaPerUnit = 30000;
+                    $namaPaketTeks = "Sepatu - Fast Clean";
+                } elseif ($tipeSepatuLower == 'deep_clean') {
+                    $hargaPerUnit = 50000;
+                    $namaPaketTeks = "Sepatu - Deep Clean";
+                } elseif ($tipeSepatuLower == 'unyellowing') {
+                    $hargaPerUnit = 65000;
+                    $namaPaketTeks = "Sepatu - Unyellowing";
+                } else {
+                    $hargaPerUnit = 30000;
+                    $namaPaketTeks = "Sepatu - Fast Clean";
                 }
                 $estimasiHarga = ($qtyInput * $hargaPerUnit) + $ongkir;
             } elseif ($jenisLayanan == 'setrika') {
@@ -180,7 +212,7 @@ public function store(Request $request)
                 if ($tipeDurasi !== 'express' && $tipeDurasi !== 'reguler') {
                     $tipeDurasi = 'reguler';
                 }
-                $hargaPerKg = ($tipeDurasi == 'express') ? 9000 : 5000;
+                $hargaPerKg = ($tipeDurasi == 'express') ? 9000 : 6000;
                 $estimasiHarga = ($qtyInput * $hargaPerKg) + $ongkir;
                 $namaPaketTeks = "Kiloan - " . ucfirst($tipeDurasi);
             }
@@ -220,7 +252,6 @@ public function store(Request $request)
                     $jamDeliveryFinal = $mapJam['19:00 - 21:00'];
                 }
             } else {
-                // 🧸 SINKRONISASI HARI ESTIMASI SECARA SILENT (CARA 1)
                 if ($jenisLayanan == 'boneka') {
                     $ukuranLower = strtolower($tipeDurasi);
                     if ($ukuranLower == 's') {
@@ -235,8 +266,13 @@ public function store(Request $request)
                 } elseif ($jenisLayanan == 'permadani') {
                     $durasiMinimal = 14;
                 } elseif ($jenisLayanan == 'gorden') {
-                    // 🧺 LOGIKA UPDATE: SINKRONISASI DURASI MINIMAL GORDEN
                     $durasiMinimal = (strtolower($tipeDurasi) == 'tebal') ? 4 : 3;
+                } elseif ($jenisLayanan == 'bedcover') {
+                    // 🧺 SINKRONISASI ESTIMASI HARI BEDCOVER (4 HARI UNTUK SINGLE, 7 HARI DOUBLE/KING)
+                    $durasiMinimal = (strtolower($tipeDurasi) == 'single') ? 4 : 7;
+                } elseif ($jenisLayanan == 'sepatu') {
+                    // 👟 SINKRONISASI ESTIMASI HARI SEPATU (3 HARI)
+                    $durasiMinimal = 3;
                 } elseif ($tipeDurasi == 'express') {
                     $durasiMinimal = 1;
                 } else {
@@ -323,23 +359,22 @@ public function store(Request $request)
             $tipeDurasiLower = strtolower($order->tipe_durasi);
 
             // =====================================================================
-            // 🌟 LOGIKA HITUNG HARGA REAL ADMIN (DIPERBAIKI UNTUK GORDEN)
+            // 🌟 LOGIKA HITUNG HARGA REAL ADMIN (SINKRONISASI TOTAL LAYANAN)
             // =====================================================================
             if ($order->jenis_layanan == 'boneka') {
-                if (str_contains($tipeDurasiLower, 'kecil') || str_contains($tipeDurasiLower, '(s)')) {
+                if (str_contains($tipeDurasiLower, 'kecil') || str_contains($tipeDurasiLower, '(s)') || $tipeDurasiLower == 's') {
                     $hargaPerUnit = 20000;
-                } elseif (str_contains($tipeDurasiLower, 'sedang') || str_contains($tipeDurasiLower, '(m)')) {
+                } elseif (str_contains($tipeDurasiLower, 'sedang') || str_contains($tipeDurasiLower, '(m)') || $tipeDurasiLower == 'm') {
                     $hargaPerUnit = 30000;
-                } elseif (str_contains($tipeDurasiLower, 'besar') || str_contains($tipeDurasiLower, '(l)')) {
+                } elseif (str_contains($tipeDurasiLower, 'besar') || str_contains($tipeDurasiLower, '(l)') || $tipeDurasiLower == 'l') {
                     $hargaPerUnit = 60000;
-                } elseif (str_contains($tipeDurasiLower, 'sangat besar') || str_contains($tipeDurasiLower, '(xl)')) {
+                } elseif (str_contains($tipeDurasiLower, 'sangat besar') || str_contains($tipeDurasiLower, '(xl)') || $tipeDurasiLower == 'xl') {
                     $hargaPerUnit = 75000;
                 } else {
                     $hargaPerUnit = 20000;
                 }
                 $hargaFinalPerItem = $hargaPerUnit;
             } elseif ($order->jenis_layanan == 'gorden') {
-                // 🧺 AMANKAN HARGA REAL KHUSUS LAYANAN GORDEN PREMIUM
                 if (str_contains($tipeDurasiLower, 'vitrase')) {
                     $hargaFinalPerItem = 25000;
                 } elseif (str_contains($tipeDurasiLower, 'tipis')) {
@@ -347,10 +382,31 @@ public function store(Request $request)
                 } elseif (str_contains($tipeDurasiLower, 'tebal')) {
                     $hargaFinalPerItem = 35000;
                 } else {
-                    $hargaFinalPerItem = 30000; // Fallback gorden tipis
+                    $hargaFinalPerItem = 30000;
+                }
+            } elseif ($order->jenis_layanan == 'bedcover') {
+                // 🧺 ADMIN UPDATE: AMANKAN HARGA BEDCOVER
+                if (str_contains($tipeDurasiLower, 'single')) {
+                    $hargaFinalPerItem = 40000;
+                } elseif (str_contains($tipeDurasiLower, 'double')) {
+                    $hargaFinalPerItem = 55000;
+                } elseif (str_contains($tipeDurasiLower, 'king')) {
+                    $hargaFinalPerItem = 70000;
+                } else {
+                    $hargaFinalPerItem = 40000;
+                }
+            } elseif ($order->jenis_layanan == 'sepatu') {
+                // 👟 ADMIN UPDATE: AMANKAN HARGA SEPATU
+                if (str_contains($tipeDurasiLower, 'fast') || str_contains($tipeDurasiLower, 'fast_clean')) {
+                    $hargaFinalPerItem = 30000;
+                } elseif (str_contains($tipeDurasiLower, 'deep') || str_contains($tipeDurasiLower, 'deep_clean')) {
+                    $hargaFinalPerItem = 50000;
+                } elseif (str_contains($tipeDurasiLower, 'unyellowing')) {
+                    $hargaFinalPerItem = 65000;
+                } else {
+                    $hargaFinalPerItem = 30000;
                 }
             } elseif ($order->jenis_layanan == 'permadani') {
-                // 🎪 Pisahkan permadani dari kiloan karena harganya beda jauh
                 $hargaFinalPerItem = (str_contains($tipeDurasiLower, 'tebal')) ? 70000 : 45000;
             } elseif ($order->jenis_layanan == 'setrika') {
                 if (str_contains($tipeDurasiLower, 'kilat')) {
@@ -361,8 +417,7 @@ public function store(Request $request)
                     $hargaFinalPerItem = 5000;
                 }
             } else {
-                // Khusus laundry kiloan biasa
-                $hargaFinalPerItem = (str_contains($tipeDurasiLower, 'express')) ? 9000 : 5000;
+                $hargaFinalPerItem = (str_contains($tipeDurasiLower, 'express')) ? 9000 : 6000;
             }
 
             $beratReal = (float) $request->input('berat_asli');

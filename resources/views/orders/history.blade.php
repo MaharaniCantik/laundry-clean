@@ -84,20 +84,30 @@
                                 @php
                                 $jenisLayananLower = strtolower($order['jenis_layanan'] ?? $order->jenis_layanan ?? '');
                                 @endphp
-                                @if($jenisLayananLower == 'permadani')
+
+                                @if(str_contains($jenisLayananLower, 'permadani') || str_contains($jenisLayananLower, 'karpet'))
                                 Luas Karpet:
-                                @elseif($jenisLayananLower == 'boneka')
+                                @elseif(str_contains($jenisLayananLower, 'boneka'))
                                 Jumlah Boneka:
+                                @elseif(str_contains($jenisLayananLower, 'gorden'))
+                                Luas Gorden:
+                                @elseif(str_contains($jenisLayananLower, 'bedcover'))
+                                Jumlah Bedcover:
+                                @elseif(str_contains($jenisLayananLower, 'sepatu'))
+                                Jumlah Sepatu:
                                 @else
                                 Berat Timbangan:
                                 @endif
                             </span>
                             <span class="font-bold text-gray-800">
                                 {{ number_format($order['berat_laundry'] ?? $order->berat_laundry ?? 0, 0) }}
-                                @if($jenisLayananLower == 'permadani')
+
+                                @if(str_contains($jenisLayananLower, 'permadani') || str_contains($jenisLayananLower, 'karpet') || str_contains($jenisLayananLower, 'gorden'))
                                 m²
-                                @elseif($jenisLayananLower == 'boneka')
+                                @elseif(str_contains($jenisLayananLower, 'boneka') || str_contains($jenisLayananLower, 'bedcover'))
                                 Pcs
+                                @elseif(str_contains($jenisLayananLower, 'sepatu'))
+                                Pasang
                                 @else
                                 Kg
                                 @endif
@@ -143,18 +153,23 @@
                     </div>
 
                     {{-- 🌟 TAMBAHAN BLOK INSTRUKSI ALAMAT/PATOKAN USER --}}
-                    @if(!empty($order['instruksi_alamat']))
+                    @php
+                    $instruksiAlamat = $order['instruksi_alamat'] ?? $order->instruksi_alamat ?? '';
+                    $instruksiDriver = $order['instruksi_driver'] ?? $order->instruksi_driver ?? '';
+                    @endphp
+
+                    @if(!empty($instruksiAlamat))
                     <div class="bg-orange-50 p-3 rounded-xl text-xs text-orange-700 mt-2 border border-orange-100">
                         <span class="font-bold text-orange-800 block mb-1">📍 Patokan / Instruksi Alamat:</span>
-                        {{ $order['instruksi_alamat'] }}
+                        {{ $instruksiAlamat }}
                     </div>
                     @endif
 
                     {{-- 🌟 BOX CATATAN DRIVER --}}
-                    @if(!empty($order['instruksi_driver']))
+                    @if(!empty($instruksiDriver))
                     <div class="bg-amber-50 p-3 rounded-xl text-xs text-amber-700 mt-2 border border-amber-100">
                         <span class="font-bold text-amber-800 block mb-1">📌 Catatan Untuk Driver:</span>
-                        "{{ $order['instruksi_driver'] }}"
+                        "{{ $instruksiDriver }}"
                     </div>
                     @endif
 

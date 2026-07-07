@@ -322,6 +322,10 @@
                         jenisLayanan = 'boneka';
                     } else if (window.location.pathname.includes('gorden')) {
                         jenisLayanan = 'gorden';
+                    } else if (window.location.pathname.includes('bedcover')) {
+                        jenisLayanan = 'bedcover';
+                    } else if (window.location.pathname.includes('sepatu')) {
+                        jenisLayanan = 'sepatu';
                     } else {
                         jenisLayanan = 'kiloan';
                     }
@@ -332,8 +336,10 @@
                     'kiloan': 3,     // Kiloan nunggu 3 hari
                     'permadani': 14, // Permadani nunggu 14 hari
                     'setrika': 2,    // Setrika nunggu 2 hari
-                    'boneka': 2,     // 🧸 UPDATE: Boneka default nunggu 2 hari (Ukuran S)
-                    'gorden':3, // Gorden 3 hari
+                    'boneka': 2,     // Boneka default nunggu 2 hari (Ukuran S)
+                    'gorden':3,      // Gorden 3 hari
+                    'bedcover':4,     // Bedcover nunggu 4 hari
+                    'sepatu':3      // Sepatu 3 hari
                 };
 
                 // 3. Ambil jumlah hari berdasarkan layanan aktif (jika tidak terdaftar, default 3 hari)

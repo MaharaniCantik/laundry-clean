@@ -38,13 +38,21 @@
                     Pricelist Bedcover
                 </h2>
                 <div class="bg-white rounded-[24px] shadow-sm border border-gray-100 overflow-hidden divide-y divide-gray-100">
-                    
+
                     <div class="flex justify-between items-center p-4 px-6">
                         <div class="space-y-0.5">
-                            <h3 class="text-sm font-bold text-gray-700 tracking-wide">King(Putih)</h3>
-                            <p class="text-xs text-gray-400 font-medium">FREE Stain Removal, Brightening+, Antibacterial & Linen Spray ( Bikin Relax )|Estimasi hari 7 hari </p>
+                            <h3 class="text-sm font-bold text-gray-700 tracking-wide">Single</h3>
+                            <p class="text-xs text-gray-400 font-medium">FREE Stain Removal, Antibacterial & Linen Spray ( Bikin Relax ) | Estimasi hari 4 hari</p>
                         </div>
-                        <span class="text-sm font-extrabold text-[#F6921E]">Rp 120.000</span>
+                        <span class="text-sm font-extrabold text-[#F6921E]">Rp 40.000</span>
+                    </div>
+
+                    <div class="flex justify-between items-center p-4 px-6">
+                        <div class="space-y-0.5">
+                            <h3 class="text-sm font-bold text-gray-700 tracking-wide">Double</h3>
+                            <p class="text-xs text-gray-400 font-medium">FREE Stain Removal, Antibacterial & Linen Spray ( Bikin Relax ) |Estimasi Hari 7 hari</p>
+                        </div>
+                        <span class="text-sm font-extrabold text-[#F6921E]">Rp 55.000</span>
                     </div>
 
                     <div class="flex justify-between items-center p-4 px-6">
@@ -52,41 +60,9 @@
                             <h3 class="text-sm font-bold text-gray-700 tracking-wide">King</h3>
                             <p class="text-xs text-gray-400 font-medium">FREE Stain Removal, Antibacterial & Linen Spray ( Bikin Relax ) | Estimasi 7 hari</p>
                         </div>
-                        <span class="text-sm font-extrabold text-[#F6921E]">Rp 125 .000</span>
+                        <span class="text-sm font-extrabold text-[#F6921E]">Rp 70.000</span>
                     </div>
 
-
-                    <div class="flex justify-between items-center p-4 px-6">
-                        <div class="space-y-0.5">
-                            <h3 class="text-sm font-bold text-gray-700 tracking-wide">Doubel</h3>
-                            <p class="text-xs text-gray-400 font-medium">FREE Stain Removal, Antibacterial & Linen Spray ( Bikin Relax ) |Estimasi Hari 7 hari</p>
-                        </div>
-                        <span class="text-sm font-extrabold text-[#F6921E]">Rp 115.000</span>
-                    </div>
-
-                    <div class="flex justify-between items-center p-4 px-6">
-                        <div class="space-y-0.5">
-                            <h3 class="text-sm font-bold text-gray-700 tracking-wide">Doubel (Putih)</h3>
-                            <p class="text-xs text-gray-400 font-medium">FREE Stain Removal, Brightening+, Antibacterial & Linen Spray ( Bikin Relax ) | Estimasi hari 7 hari</p>
-                        </div>
-                        <span class="text-sm font-extrabold text-[#F6921E]">Rp 110.000</span>
-                    </div>
-
-                    <div class="flex justify-between items-center p-4 px-6">
-                        <div class="space-y-0.5">
-                            <h3 class="text-sm font-bold text-gray-700 tracking-wide">Singel</h3>
-                            <p class="text-xs text-gray-400 font-medium">FREE Stain Removal, Antibacterial & Linen Spray ( Bikin Relax ) | Estimasi hari 4 hari</p>
-                        </div>
-                        <span class="text-sm font-extrabold text-[#F6921E]">Rp 80.000</span>
-                    </div>
-
-                    <div class="flex justify-between items-center p-4 px-6">
-                        <div class="space-y-0.5">
-                            <h3 class="text-sm font-bold text-gray-700 tracking-wide">Singel (Putih)</h3>
-                            <p class="text-xs text-gray-400 font-medium">FREE Stain Removal, Brightening+, Antibacterial & Linen Spray ( Bikin Relax ) | Estimasi 4 hari</p>
-                        </div>
-                        <span class="text-sm font-extrabold text-[#F6921E]">Rp 75.000</span>
-                    </div>
                 </div>
             </div>
 
@@ -172,7 +148,7 @@
 
                     {{-- CTA Button --}}
                     <div class="pt-4 flex justify-center">
-                        <a href="{{ route('order.checkout', ['layanan' => 'kiloan']) }}"
+                        <a href="{{ route('order.checkout', ['layanan' => 'bedcover']) }}"
                            class="inline-block bg-orange-500 hover:bg-orange-600 text-white font-bold text-base tracking-wide rounded-xl px-12 py-3.5 shadow-md hover:shadow-orange-200 transition-all duration-150 ease-out">
                             Pesan Sekarang
                         </a>
