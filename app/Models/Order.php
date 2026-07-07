@@ -63,8 +63,7 @@ class Order extends Model
     }
 
     public function kurir()
-    {
-        // instruksi_driver menyimpan ID kurir, user_id di tabel kurir adalah pemilik ID tersebut
-        return $this->belongsTo(\App\Models\Kurir::class, 'instruksi_driver', 'user_id');
-    }
+{
+    return $this->belongsTo(\App\Models\Kurir::class, 'kurir_id', 'id');
+}
 }

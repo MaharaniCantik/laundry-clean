@@ -42,8 +42,8 @@
                         </div>
                         <div class="flex justify-between py-2 border-t border-dashed">
                             <span class="text-gray-600">Kurir Penjemput:</span>
-                            <span class="font-semibold text-blue-600">
-                                {{ $order['nama_kurir_siap'] }}
+                            <span class="font-semibold text-amber-600">
+                                {{ $order->kurir->user->name ?? 'Mencari Kurir...' }}
                             </span>
                         </div>
                         <div class="flex justify-between text-sm">

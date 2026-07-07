@@ -164,12 +164,22 @@
             </div>
 
             {{-- Tambahan Tampilan Kurir di Halaman Lacak --}}
-            <div class="mt-3 pt-3 border-t border-gray-100">
-                <p class="text-xs font-bold text-gray-700">🛵 Kurir Penjemput:</p>
-                <p class="text-sm text-blue-600 font-semibold mt-0.5">
-                    {{ $order->nama_kurir_siap ?? 'Sedang mencari kurir terdekat...' }}
-                </p>
-            </div>
+<div class="mt-3 pt-3 border-t border-gray-100">
+    <p class="text-xs font-bold text-gray-700">🛵 Kurir Penjemput:</p>
+    <p class="text-sm text-blue-600 font-semibold mt-0.5">
+        {{-- 🛠️ FIX: Membaca nama lewat relasi Order -> Kurir -> User --}}
+        {{ $order->kurir?->user?->name ?? 'Sedang mencari kurir terdekat...' }}
+    </p>
+</div>
+
+{{-- 🛠️ FIX: Script Auto Refresh Halaman agar Status Berubah Otomatis Tanpa Klik Refresh Manual --}}
+<script>
+    @if($order->status !== 'Selesai')
+        setTimeout(function() {
+            window.location.reload();
+        }, 15000); // Auto refresh setiap 15 detik
+    @endif
+</script>
 
             {{-- 1. Jadwal Pengantaran Kembali --}}
             <div class="mt-3 pt-3 border-t border-gray-100">

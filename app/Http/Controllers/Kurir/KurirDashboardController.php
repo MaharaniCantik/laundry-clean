@@ -8,62 +8,63 @@ use App\Models\Kurir;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash; 
+use App\Services\WhatsappService;
 
 class KurirDashboardController extends Controller
 {
     public function index()
     {
-        $userId = auth()->id(); 
+        $userId = auth()->id();
         $kurir = Kurir::where('user_id', $userId)->first();
 
         if (!$kurir) {
             return "Akun Anda belum terdaftar sebagai armada kurir.";
         }
 
+        // 1. Mengambil orderan baru yang masuk & siap diklaim oleh kurir mana saja
         $orderanMasuk = Order::where('status', 'Pending Penjemputan')
-                            ->whereNull('kurir_id')
-                            ->orderBy('created_at', 'desc')
-                            ->get();
+            ->whereNull('kurir_id')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-        // 🔥 HITUNG TUGAS BERDASARKAN ID TABEL KURIRS
+        // 2. Menghitung statistik untuk Card Dashboard
         $totalPickup = Order::where('kurir_id', $kurir->id)->where('status', 'Sedang Dijemput')->count();
-        $totalDelivery = Order::where('kurir_id', $kurir->id)->where('status', 'Siap Diantar')->count();
-        $totalCompletedToday = Order::where('kurir_id', $kurir->id)
-                                    ->where('status', 'Selesai')
-                                    ->whereDate('updated_at', today())
-                                    ->count();
 
+        // Card antar hanya menghitung yang benar-benar siap diantar ke rumah konsumen
+        $totalDelivery = Order::where('kurir_id', $kurir->id)->where('status', 'Siap Diantar')->count();
+
+        $totalCompletedToday = Order::where('kurir_id', $kurir->id)
+            ->where('status', 'Selesai')
+            ->whereDate('updated_at', today())
+            ->count();
+
+        // 🛠️ FIX LOGIKA: Tugas aktif tetap memantau baju yang 'Dibawa ke Toko' agar kurir tau progress-nya,
+        // atau jika baju sudah berstatus 'Siap Diantar' maka card pengantaran akan muncul di sini.
         $activeTasks = Order::where('kurir_id', $kurir->id)
-                            ->whereIn('status', ['Sedang Dijemput', 'Siap Diantar', 'Kurir Menuju Lokasi', 'Dibawa ke Toko'])
-                            ->orderBy('created_at', 'desc')
-                            ->get();
+            ->whereIn('status', ['Sedang Dijemput', 'Kurir Menuju Lokasi', 'Dibawa ke Toko', 'Siap Diantar'])
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return view('kurir.dashboard', compact('totalPickup', 'totalDelivery', 'totalCompletedToday', 'activeTasks', 'orderanMasuk'));
     }
 
-    /**
-     * FITUR: Kurir mengambil orderan secara mandiri dari dashboard
-     */
     public function ambilPesanan(Request $request, $id)
     {
         try {
-            $userId = auth()->id(); 
+            $userId = auth()->id();
             $kurir = Kurir::where('user_id', $userId)->first();
 
             if (!$kurir) {
                 return back()->with('error', 'Anda bukan armada kurir resmi.');
             }
 
-            // 🛠️ FIX: Tambahkan nama_kurir_siap agar muncul di tracking halaman user
             $updated = Order::where('id', $id)
                 ->where('status', 'Pending Penjemputan')
                 ->whereNull('kurir_id')
                 ->update([
-                    'kurir_id'         => $kurir->id, 
-                    'nama_kurir_siap'  => auth()->user()->name, // 👈 PENTING: Mengisi nama kurir
-                    'status'           => 'Sedang Dijemput', 
-                    'updated_at'       => now(),
+                    'kurir_id'   => $kurir->id,
+                    'status'     => 'Sedang Dijemput',
+                    'updated_at' => now(),
                 ]);
 
             if ($updated) {
@@ -84,28 +85,47 @@ class KurirDashboardController extends Controller
         $order = Order::findOrFail($id);
         $userId = auth()->id();
         $kurir = Kurir::where('user_id', $userId)->first();
-        
+
         if (!$kurir) {
             return back()->with('error', 'Akses ditolak.');
         }
 
-        // 🛠️ FIX: Mengubah flash message UX menjadi lebih ramah dan status bertahap
+        // 1. KONDISI: KURIR SELESAI PICKUP & BAWA KE TOKO
         if ($order->status == 'Sedang Dijemput' || $order->status == 'Kurir Menuju Lokasi') {
-            $order->status = 'Dibawa ke Toko'; // 👈 Mengubah status ke toko, bukan langsung diproses cuci
+            $order->status = 'Dibawa ke Toko';
             $order->save();
-            return redirect()->back()->with('success', '🚚 Laundry berhasil di-pickup dan sedang dibawa menuju toko!');
-        } else if ($order->status == 'Siap Diantar') {
-            $order->status = 'Selesai';
-            $order->save();
-            
-            // Kembalikan status_kerja kurir ke available
+
+            // 🔥 Kirim WA: Pakaian sedang dibawa ke toko
+            if (!empty($order->no_telp)) {
+                $pesan = "Halo {$order->nama_pelanggan},\n\nKurir telah selesai menjemput laundry Anda. Saat ini pakaian sedang *Dibawa ke Toko/Workshop* untuk proses pencucian. 🧼👕";
+                WhatsappService::send($order->no_telp, $pesan);
+            }
+
+            // Sinkronisasi status kerja kurir
             $kurir->status_kerja = 'available';
             $kurir->save();
-            
+
+            return redirect()->back()->with('success', '🚚 Laundry berhasil di-pickup dan diserahkan ke toko! Anda siap mengambil orderan lain.');
+        }
+
+        // 2. KONDISI: KURIR SELESAI MENGANTAR CUCIAN BERSIH KE PELANGGAN
+        else if ($order->status == 'Siap Diantar') {
+            $order->status = 'Selesai';
+            $order->save();
+
+            // 🔥 Kirim WA: Pakaian sudah sampai di tangan pelanggan (Selesai)
+            if (!empty($order->no_telp)) {
+                $pesan = "Halo {$order->nama_pelanggan},\n\nPakaian laundry Anda telah sukses diantarkan oleh kurir kami ke lokasi Anda. Transaksi #{$order->id} dinyatakan *Selesai*.\n\nTerima kasih banyak telah menggunakan layanan kami! 🙏✨";
+                WhatsappService::send($order->no_telp, $pesan);
+            }
+
+            // Sinkronisasi status kerja kurir
+            $kurir->status_kerja = 'available';
+            $kurir->save();
+
             return redirect()->back()->with('success', '✅ Laundry telah sukses diantarkan ke tangan pelanggan!');
         }
-        
-        $order->save();
+
         return redirect()->back()->with('success', 'Status order berhasil diperbarui!');
     }
 
@@ -118,11 +138,11 @@ class KurirDashboardController extends Controller
             return redirect()->route('dashboard')->with('error', 'Akses armada ditolak.');
         }
 
-        // 🛠️ FIX: Menggunakan $kurir->id bukan $userId
+        // 🛠️ FIX LOGIKA MUTLAK: Riwayat HANYA menampilkan orderan yang BENAR-BENAR sukses sampai ke tangan pelanggan ('Selesai')
         $query = Order::where('kurir_id', $kurir->id)->where('status', 'Selesai');
 
         if ($request->has('search') && $request->search != '') {
-            $query->where('nama_pelanggan', 'like', '%' . $request->search . '%'); 
+            $query->where('nama_pelanggan', 'like', '%' . $request->search . '%');
         }
 
         $riwayatOrders = $query->latest('updated_at')->paginate(6);
@@ -133,14 +153,13 @@ class KurirDashboardController extends Controller
     public function profile()
     {
         $userId = auth()->id();
-        $profile = auth()->user(); 
+        $profile = auth()->user();
         $kurirInfo = Kurir::where('user_id', $userId)->first();
-        
+
         if ($kurirInfo) {
-            $profile->id = $kurirInfo->id; 
-            // 🛠️ FIX: Menghitung total_tasks menggunakan $kurirInfo->id
+            $profile->id = $kurirInfo->id;
             $profile->total_tasks = Order::where('kurir_id', $kurirInfo->id)->where('status', 'Selesai')->count();
-            $profile->rating = $kurirInfo->rating ?? 5.0; 
+            $profile->rating = $kurirInfo->rating ?? 5.0;
         }
 
         return view('kurir.profile', compact('profile'));
