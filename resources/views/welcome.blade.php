@@ -506,7 +506,7 @@
                 </div>
                 <div class="ml-4">
                   <h3 class="text-lg font-medium text-gray-900">Alamat Toko</h3>
-                  <p class="text-gray-600 mt-1">Jl. Mawar Indah No. 45<br>Kec. Serpong, Tangerang<br>Banten, Indonesia 15310</p>
+                  <p class="text-gray-600 mt-1">Jl. Aria Santika No.34, RT.003/RW.03, Margasari<br>Kec. Karawaci, Kota Tangerang<br>Banten, Indonesia 15310</p>
                 </div>
               </div>
 
@@ -521,7 +521,7 @@
                 </div>
                 <div class="ml-4">
                   <h3 class="text-lg font-medium text-gray-900">No. Handphone</h3>
-                  <p class="text-gray-600 mt-1">+62 812-3456-7890</p>
+                  <p class="text-gray-600 mt-1">+62 82324347254</p>
                 </div>
               </div>
 
@@ -536,7 +536,7 @@
                 </div>
                 <div class="ml-4">
                   <h3 class="text-lg font-medium text-gray-900">Email</h3>
-                  <p class="text-gray-600 mt-1">support@tokoanda.com</p>
+                  <p class="text-gray-600 mt-1">support@nugroholaundry.com</p>
                 </div>
               </div>
               <!-- Jam Operasional -->

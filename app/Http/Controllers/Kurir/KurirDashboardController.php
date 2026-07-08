@@ -96,9 +96,16 @@ class KurirDashboardController extends Controller
             $order->save();
 
             // 🔥 Kirim WA: Pakaian sedang dibawa ke toko
-            if (!empty($order->no_telp)) {
+            if (!empty($order->nomor_telepon_order)) { // 👈 Ganti jadi nomor_telepon_order
                 $pesan = "Halo {$order->nama_pelanggan},\n\nKurir telah selesai menjemput laundry Anda. Saat ini pakaian sedang *Dibawa ke Toko/Workshop* untuk proses pencucian. 🧼👕";
-                WhatsappService::send($order->no_telp, $pesan);
+                
+                // Format nomor HP otomatis ke 628xx biar Fonnte lancar
+                $nomor_wa = preg_replace('/[^0-9]/', '', $order->nomor_telepon_order);
+                if (substr($nomor_wa, 0, 1) === '0') {
+                    $nomor_wa = '62' . substr($nomor_wa, 1);
+                }
+
+                WhatsappService::send($nomor_wa, $pesan);
             }
 
             // Sinkronisasi status kerja kurir
@@ -114,9 +121,16 @@ class KurirDashboardController extends Controller
             $order->save();
 
             // 🔥 Kirim WA: Pakaian sudah sampai di tangan pelanggan (Selesai)
-            if (!empty($order->no_telp)) {
+            if (!empty($order->nomor_telepon_order)) { // 👈 Ganti jadi nomor_telepon_order
                 $pesan = "Halo {$order->nama_pelanggan},\n\nPakaian laundry Anda telah sukses diantarkan oleh kurir kami ke lokasi Anda. Transaksi #{$order->id} dinyatakan *Selesai*.\n\nTerima kasih banyak telah menggunakan layanan kami! 🙏✨";
-                WhatsappService::send($order->no_telp, $pesan);
+                
+                // Format nomor HP otomatis ke 628xx biar Fonnte lancar
+                $nomor_wa = preg_replace('/[^0-9]/', '', $order->nomor_telepon_order);
+                if (substr($nomor_wa, 0, 1) === '0') {
+                    $nomor_wa = '62' . substr($nomor_wa, 1);
+                }
+
+                WhatsappService::send($nomor_wa, $pesan);
             }
 
             // Sinkronisasi status kerja kurir

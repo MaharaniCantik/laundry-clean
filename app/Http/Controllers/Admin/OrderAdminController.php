@@ -95,8 +95,8 @@ class OrderAdminController extends Controller
             }
         }
 
-        // 🔥 INTEGRASI WHATSAPP OTOMATIS SEBELUM REDIRECT
-        if (!empty($order->no_telp)) {
+        // 🔥 INTEGRASI WHATSAPP OTOMATIS SEBELUM REDIRECT (SUDAH DISINKRONKAN)
+        if (!empty($order->nomor_telepon_order)) { // 👈 Ganti jadi nomor_telepon_order
             $nama = $order->nama_pelanggan;
             $idOrder = $order->id;
             $pesan = "";
@@ -125,7 +125,19 @@ class OrderAdminController extends Controller
 
             // Jalankan pengiriman jika isi pesan ter-generate
             if ($pesan != "") {
-                WhatsappService::send($order->no_telp, $pesan);
+                // Ambil nomor telepon dari kolom database yang benar
+                $nomor_wa = $order->nomor_telepon_order;
+
+                // Bersihkan karakter non-angka seperti spasi, strip, atau plus
+                $nomor_wa = preg_replace('/[^0-9]/', '', $nomor_wa);
+
+                // Otomatis ubah awalan '08xxx' menjadi format internasional '628xxx' agar Fonnte berhasil memprosesnya
+                if (substr($nomor_wa, 0, 1) === '0') {
+                    $nomor_wa = '62' . substr($nomor_wa, 1);
+                }
+
+                // Tembak pengiriman melalui Service Fonnte
+                WhatsappService::send($nomor_wa, $pesan);
             }
         }
 

@@ -188,8 +188,8 @@
 
 <script>
     // 1. 🔥 SET KOORDINAT OUTLET LAUNDRY HASIL WAWANCARA DI SINI 🔥
-    const koordinatOutlet = L.latLng(-6.178284931297267, 106.60835419292565);
-    const map = L.map('map').setView(koordinatOutlet, 13);
+    const koordinatOutlet = L.latLng(-6.178550, 106.608420);
+    const map = L.map('map').setView(koordinatOutlet, 15);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'

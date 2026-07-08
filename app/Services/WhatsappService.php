@@ -15,21 +15,22 @@ class WhatsappService
      */
     public static function send($noTelp, $pesan)
     {
-        // 1. Standarisasi nomor telepon ke format 62...
+        // 1. Bersihkan nomor dari spasi atau karakter aneh, lalu standarisasi ke 62...
+        $noTelp = preg_replace('/[^0-9]/', '', $noTelp);
         if (substr($noTelp, 0, 1) === '0') {
             $noTelp = '62' . substr($noTelp, 1);
         } elseif (substr($noTelp, 0, 2) !== '62') {
             $noTelp = '62' . $noTelp;
         }
 
-        // 2. Tembak API Gateway WA (Contoh di bawah menggunakan Fonnte)
-        // Silakan ganti URL & TOKEN sesuai penyedia API WA yang kamu pakai nanti saat deploy
-        $token = env('WHATSAPP_TOKEN', 'CONTOH_TOKEN_FONNTE_KAMU_DISINI');
+        // 2. Ambil token dari .env (Memakai nama WHATSAPP_TOKEN sesuai settingan awalmu)
+        $token = env('WHATSAPP_TOKEN', 'upxHcooeC3MFTppdbF2d');
 
         try {
+            // 🔥 KUNCI PERBAIKAN: Ditambahkan ->asForm() agar sesuai request Multipart Fonnte!
             $response = Http::withHeaders([
                 'Authorization' => $token
-            ])->post('https://api.fonnte.com/send', [
+            ])->asForm()->post('https://api.fonnte.com/send', [
                 'target' => $noTelp,
                 'message' => $pesan,
                 'countryCode' => '62', // default Indonesia

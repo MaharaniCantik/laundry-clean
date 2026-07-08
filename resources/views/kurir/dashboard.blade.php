@@ -166,13 +166,26 @@
                             </p>
                         </div>
 
+                        @php
+                        // Logika pembersihan nomor HP tetap berjalan di latar belakang (aman dari crash)
+                        $phone = $task->nomor_telepon_order ?? $task->no_telp;
+                        $phone = preg_replace('/[^0-9]/', '', $phone);
+                        if (substr($phone, 0, 1) === '0') {
+                        $phone = '62' . substr($phone, 1);
+                        }
+                        @endphp
+
                         <div class="grid grid-cols-2 gap-3 pt-2">
-                            <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($task->alamat_lengkap) }}" target="_blank" class="flex items-center justify-center gap-2 py-2.5 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
+                            <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($task->alamat_lengkap) }}"
+                                target="_blank"
+                                class="flex items-center justify-center gap-2 py-2.5 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
                                 <span class="material-symbols-outlined text-[16px]">map</span> Maps
                             </a>
 
-                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $task->no_hp_pelanggan ?? '') }}" target="_blank" class="flex items-center justify-center gap-2 py-2.5 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
-                                <span class="material-symbols-outlined text-[16px]">chat</span> WhatsApp
+                            <a href="https://api.whatsapp.com/send?phone={{ $phone }}&text=Halo%20{{ urlencode($task->nama_pelanggan ?? 'Pelanggan') }},%20saya%20kurir%20dari%20CleanFlow..."
+                                target="_blank"
+                                class="flex items-center justify-center gap-2 py-2.5 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
+                                Maps / WhatsApp
                             </a>
 
                             <form action="{{ route('kurir.updateStatus', $task->id) }}" method="POST" class="col-span-2">
@@ -182,8 +195,7 @@
                                 </button>
                             </form>
                         </div>
-                    </div>
-                    @empty
+                    </div> @empty
                     <div class="col-span-1 md:col-span-3 bg-slate-50 rounded-2xl p-12 text-center border-2 border-dashed border-slate-200">
                         <span class="material-symbols-outlined text-slate-300 text-[48px]">auto_stories</span>
                         <p class="text-sm font-medium text-slate-500 mt-2">Mantap! Anda tidak memiliki tugas aktif berjalan.</p>
@@ -191,7 +203,6 @@
                     @endforelse
                 </div>
             </div>
-
         </div>
     </div>
 </x-kurir-layout>

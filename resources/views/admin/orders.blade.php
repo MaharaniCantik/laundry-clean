@@ -47,18 +47,6 @@
                     <option value="kiloan">Kiloan</option>
                     <option value="satuan">Satuan</option>
                 </select>
-                <div class="flex items-center gap-2">
-                    <button
-                        class="inline-flex items-center gap-1.5 px-3 py-2 bg-surface-container-lowest border border-outline-variant text-on-surface font-label-md text-label-md rounded-lg hover:bg-surface-container-low transition-colors shadow-sm">
-                        <span class="material-symbols-outlined text-[18px]">description</span>
-                        Excel
-                    </button>
-                    <button
-                        class="inline-flex items-center gap-1.5 px-3 py-2 bg-surface-container-lowest border border-outline-variant text-on-surface font-label-md text-label-md rounded-lg hover:bg-surface-container-low transition-colors shadow-sm">
-                        <span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
-                        PDF
-                    </button>
-                </div>
             </div>
         </div>
         <!-- Active Orders Table Card -->
