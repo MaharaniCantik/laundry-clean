@@ -32,7 +32,7 @@ class DatabaseSeeder extends Seeder
         // 3. Akun Kurir
         User::create([
             'name'     => 'Bang Kurir',
-            'email'    => 'senku@ccyk.com',
+            'email'    => 'senku@gmail.com',
             'password' => Hash::make('senku123'),
             'role'     => 'kurir',
         ]);
