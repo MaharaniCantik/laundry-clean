@@ -1,10 +1,14 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <x-app-layout>
-    <form action="{{ route('order.store') }}" method="POST">
+    <form action="{{ route('order.store') }}" method="POST" id="form-order">
+        <!-- 2. Wajib ada @csrf di baris ini -->
+        @csrf
+
+        <!-- 3. Detektor Eror Validasi (Tetap pasang untuk jaga-jaga) -->
         @if ($errors->any())
-            <div style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin: 20px 0; z-index: 9999; position: relative;">
-                <strong>Aduh, ada data yang kurang:</strong>
+            <div style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin: 20px 0; position: relative; z-index: 9999;">
+                <strong>Ada data yang belum pas:</strong>
                 <ul>
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -12,7 +16,6 @@
                 </ul>
             </div>
         @endif
-        @csrf
 
         {{-- 🌟 FIX KONSISTEN: Amankan semua input hidden menggunakan kombinasi old() dan fallback variabel --}}
         <input type="hidden" name="nama_pelanggan" value="{{ old('nama_pelanggan', $namaUser) }}">
