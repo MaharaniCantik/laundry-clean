@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\URL; //  Sudah diperbaiki (backslash tunggal)
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,7 +20,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // 🔥 Tambahkan baris ini agar semua aset CSS/JS dibaca lewat HTTPS di Railway
+        // 🔥 Memaksa aset menggunakan HTTPS jika berjalan di server live Railway
         if (config('app.env') === 'production' || env('RAILWAY_STATIC_URL')) {
             URL::forceScheme('https');
         }
