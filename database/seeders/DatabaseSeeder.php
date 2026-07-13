@@ -32,17 +32,17 @@ class DatabaseSeeder extends Seeder
         // 3. Akun Kurir
         User::create([
             'name'     => 'Bang Kurir',
-            'email'    => 'kurir@gmail.com',
-            'password' => Hash::make('kurir123'),
+            'email'    => 'senku@ccyk.com',
+            'password' => Hash::make('senku123'),
             'role'     => 'kurir',
         ]);
 
-        // 4. Akun Customer (Pelanggan Pertama buat Bahan Tes)
-        // User::create([
-        //     'name'     => 'Customer',
-        //     'email'    => 'customer@gmail.com',
-        //     'password' => Hash::make('customer123'),
-        //     'role'     => 'user', 
-        // ]);
+        //4. Akun Customer (Pelanggan Pertama buat Bahan Tes)
+        User::create([
+            'name'     => 'Customer',
+            'email'    => 'queen@gmail.com',
+            'password' => Hash::make('queen123'),
+            'role'     => 'user', 
+        ]);
     }
 }
