@@ -297,7 +297,7 @@ class OrderController extends Controller
                 'user_id'             => auth()->id(),
                 'nama_pelanggan'      => auth()->user()->name,
                 'alamat_lengkap'      => $request->input('alamat_lengkap'),
-                'nomor_telepon_order' => $request->input('phone'),
+                'nomor_telepon_order' => $request->input('nomor_telepon_order'),
                 'instruksi_driver'    => $catatanDriverFinal,
                 'jarak_km'            => $jarak,
                 'ongkos_kirim'        => $ongkir,

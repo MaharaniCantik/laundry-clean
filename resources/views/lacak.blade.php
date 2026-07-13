@@ -8,8 +8,8 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel=<script src="https://cdn.tailwindcss.com">
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -33,7 +33,6 @@
     </script>
 
     <style>
-        /* 3. PAKSA SEMUA FONT MENGGUNAKAN POPPINS SESUAI WELCOME */
         * {
             font-family: 'Poppins', sans-serif;
         }
@@ -62,6 +61,7 @@
 
     <main class="relative pt-32 pb-12 flex flex-col items-center justify-center px-4 space-y-8 w-full">
 
+        {{-- FORM PENCARIAN --}}
         <div class="bg-white w-full max-w-md rounded-[32px] shadow-2xl p-8 border-2 border-white">
             <div class="text-center mb-6">
                 <h1 class="text-2xl font-bold text-gray-900">Lacak Laundry</h1>
@@ -86,6 +86,7 @@
             <p id="error-message" class="text-red-500 text-xs mt-3 hidden text-center font-semibold">Nomor resi wajib diisi!</p>
         </div>
 
+        {{-- DETAIL DATA ORDER --}}
         @if(isset($order))
         <div class="bg-white w-full max-w-2xl rounded-[32px] shadow-2xl p-6 md:p-8 border-2 border-white fade-in space-y-6">
             <div class="border-b border-dashed border-gray-100 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
@@ -95,7 +96,19 @@
                 </div>
                 <div class="sm:text-right">
                     <span class="text-gray-400 text-xs block">Status Terakhir:</span>
-                    <span class="inline-block px-3 py-1 rounded-full text-[11px] font-black bg-orange-50 text-[#F6921E] mt-0.5 border border-orange-100">{{ $order->status }}</span>
+                    @if($order->status == 'To Pending' || $order->status == 'Pending Penjemputan')
+                    <span class="inline-block px-3 py-1 rounded-full text-[11px] font-black bg-yellow-50 text-yellow-600 mt-0.5 border border-yellow-100">Pending Penjemputan</span>
+                    @elseif($order->status == 'To Pickup')
+                    <span class="inline-block px-3 py-1 rounded-full text-[11px] font-black bg-blue-50 text-blue-600 mt-0.5 border border-blue-100">Sedang Dijemput</span>
+                    @elseif($order->status == 'To Washing')
+                    <span class="inline-block px-3 py-1 rounded-full text-[11px] font-black bg-purple-50 text-purple-600 mt-0.5 border border-purple-100">Sedang Dicuci</span>
+                    @elseif($order->status == 'To Delivery')
+                    <span class="inline-block px-3 py-1 rounded-full text-[11px] font-black bg-indigo-50 text-indigo-600 mt-0.5 border border-indigo-100">Sedang Diantar</span>
+                    @elseif($order->status == 'To Complete' || $order->status == 'Selesai')
+                    <span class="inline-block px-3 py-1 rounded-full text-[11px] font-black bg-green-50 text-green-600 mt-0.5 border border-green-100">Selesai</span>
+                    @else
+                    <span class="inline-block px-3 py-1 rounded-full text-[11px] font-black bg-gray-50 text-gray-600 mt-0.5 border border-gray-100">{{ $order->status }}</span>
+                    @endif
                 </div>
             </div>
 
@@ -104,7 +117,7 @@
                     <p class="text-gray-400">Pelanggan:</p>
                     <p class="font-bold text-gray-800 mt-0.5">{{ auth()->check() ? $order->nama_pelanggan : substr($order->nama_pelanggan, 0, 2) . '***' }}</p>
                 </div>
-                {{-- 🧸 CARD ESTIMASI QUANTITY (DINAMIS UNTUK GORDEN, BEDCOVER, SEPATU, DLL) --}}
+
                 <div class="p-4 bg-gray-50 rounded-xl">
                     <span class="text-xs text-gray-400 block mb-1">
                         @php
@@ -139,6 +152,7 @@
                         @endif
                     </p>
                 </div>
+
                 <div class="bg-gray-50 p-3 rounded-2xl text-gray-600">
                     <p class="text-gray-400">Paket Layanan:</p>
                     <p class="font-bold text-gray-800 mt-0.5">{{ ucfirst($order->tipe_durasi ?? 'reguler') }}</p>
@@ -163,25 +177,13 @@
                 </p>
             </div>
 
-            {{-- Tambahan Tampilan Kurir di Halaman Lacak --}}
-<div class="mt-3 pt-3 border-t border-gray-100">
-    <p class="text-xs font-bold text-gray-700">🛵 Kurir Penjemput:</p>
-    <p class="text-sm text-blue-600 font-semibold mt-0.5">
-        {{-- 🛠️ FIX: Membaca nama lewat relasi Order -> Kurir -> User --}}
-        {{ $order->kurir?->user?->name ?? 'Sedang mencari kurir terdekat...' }}
-    </p>
-</div>
+            <div class="mt-3 pt-3 border-t border-gray-100">
+                <p class="text-xs font-bold text-gray-700">🛵 Kurir Penjemput:</p>
+                <p class="text-sm text-blue-600 font-semibold mt-0.5">
+                    {{ $order->kurir?->user?->name ?? 'Sedang mencari kurir terdekat...' }}
+                </p>
+            </div>
 
-{{-- 🛠️ FIX: Script Auto Refresh Halaman agar Status Berubah Otomatis Tanpa Klik Refresh Manual --}}
-<script>
-    @if($order->status !== 'Selesai')
-        setTimeout(function() {
-            window.location.reload();
-        }, 15000); // Auto refresh setiap 15 detik
-    @endif
-</script>
-
-            {{-- 1. Jadwal Pengantaran Kembali --}}
             <div class="mt-3 pt-3 border-t border-gray-100">
                 <p class="text-xs font-bold text-gray-700">📦 Jadwal Pengantaran Kembali:</p>
                 <p class="text-sm text-blue-600 font-semibold mt-0.5">
@@ -189,7 +191,6 @@
                 </p>
             </div>
 
-            {{-- 2. Metode Pembayaran --}}
             <div class="mt-3 pt-3 border-t border-gray-100">
                 <p class="text-xs font-bold text-gray-700">💳 Metode Pembayaran:</p>
                 <div class="mt-1">
@@ -199,7 +200,6 @@
                 </div>
             </div>
 
-            {{-- 3. Box Catatan Driver --}}
             @if(!empty($order->instruksi_driver) || !empty($order['instruksi_driver']))
             <div class="bg-amber-50 p-3 rounded-xl text-xs text-amber-700 mt-4 border border-amber-100">
                 <span class="font-bold text-amber-800 block mb-1">📌 Catatan Untuk Driver:</span>
@@ -209,6 +209,7 @@
         </div>
         @endif
 
+        {{-- RIWAYAT PESANAN --}}
         @auth
         @if(isset($ordersHistory) && $ordersHistory->count() > 0)
         <div class="bg-white w-full max-w-2xl rounded-[32px] shadow-2xl p-6 border-2 border-white fade-in space-y-3">
@@ -225,7 +226,19 @@
                         <p class="text-gray-400 text-[11px]">{{ date('d M Y', strtotime($histori->created_at)) }} • <span class="font-semibold text-gray-600">Rp {{ number_format($histori->total_harga, 0, ',', '.') }}</span></p>
                     </div>
                     <div>
-                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-100">{{ $histori->status }}</span>
+                        @if($histori->status == 'To Pending' || $histori->status == 'Pending Penjemputan')
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-yellow-50 text-yellow-600 border border-yellow-100">Pending Penjemputan</span>
+                        @elseif($histori->status == 'To Pickup')
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-100">Sedang Dijemput</span>
+                        @elseif($histori->status == 'To Washing')
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-600 border border-purple-100">Sedang Dicuci</span>
+                        @elseif($histori->status == 'To Delivery')
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-600 border border-indigo-100">Sedang Diantar</span>
+                        @elseif($histori->status == 'To Complete' || $histori->status == 'Selesai')
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-green-50 text-green-600 border border-green-100">Selesai</span>
+                        @else
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-gray-50 text-gray-600 border border-gray-100">{{ $histori->status }}</span>
+                        @endif
                     </div>
                 </div>
                 @endforeach
@@ -235,6 +248,7 @@
         @endauth
     </main>
 
+    {{-- JAVASCRIPT UTK LOADING BUTTON DAN AUTO REFRESH --}}
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const formLacak = document.getElementById('form-lacak');
@@ -242,27 +256,38 @@
             const inputResi = document.getElementById('resi');
             const errorMessage = document.getElementById('error-message');
 
-            formLacak.addEventListener('submit', (e) => {
-                const resiValue = inputResi.value.trim();
+            if (formLacak) {
+                formLacak.addEventListener('submit', (e) => {
+                    const resiValue = inputResi.value.trim();
 
-                if (!resiValue) {
-                    e.preventDefault();
-                    errorMessage.classList.remove('hidden');
-                    inputResi.focus();
-                    return;
-                }
+                    if (!resiValue) {
+                        e.preventDefault();
+                        errorMessage.classList.remove('hidden');
+                        inputResi.focus();
+                        return;
+                    }
 
-                btnLacak.innerHTML = `
-                    <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Mencari...
-                `;
-                btnLacak.disabled = true;
-            });
+                    btnLacak.innerHTML = `
+                        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Mencari...
+                    `;
+                    btnLacak.disabled = true;
+                });
+            }
         });
     </script>
+
+    {{-- AUTO REFRESH HALAMAN SECARA AMAN --}}
+    @if(isset($order) && $order->status !== 'Selesai' && $order->status !== 'To Complete')
+    <script>
+        setTimeout(function() {
+            window.location.reload();
+        }, 15000); // Auto refresh setiap 15 detik
+    </script>
+    @endif
 </body>
 
 </html>

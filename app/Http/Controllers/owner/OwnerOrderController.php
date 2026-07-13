@@ -187,7 +187,7 @@ class OwnerOrderController extends Controller
         $laporan = $query->get();
 
         // Lempar data ke view PDF
-        $pdf = \Barryvdh\Dompdf\Facades\Pdf::loadView('owner.laporan-pdf', compact('laporan', 'startDate', 'endDate'));
+        $pdf = loadView('owner.laporan-pdf', compact('laporan', 'startDate', 'endDate'));
 
         return $pdf->setPaper('a4', 'portrait')->download('Laporan-Keuangan.pdf');
     }

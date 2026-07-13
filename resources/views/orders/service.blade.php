@@ -9,7 +9,7 @@
         <input type="hidden" name="alamat_lengkap" value="{{ old('alamat_lengkap', $alamatUser ?? session('alamat_lengkap_backup')) }}">
         <input type="hidden" name="jarak_km" value="{{ old('jarak_km', $jarakTampil) }}">
         <input type="hidden" name="ongkos_kirim" value="{{ old('ongkos_kirim', $ongkir) }}">
-        <input type="hidden" name="phone" value="{{ old('phone', $phoneUser ?? request('phone')) }}">
+        <input type="hidden" name="nomor_telepon_order" value="{{ old('nomor_telepon_order', $phoneUser ?? request('nomor_telepon_order')) }}">
 
         {{-- JADWAL PICKUP (AMBIL) --}}
         <input type="hidden" name="hari_pickup" value="{{ old('hari_pickup', $hariPickup) }}">

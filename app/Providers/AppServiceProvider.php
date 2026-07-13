@@ -19,6 +19,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // 🔥 Tambahkan baris ini agar semua aset CSS/JS dibaca lewat HTTPS di Railway
+        if (config('app.env') === 'production' || env('RAILWAY_STATIC_URL')) {
+            URL::forceScheme('https');
+        }
     }
 }

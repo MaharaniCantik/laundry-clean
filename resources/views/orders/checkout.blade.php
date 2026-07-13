@@ -90,7 +90,7 @@
 
                         <div class="mt-4">
                             <label class="block text-xs font-semibold text-gray-700 mb-1">No Telpon</label>
-                            <input type="tel" name="phone" class="w-full border border-[#F6921E]/50 rounded-full px-4 py-2 focus:ring-2 focus:ring-[#F6921E] outline-none" required>
+                            <input type="tel" name="nomor_telepon_order" class="w-full border border-[#F6921E]/50 rounded-full px-4 py-2 focus:ring-2 focus:ring-[#F6921E] outline-none" required>
                         </div>
                     </div>
 

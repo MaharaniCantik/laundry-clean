@@ -24,16 +24,16 @@ class WhatsappService
         }
 
         // 2. Ambil token dari .env (Memakai nama WHATSAPP_TOKEN sesuai settingan awalmu)
-        $token = env('WHATSAPP_TOKEN', 'upxHcooeC3MFTppdbF2d');
+        $token = env('WHATSAPP_TOKEN', 'gpFpzb4KSSFEDvJbmFoH');
 
         try {
-            // 🔥 KUNCI PERBAIKAN: Ditambahkan ->asForm() agar sesuai request Multipart Fonnte!
+            // 🔥 TAMBAHKAN ->withoutVerifying() di bawah ini untuk bypass error cURL 60
             $response = Http::withHeaders([
                 'Authorization' => $token
-            ])->asForm()->post('https://api.fonnte.com/send', [
+            ])->asForm()->withoutVerifying()->post('https://api.fonnte.com/send', [
                 'target' => $noTelp,
                 'message' => $pesan,
-                'countryCode' => '62', // default Indonesia
+                'countryCode' => '62',
             ]);
 
             Log::info("WA Terkirim ke {$noTelp}. Response: " . $response->body());

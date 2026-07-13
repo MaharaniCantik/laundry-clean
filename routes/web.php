@@ -113,6 +113,8 @@ Route::middleware(['auth'])->prefix('kurir')->name('kurir.')->group(function () 
     
     // Dashboard Utama Kurir (Menampilkan Orderan Masuk & Tugas Aktif)
     Route::get('/dashboard', [KurirDashboardController::class, 'index'])->name('dashboard');
+
+    Route::post('/toggle-kehadiran', [KurirDashboardController::class, 'toggleKehadiran'])->name('toggleKehadiran');
     
     // 🌟 FITUR BARU: Ambil/Klaim Orderan dari Dashboard (URL: kurir/ambil/{id})
     Route::post('/ambil/{id}', [KurirDashboardController::class, 'ambilPesanan'])->name('ambil');

@@ -16,19 +16,39 @@
             </div>
             @endif
 
+            {{-- 🛠️ UPDATE SAKLAR MENGGUNAKAN $kurir->status_kerja --}}
             <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Status Kehadiran</span>
+                    @if($kurir->status_kerja === 'inactive')
+                    <h1 class="text-2xl font-bold text-rose-600 flex items-center gap-2 mt-1">
+                        Nonaktif (Izin/Libur)
+                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                    </h1>
+                    @elseif($kurir->status_kerja === 'on-delivery')
+                    <h1 class="text-2xl font-bold text-blue-600 flex items-center gap-2 mt-1">
+                        Sedang Bertugas (On-Delivery)
+                        <span class="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></span>
+                    </h1>
+                    @else
                     <h1 class="text-2xl font-bold text-emerald-600 flex items-center gap-2 mt-1">
                         Siap Kerja (Available)
                         <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
                     </h1>
+                    @endif
                 </div>
 
-                <label class="relative inline-flex items-center cursor-pointer group">
-                    <input type="checkbox" checked class="sr-only peer">
-                    <div class="w-14 h-8 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:start-[4px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500"></div>
-                </label>
+                <form action="{{ route('kurir.toggleKehadiran') }}" method="POST" id="formToggleKehadiran">
+                    @csrf
+                    <label class="relative inline-flex items-center cursor-pointer group">
+                        <input type="checkbox"
+                            {{ $kurir->status_kerja === 'available' ? 'checked' : '' }}
+                            {{ $kurir->status_kerja === 'on-delivery' ? 'disabled' : '' }}
+                            class="sr-only peer"
+                            onchange="document.getElementById('formToggleKehadiran').submit();">
+                        <div class="w-14 h-8 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:start-[4px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500"></div>
+                    </label>
+                </form>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -63,10 +83,12 @@
                 </div>
             </div>
 
-            {{-- 1. SECTION ORDERAN BARU --}}
+            {{-- 🛠️ SECTION ORDERAN BARU (Hanya tampil jika kurir AKTIF / tidak inactive) --}}
+            {{-- Ganti Auth::user() menjadi $kurir --}}
+            @if($kurir->status_kerja !== 'inactive')
             <div class="space-y-4">
                 <h2 class="text-lg font-bold text-slate-800 tracking-tight flex items-center gap-2">
-                    📦 Orderan Baru Tersedia <span class="bg-amber-100 text-amber-700 text-xs px-2.5 py-0.5 rounded-full font-semibold">{{ $orderanMasuk->count() }}</span>
+                    📦 Orderan Baru Tersedia ...
                 </h2>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -79,10 +101,8 @@
                             <div class="flex justify-between items-start">
                                 <div>
                                     <h3 class="font-bold text-slate-800 text-base">{{ $order->nama_pelanggan }}</h3>
-                                    {{-- 🛠️ FIX: Ditambahkan $order->jenis_layanan --}}
                                     <p class="text-xs text-slate-500 mt-0.5">
                                         {{ $order->tipe_durasi }} • {{ number_format($order->berat_laundry, 0) }}
-                                        {{-- Logika Satuan Dinamis --}}
                                         @if(str_contains($layananBaru, 'permadani') || str_contains($layananBaru, 'karpet') || str_contains($layananBaru, 'gorden'))
                                         m²
                                         @elseif(str_contains($layananBaru, 'boneka') || str_contains($layananBaru, 'bedcover'))
@@ -116,8 +136,9 @@
                     @endforelse
                 </div>
             </div>
+            @endif
 
-            {{-- 2. SECTION TUGAS AKTIF SAYA --}}
+            {{-- SECTION TUGAS AKTIF SAYA --}}
             <div class="space-y-4">
                 <div class="flex justify-between items-center">
                     <h2 class="text-lg font-bold text-slate-800 tracking-tight flex items-center gap-2">
@@ -137,10 +158,8 @@
                             <div class="flex justify-between items-start">
                                 <div>
                                     <h3 class="font-bold text-slate-800 text-base">{{ $task->nama_pelanggan }}</h3>
-                                    {{-- 🛠️ FIX: Ditambahkan $task->jenis_layanan --}}
                                     <p class="text-xs text-slate-400 mt-0.5">
                                         {{ $task->tipe_durasi }} • ~{{ number_format($task->berat_laundry, 0) }}
-                                        {{-- Logika Satuan Dinamis --}}
                                         @if(str_contains($layananAktif, 'permadani') || str_contains($layananAktif, 'karpet') || str_contains($layananAktif, 'gorden'))
                                         m²
                                         @elseif(str_contains($layananAktif, 'boneka') || str_contains($layananAktif, 'bedcover'))
@@ -167,7 +186,6 @@
                         </div>
 
                         @php
-                        // Logika pembersihan nomor HP tetap berjalan di latar belakang (aman dari crash)
                         $phone = $task->nomor_telepon_order ?? $task->no_telp;
                         $phone = preg_replace('/[^0-9]/', '', $phone);
                         if (substr($phone, 0, 1) === '0') {
@@ -182,16 +200,23 @@
                                 <span class="material-symbols-outlined text-[16px]">map</span> Maps
                             </a>
 
-                            <a href="https://api.whatsapp.com/send?phone={{ $phone }}&text=Halo%20{{ urlencode($task->nama_pelanggan ?? 'Pelanggan') }},%20saya%20kurir%20dari%20CleanFlow..."
+                            <a href="https://api.whatsapp.com/send?phone={{ $phone }}&text=Halo%20{{ urlencode($task->nama_pelanggan ?? 'Pelanggan') }},%20saya%20kurir%20dari%20NugrahaLaundry..."
                                 target="_blank"
                                 class="flex items-center justify-center gap-2 py-2.5 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
-                                Maps / WhatsApp
+                                WhatsApp
                             </a>
 
                             <form action="{{ route('kurir.updateStatus', $task->id) }}" method="POST" class="col-span-2">
                                 @csrf
-                                <button type="submit" class="w-full py-3 text-white rounded-xl text-sm font-bold shadow-md transition-colors {{ $isPickupStatus ? 'bg-blue-600 shadow-blue-100 hover:bg-blue-700' : 'bg-rose-500 shadow-rose-100 hover:bg-rose-600' }}">
-                                    {{ $isPickupStatus ? 'Selesai Pick-up (Bawa ke Toko)' : 'Selesai Antar ke Konsumen' }}
+                                @php
+                                // Kita cek langsung status teks aslinya dari database
+                                $currentStatus = strtolower($task->status);
+                                // Tentukan apakah ini termasuk status penjemputan atau bukan
+                                $isRealPickup = in_array($currentStatus, ['sedang dijemput', 'kurir menuju lokasi', 'to pickup', 'pending penjemputan']);
+                                @endphp
+
+                                <button type="submit" class="w-full py-3 text-white rounded-xl text-sm font-bold shadow-md transition-colors {{ $isRealPickup ? 'bg-blue-600 shadow-blue-100 hover:bg-blue-700' : 'bg-rose-500 shadow-rose-100 hover:bg-rose-600' }}">
+                                    {{ $isRealPickup ? 'Selesai Pick-up (Bawa ke Toko)' : 'Selesai Antar ke Konsumen' }}
                                 </button>
                             </form>
                         </div>

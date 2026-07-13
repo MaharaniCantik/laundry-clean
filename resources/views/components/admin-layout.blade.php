@@ -206,18 +206,6 @@
                         <span class="material-symbols-outlined"data-icon="local_shipping">local_shipping</span>
                         <span class="font-body-md text-body-md">Fleet &amp; Couriers</span>
                     </a>
-                    <!-- Services & Pricing -->
-                    <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant dark:text-outline hover:text-primary dark:hover:text-primary-fixed hover:bg-surface-container-low dark:hover:bg-surface-container transition-colors duration-200 scale-95 active:scale-90 transition-transform"
-                        href="#">
-                        <span class="material-symbols-outlined" data-icon="settings_suggest">settings_suggest</span>
-                        <span class="font-body-md text-body-md" >Services &amp; Pricing</span>
-                    </a>
-                    <!-- WhatsApp Logs -->
-                    <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant dark:text-outline hover:text-primary dark:hover:text-primary-fixed hover:bg-surface-container-low dark:hover:bg-surface-container transition-colors duration-200 scale-95 active:scale-90 transition-transform"
-                        href="#">
-                        <span class="material-symbols-outlined" data-icon="history_edu" >history_edu</span>
-                        <span class="font-body-md text-body-md" >WhatsApp Logs</span>
-                    </a>
                 </div>
             </div>
             <div class="mt-auto px-4 py-4 border-t border-outline-variant">
