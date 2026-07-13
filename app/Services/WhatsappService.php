@@ -23,8 +23,7 @@ class WhatsappService
             $noTelp = '62' . $noTelp;
         }
 
-        // 2. Ambil token dari .env (Memakai nama WHATSAPP_TOKEN sesuai settingan awalmu)
-        $token = env('WHATSAPP_TOKEN', 'gpFpzb4KSSFEDvJbmFoH');
+        $token = 'gpFpzb4KSSFEDvJbmFoH';
 
         try {
             // 🔥 TAMBAHKAN ->withoutVerifying() di bawah ini untuk bypass error cURL 60
