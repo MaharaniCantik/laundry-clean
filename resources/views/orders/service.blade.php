@@ -290,9 +290,10 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="w-full bg-[#F6921E] text-white font-bold py-4 rounded-xl shadow-lg hover:bg-orange-600 transition-all">
+                        <!-- 🔥 GANTI TOMBOLNYA MENJADI LINK LANGSUNG KE HISTORY -->
+                        <a href="/order/history" class="w-full block text-center bg-[#F6921E] text-white font-bold py-4 rounded-xl shadow-lg hover:bg-orange-600 transition-all">
                             Konfirmasi & Jemput Sekarang
-                        </button>
+                        </a>
 
                     </div>
                 </div>
