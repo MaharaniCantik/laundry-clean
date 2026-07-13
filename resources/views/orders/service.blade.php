@@ -2,6 +2,16 @@
 
 <x-app-layout>
     <form action="{{ route('order.store') }}" method="POST">
+        @if ($errors->any())
+            <div style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin: 20px 0; z-index: 9999; position: relative;">
+                <strong>Aduh, ada data yang kurang:</strong>
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
         @csrf
 
         {{-- 🌟 FIX KONSISTEN: Amankan semua input hidden menggunakan kombinasi old() dan fallback variabel --}}
